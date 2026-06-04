@@ -3,17 +3,13 @@
     xmlns:mvc="sap.ui.core.mvc"
     xmlns:core="sap.ui.core"
     xmlns:f="sap.f"
-    xmlns:layout="sap.ui.layout"
     xmlns:t="sap.ui.table"
     xmlns="sap.m"
 >
     <f:DynamicPage
         id="dynamicPageId"
-        headerExpanded="{/headerExpanded}"
-        toggleHeaderOnTitleClick="{/titleClickable}"
         fitContent="true"
     >
-        <!-- DynamicPage Title -->
         <f:title>
             <f:DynamicPageTitle>
                 <f:heading>
@@ -22,79 +18,163 @@
             </f:DynamicPageTitle>
         </f:title>
 
-        <!-- DynamicPage Header -->
-
-        <!-- DynamicPage Content -->
         <f:content>
-            <t:Table
-                id="sanctionsTable"
-                selectionMode="None"
-                enableSelectAll="false"
-                rows="{path: '/HDR_STRSet'}"
-                threshold="15"
-                scrollThreshold="50"
-                enableBusyIndicator="true"
-                ariaLabelledBy="title"
-                visibleRowCountMode="Auto"
-                minAutoRowCount="5"
+            <Panel
+                height="100%"
+                expandable="false"
             >
-                <!-- No Data placeholder with visible icon -->
-                <t:noData>
-                    <VBox
-                        alignItems="Center"
-                        justifyContent="Center"
-                        height="100%"
-                        width="100%"
-                        class="sapUiMediumMargin"
-                    >
-                        <core:Icon
-                            src="sap-icon://inbox"
-                            size="3rem"
-                            color="sapContent_NonInteractiveIconColor"
-                            class="sapUiSmallMarginBottom"
-                        />
-                        <Text text="No data available" />
-                    </VBox>
-                </t:noData>
+                <IconTabBar
+                    id="mainTabBar"
+                    expanded="true"
+                    stretchContentHeight="true"
+                    class="sapUiResponsiveContentPadding"
+                >
+                    <!-- ─── CURRENT TAB ─── -->
+                    <items>
+                    
+                        <IconTabFilter
+                            id="tabCurrent"
+                            text="Current"
+                            icon="sap-icon://activity-items"
+                            iconDensityAware="false"
+                            design="Horizontal"
+                            key="current"
+                        >
+                            <t:Table
+                                id="currentTable"
+                                selectionMode="None"
+                                enableSelectAll="false"
+                                rows="{path: '/HDR_STRSet'}"
+                                threshold="15"
+                                scrollThreshold="50"
+                                enableBusyIndicator="true"
+                                visibleRowCountMode="Auto"
+                                minAutoRowCount="5"
+                            >
+                                <t:noData>
+                                    <VBox
+                                        alignItems="Center"
+                                        justifyContent="Center"
+                                        class="sapUiMediumMargin"
+                                    >
+                                        <core:Icon
+                                            src="sap-icon://inbox"
+                                            size="3rem"
+                                            color="sapContent_NonInteractiveIconColor"
+                                            class="sapUiSmallMarginBottom"
+                                        />
+                                        <Text text="No data available" />
+                                    </VBox>
+                                </t:noData>
+                                <t:extension>
+                                    <OverflowToolbar style="Standard">
+                                        <HBox
+                                            alignItems="Center"
+                                            columnGap="0.5rem"
+                                        >
+                                            <core:Icon
+                                                src="sap-icon://search"
+                                            />
+                                            <Input
+                                                id="currentSearch"
+                                                showClearIcon="true"
+                                                width="25rem"
+                                                placeholder="Search..."
+                                                liveChange=".onSearchCurrent"
+                                            />
+                                        </HBox>
+                                        <ToolbarSpacer />
+                                        <Button
+                                            icon="sap-icon://refresh"
+                                            tooltip="Refresh"
+                                            press=".onRefreshCurrent"
+                                        />
+                                    </OverflowToolbar>
+                                </t:extension>
+                                <t:footer>
+                                    <OverflowToolbar>
+                                        <Label
+                                            visible="{= ${/currentCount} > 0 }"
+                                            text="Number of Violations: {/currentCount}"
+                                        />
+                                    </OverflowToolbar>
+                                </t:footer>
+                            </t:Table>
+                        </IconTabFilter>
 
-                <t:extension>
-                    <OverflowToolbar style="Clear">
-                        <Input showClearIcon="true" width="25rem" />
-                        <ToolbarSpacer />
-                        <Button
-                            icon="sap-icon://refresh"
-                            tooltip="Reinitialize Model"
-                            press=".onModelRefresh"
-                        />
-                    </OverflowToolbar>
-                </t:extension>
-
-                <t:columns>
-                    <t:Column
-                        sortProperty="Name"
-                        filterProperty="Name"
-                        autoResizable="true"
-                        width="11rem"
-                    >
-                        <Label text="{/#Product/Name/@sap:label}" />
-                        <t:template>
-                            <Text
-                                text="{ZactionRefNo}"
-                                wrapping="false"
-                            />
-                        </t:template>
-                    </t:Column>
-                </t:columns>
-
-                <t:footer>
-                    <OverflowToolbar>
-                        <Label
-                            visible="{= ${/itemCount} > 0 }"
-                            text="Number of Violations: {/itemCount}"
-                        />
-                    </OverflowToolbar>
-                </t:footer>
-            </t:Table>
+                        <!-- ─── HISTORY TAB ─── -->
+                        <IconTabFilter
+                            id="tabHistory"
+                            text="History"
+                            icon="sap-icon://history"
+                            iconDensityAware="false"
+                            design="Horizontal"
+                            key="history"
+                        >
+                            <t:Table
+                                id="historyTable"
+                                selectionMode="None"
+                                enableSelectAll="false"
+                                rows="{path: '/HDR_HISTSet'}"
+                                threshold="15"
+                                scrollThreshold="50"
+                                enableBusyIndicator="true"
+                                visibleRowCountMode="Auto"
+                                minAutoRowCount="5"
+                            >
+                                <t:noData>
+                                    <VBox
+                                        alignItems="Center"
+                                        justifyContent="Center"
+                                        class="sapUiMediumMargin"
+                                    >
+                                        <core:Icon
+                                            src="sap-icon://inbox"
+                                            size="3rem"
+                                            color="sapContent_NonInteractiveIconColor"
+                                            class="sapUiSmallMarginBottom"
+                                        />
+                                        <Text text="No history available" />
+                                    </VBox>
+                                </t:noData>
+                                <t:extension>
+                                    <OverflowToolbar style="Standard">
+                                        <HBox
+                                            alignItems="Center"
+                                            columnGap="0.5rem"
+                                        >
+                                            <core:Icon
+                                                src="sap-icon://search"
+                                            />
+                                            <Input
+                                                id="historySearch"
+                                                showClearIcon="true"
+                                                width="25rem"
+                                                placeholder="Search..."
+                                                liveChange=".onSearchHistory"
+                                            />
+                                        </HBox>
+                                        <ToolbarSpacer />
+                                        <Button
+                                            icon="sap-icon://refresh"
+                                            tooltip="Refresh"
+                                            press=".onRefreshHistory"
+                                        />
+                                    </OverflowToolbar>
+                                </t:extension>
+                                <t:footer>
+                                    <OverflowToolbar>
+                                        <Label
+                                            visible="{= ${/historyCount} > 0 }"
+                                            text="Number of Records: {/historyCount}"
+                                        />
+                                    </OverflowToolbar>
+                                </t:footer>
+                            </t:Table>
+                        </IconTabFilter>
+                    </items>
+                </IconTabBar>
+            </Panel>
         </f:content>
     </f:DynamicPage>
 </mvc:View>
