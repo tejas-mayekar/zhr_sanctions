@@ -64,6 +64,7 @@
         }
       },
       "": {
+        "type": "sap.ui.model.odata.v2.ODataModel",
         "dataSource": "mainService",
         "preload": true,
         "settings": {}

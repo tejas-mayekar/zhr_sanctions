@@ -32,6 +32,7 @@ server:
         backend:
           - path: /sap
             url: https://sapdev-app01.matarat.local:44300
+            client: '100'
     - name: sap-fe-mockserver
       beforeMiddleware: csp
       configuration:
