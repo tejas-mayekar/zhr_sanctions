@@ -1,0 +1,25 @@
+# yaml-language-server: $schema=https://sap.github.io/ui5-tooling/schema/ui5.yaml.json
+
+specVersion: "4.0"
+metadata:
+  name: zhrsanctions
+type: application
+builder:
+  resources:
+    excludes:
+      - /test/**
+      - /localService/**
+  customTasks:
+    - name: deploy-to-abap
+      afterTask: generateCachebusterInfo
+      configuration:
+        target:
+          url: https://sapdev-app01.matarat.local:44300
+          client: '100'
+        app:
+          name: ZHR_SAN_AND_VIO
+          description: Sanctions and Violations
+          package: ZDAC_HR
+          transport: MD4K914310
+        exclude:
+          - /test/

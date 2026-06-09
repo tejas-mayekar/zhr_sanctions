@@ -1,1 +1,16 @@
 /* Enter your custom styles here */
+.custom-tab-filter {
+                background-color: #f5f5f5 !important;
+            }
+            
+            .custom-tab-filter .sapMITBContent {
+                background-color: #ffffff !important;
+            }
+            
+            .custom-tab-filter .sapMITBItem {
+                background-color: #f5f5f5 !important;
+            }
+            
+            .custom-tab-filter .sapMITBItemSelected {
+                background-color: #ffffff !important;
+            }

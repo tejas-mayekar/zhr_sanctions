@@ -1,0 +1,12 @@
+{
+  "base": "./dist",
+  "conn_usestrictssl": false,
+  "conn_server": "https://10.123.1.11:44300",
+  "conn_client": "100",
+  "conn_user": "Daco_eamv04",
+  "conn_password": "Daco@12345",
+  "abap_package": "ZDAC_HR",
+  "abap_bsp": "zhr_sanctions",
+  "abap_bsp_text": "Hr sanctions",
+  "abap_transport": "MD4K914310"
+}

@@ -6,38 +6,72 @@ sap.ui.define([
     "sap/ui/model/json/JSONModel",
     "sap/ui/model/Filter",
     "sap/ui/model/FilterOperator",
-    "sap/ui/model/odata/v2/ODataModel"  // Add this import
+    "sap/ui/model/odata/v2/ODataModel"
 ], (Controller, Column, Label, Text, JSONModel, Filter, FilterOperator, ODataModel) => {
     "use strict";
 
     const CURRENT_COLUMNS = [
-        { label: "Action Ref No", binding: "ZactionRefNo", width: "11rem", sortProperty: "ZactionRefNo", filterProperty: "ZactionRefNo", visible: true },
-        { label: "Employee ID", binding: "EmployeeId", width: "9rem", sortProperty: "EmployeeId", filterProperty: "EmployeeId", visible: true },
+        { label: "Action Ref No", binding: "ZACTION_REF_NO", width: "11rem", sortProperty: "ZACTION_REF_NO", filterProperty: "ZACTION_REF_NO", visible: true },
+        { label: "Employee ID", binding: "ZempId", width: "9rem", sortProperty: "ZempId", filterProperty: "ZempId", visible: true },
+        { label: "Employee Name", binding: "ZempName", width: "14rem", sortProperty: "ZempName", filterProperty: "ZempName", visible: true },
         { label: "Violation Type", binding: "ViolationType", width: "14rem", sortProperty: "ViolationType", filterProperty: "ViolationType", visible: true },
         { label: "Status", binding: "Status", width: "8rem", sortProperty: "Status", filterProperty: "Status", visible: false },
-        { label: "Date", binding: "ActionDate", width: "10rem", sortProperty: "ActionDate", filterProperty: "ActionDate", visible: true },
+        { label: "Incident Date", binding: "ZincDate", width: "10rem", sortProperty: "ZincDate", filterProperty: "ZincDate", visible: true },
+        { label: "Employee Type", binding: "ZempTypeDesc", width: "12rem", sortProperty: "ZempTypeDesc", filterProperty: "ZempTypeDesc", visible: true },
+        { label: "Employment Class", binding: "ZempClass", width: "14rem", sortProperty: "ZempClass", filterProperty: "ZempClass", visible: true },
+        { label: "Company", binding: "Zcompany", width: "14rem", sortProperty: "Zcompany", filterProperty: "Zcompany", visible: true },
+        { label: "Department", binding: "Zn3", width: "14rem", sortProperty: "Zn3", filterProperty: "Zn3", visible: true },
+        { label: "Position", binding: "Zposition", width: "16rem", sortProperty: "Zposition", filterProperty: "Zposition", visible: true },
+        { label: "Job Title", binding: "ZjobTitle", width: "14rem", sortProperty: "ZjobTitle", filterProperty: "ZjobTitle", visible: true },
+        { label: "Punch In Time", binding: "Zpunchintime", width: "12rem", sortProperty: "Zpunchintime", filterProperty: "Zpunchintime", visible: true },
+        { label: "Punch Out Time", binding: "Zpunchouttime", width: "12rem", sortProperty: "Zpunchouttime", filterProperty: "Zpunchouttime", visible: true },
+        { label: "Scheduled In", binding: "ZschTimeIn", width: "12rem", sortProperty: "ZschTimeIn", filterProperty: "ZschTimeIn", visible: false },
+        { label: "Scheduled Out", binding: "ZschTimeOut", width: "12rem", sortProperty: "ZschTimeOut", filterProperty: "ZschTimeOut", visible: false },
+        { label: "Delay Hours", binding: "ZdelayHrs", width: "10rem", sortProperty: "ZdelayHrs", filterProperty: "ZdelayHrs", visible: true },
+        { label: "Short Hours", binding: "ZshortHrs", width: "10rem", sortProperty: "ZshortHrs", filterProperty: "ZshortHrs", visible: true },
+        { label: "Unauthorized Days", binding: "ZunautDays", width: "12rem", sortProperty: "ZunautDays", filterProperty: "ZunautDays", visible: false },
+        { label: "Location", binding: "Zlocation", width: "8rem", sortProperty: "Zlocation", filterProperty: "Zlocation", visible: true },
+        { label: "Location Group", binding: "ZlocGroup", width: "14rem", sortProperty: "ZlocGroup", filterProperty: "ZlocGroup", visible: true },
+        { label: "Hire Date", binding: "ZhireDate", width: "12rem", sortProperty: "ZhireDate", filterProperty: "ZhireDate", visible: false },
+        { label: "Manager ID", binding: "ZlmIdName", width: "10rem", sortProperty: "ZlmIdName", filterProperty: "ZlmIdName", visible: false },
+        { label: "Manager Action Date", binding: "ZlmIdActionDate", width: "12rem", sortProperty: "ZlmIdActionDate", filterProperty: "ZlmIdActionDate", visible: false },
+        { label: "Pay Grade", binding: "ZpayGrade", width: "8rem", sortProperty: "ZpayGrade", filterProperty: "ZpayGrade", visible: false },
+        { label: "Nationality", binding: "Znationality", width: "12rem", sortProperty: "Znationality", filterProperty: "Znationality", visible: false },
+        { label: "Work Schedule", binding: "Zworkschedule", width: "12rem", sortProperty: "Zworkschedule", filterProperty: "Zworkschedule", visible: false },
+        { label: "Standard Weekly Hours", binding: "ZstdWeekHrs", width: "10rem", sortProperty: "ZstdWeekHrs", filterProperty: "ZstdWeekHrs", visible: false },
+        { label: "Working Days/Week", binding: "ZwrkDyWeek", width: "10rem", sortProperty: "ZwrkDyWeek", filterProperty: "ZwrkDyWeek", visible: false },
     ];
 
     const HISTORY_COLUMNS = [
-        { label: "Action Ref No", binding: "ZactionRefNo", width: "11rem", sortProperty: "ZactionRefNo", filterProperty: "ZactionRefNo", visible: true },
-        { label: "Employee ID", binding: "EmployeeId", width: "9rem", sortProperty: "EmployeeId", filterProperty: "EmployeeId", visible: true },
-        { label: "Closed Date", binding: "ClosedDate", width: "10rem", sortProperty: "ClosedDate", filterProperty: "ClosedDate", visible: true },
-        { label: "Resolution", binding: "Resolution", width: "14rem", sortProperty: "Resolution", filterProperty: "Resolution", visible: true },
-        { label: "Resolved By", binding: "ResolvedBy", width: "10rem", sortProperty: "ResolvedBy", filterProperty: "ResolvedBy", visible: true },
+        { label: "Action Ref No", binding: "ZACTION_REF_NO", width: "11rem", sortProperty: "ZACTION_REF_NO", filterProperty: "ZACTION_REF_NO", visible: true },
+        { label: "Employee ID", binding: "ZempId", width: "9rem", sortProperty: "ZempId", filterProperty: "ZempId", visible: true },
+        { label: "Employee Name", binding: "ZempName", width: "14rem", sortProperty: "ZempName", filterProperty: "ZempName", visible: true },
+        { label: "Closed Date", binding: "ZlmIdActionDate", width: "10rem", sortProperty: "ZlmIdActionDate", filterProperty: "ZlmIdActionDate", visible: true },
+        { label: "Resolution", binding: "ZempTypeDesc", width: "14rem", sortProperty: "ZempTypeDesc", filterProperty: "ZempTypeDesc", visible: true },
+        { label: "Resolved By", binding: "ZlmIdName", width: "10rem", sortProperty: "ZlmIdName", filterProperty: "ZlmIdName", visible: true },
     ];
 
     return Controller.extend("zhrsanctions.controller.View1", {
 
         onInit() {
-            // UI state model
-            const oModel = new JSONModel({ currentCount: 0, historyCount: 0 });
-            this.getView().setModel(oModel);
+            // UI state model (JSONModel for UI properties)
+            const oUIModel = new JSONModel({
+                currentCount: 0,
+                historyCount: 0,
+                HDR_STRSet: [],
+                HDR_HISTSet: []
+            });
+            this.getView().setModel(oUIModel);
 
-            // Explicitly create and set the ODataModel
+            // Initialize ODataModel
             this._initializeODataModel();
 
+            // Build columns
             this._buildColumns("currentTable", CURRENT_COLUMNS);
             this._buildColumns("historyTable", HISTORY_COLUMNS);
+
+            // Auto-load data on init
+            this.onSearch();
         },
 
         _initializeODataModel() {
@@ -47,9 +81,10 @@ sap.ui.define([
                 const oODataModel = new ODataModel(sServiceUrl, {
                     json: true,
                     loadMetadataAsync: true,
-                    useBatch: false  // Disable batching
+                    useBatch: false
                 });
 
+                // Set as named model
                 this.getView().setModel(oODataModel, "mainService");
                 console.log("OData model initialized successfully");
             } catch (error) {
@@ -76,7 +111,56 @@ sap.ui.define([
                 });
         },
 
-        // ── Search ────────────────────────────────────────────────────────────
+        // ── Main Search ───────────────────────────────────────────────────────
+
+        async onSearch() {
+            try {
+                const oUIModel = this.getView().getModel();
+
+                // Show loading indicator
+                sap.ui.core.BusyIndicator.show(0);
+
+                // Create filter for manager ID
+                const filters = [
+                    new Filter(
+                        "ZlmIdName",
+                        FilterOperator.EQ,
+                        '200129'
+                    )
+                ];
+
+                // Fetch data from OData service
+                const aData = await this.fetchOData("mainService", "/HDR_STRSet", filters);
+                console.log("Fetched data:", aData);
+
+                // Set data to UI model for table binding
+                if (aData && aData.length > 0) {
+                    oUIModel.setProperty("/HDR_STRSet", aData);
+                    oUIModel.setProperty("/currentCount", aData.length);
+
+                    sap.m.MessageToast.show(`Loaded ${aData.length} violations`);
+                } else {
+                    oUIModel.setProperty("/HDR_STRSet", []);
+                    oUIModel.setProperty("/currentCount", 0);
+                    sap.m.MessageToast.show("No data found");
+                }
+
+                sap.ui.core.BusyIndicator.hide();
+
+            } catch (error) {
+                sap.ui.core.BusyIndicator.hide();
+
+                console.error("OData fetch error details:", {
+                    message: error.message,
+                    statusCode: error.statusCode,
+                    responseText: error.responseText
+                });
+
+                sap.m.MessageToast.show("An error occurred while loading data.");
+            }
+        },
+
+        // ── Search in Current Tab ─────────────────────────────────────────────
 
         onSearchCurrent(oEvent) {
             this._applySearch("currentTable", CURRENT_COLUMNS, oEvent.getParameter("newValue"));
@@ -104,34 +188,14 @@ sap.ui.define([
         // ── Refresh ───────────────────────────────────────────────────────────
 
         onRefreshCurrent() {
-            this.byId("currentTable").getBinding("rows")?.refresh(true);
+            this.onSearch();
         },
 
         onRefreshHistory() {
             this.byId("historyTable").getBinding("rows")?.refresh(true);
         },
 
-        async onSearch() {
-            try {
-                // Change this to the correct entity set name from metadata
-                var filters = []; // Add any necessary filters here
-                filters.push(new sap.ui.model.Filter(
-                    "ZlmIdName",
-                    sap.ui.model.FilterOperator.EQ,
-                    '200129'
-                ));
-                var mydata = await this.fetchOData("mainService", "/HDR_STRSet", filters);
-                console.log("Fetched data:", mydata);
-            } catch (error) {
-                console.error("OData fetch error details:", {
-                    message: error.message,
-                    statusCode: error.statusCode,
-                    responseText: error.responseText
-                });
-                sap.m.MessageToast.show("An error occurred while loading data.");
-            }
-        },
-
+        // ── OData Fetch ───────────────────────────────────────────────────────
 
         fetchOData(modelName, entitySetPath, filters) {
             const oModel = this.getView().getModel(modelName);
@@ -141,7 +205,7 @@ sap.ui.define([
             }
 
             if (typeof oModel.read !== "function") {
-                return Promise.reject(new Error(`Model '${modelName}' does not have read method. Type: ${oModel.getMetadata().getName()}`));
+                return Promise.reject(new Error(`Model '${modelName}' does not have read method`));
             }
 
             return new Promise((resolve, reject) => {
