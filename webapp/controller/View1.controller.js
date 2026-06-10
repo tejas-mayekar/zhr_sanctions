@@ -66,7 +66,7 @@ sap.ui.define([
             // Initialize ODataModel
             this._initializeODataModel();
 
-            // Build columns
+            // Build columns (data columns first; the Actions column is declared in XML and stays frozen)
             this._buildColumns("currentTable", CURRENT_COLUMNS);
             this._buildColumns("historyTable", HISTORY_COLUMNS);
 
@@ -84,7 +84,6 @@ sap.ui.define([
                     useBatch: false
                 });
 
-                // Set as named model
                 this.getView().setModel(oODataModel, "mainService");
                 console.log("OData model initialized successfully");
             } catch (error) {
@@ -93,6 +92,9 @@ sap.ui.define([
         },
 
         // ── Column builder ────────────────────────────────────────────────────
+        // The frozen Actions column is declared first in the XML (index 0).
+        // Data columns are appended after it so the Actions button stays
+        // frozen on the LEFT edge while the rest of the columns scroll.
 
         _buildColumns(sTableId, aConfig) {
             const oTable = this.byId(sTableId);
@@ -117,27 +119,18 @@ sap.ui.define([
             try {
                 const oUIModel = this.getView().getModel();
 
-                // Show loading indicator
                 sap.ui.core.BusyIndicator.show(0);
 
-                // Create filter for manager ID
                 const filters = [
-                    new Filter(
-                        "ZlmIdName",
-                        FilterOperator.EQ,
-                        '200129'
-                    )
+                    new Filter("ZlmIdName", FilterOperator.EQ, '200129')
                 ];
 
-                // Fetch data from OData service
                 const aData = await this.fetchOData("mainService", "/HDR_STRSet", filters);
                 console.log("Fetched data:", aData);
 
-                // Set data to UI model for table binding
                 if (aData && aData.length > 0) {
                     oUIModel.setProperty("/HDR_STRSet", aData);
                     oUIModel.setProperty("/currentCount", aData.length);
-
                     sap.m.MessageToast.show(`Loaded ${aData.length} violations`);
                 } else {
                     oUIModel.setProperty("/HDR_STRSet", []);
@@ -149,18 +142,86 @@ sap.ui.define([
 
             } catch (error) {
                 sap.ui.core.BusyIndicator.hide();
-
                 console.error("OData fetch error details:", {
                     message: error.message,
                     statusCode: error.statusCode,
                     responseText: error.responseText
                 });
-
                 sap.m.MessageToast.show("An error occurred while loading data.");
             }
         },
 
-        // ── Search in Current Tab ─────────────────────────────────────────────
+        // ── View Details ──────────────────────────────────────────────────────
+
+        /**
+         * Called by the "Details" button in the Current (HDR_STRSet) table.
+         * Reads the row context from the JSONModel and navigates to the object page.
+         */
+        onViewDetails(oEvent) {
+            const oButton  = oEvent.getSource();
+            const oContext = oButton.getBindingContext(); // context on the default (JSON) model
+            if (!oContext) {
+                return;
+            }
+            const sActionRefNo = oContext.getProperty("ZACTION_REF_NO");
+            this._navigateToDetail(sActionRefNo, "current");
+        },
+
+        /**
+         * Called by the "Details" button in the History (HDR_HISTSet) table.
+         */
+        onViewDetailsHistory(oEvent) {
+            const oButton  = oEvent.getSource();
+            const oContext = oButton.getBindingContext();
+            if (!oContext) {
+                return;
+            }
+            const sActionRefNo = oContext.getProperty("ZACTION_REF_NO");
+            this._navigateToDetail(sActionRefNo, "history");
+        },
+
+        /**
+         * Shared navigation helper.
+         * Passes the full row data to the detail view via a named model so the
+         * object page does not need a round-trip for the data it already has.
+         *
+         * @param {string} sActionRefNo   - The key of the record.
+         * @param {string} sSource        - "current" | "history"  (used by the detail page to know which entity was opened)
+         */
+        _navigateToDetail(sActionRefNo, sSource) {
+            if (!sActionRefNo) {
+                sap.m.MessageToast.show("Cannot open details: record has no Action Ref No.");
+                return;
+            }
+
+            // Find the full record from the JSON model so the object page has all fields immediately
+            const oUIModel  = this.getView().getModel();
+            const sSetKey   = sSource === "history" ? "HDR_HISTSet" : "HDR_STRSet";
+            const aRecords  = oUIModel.getProperty(`/${sSetKey}`) || [];
+            const oRecord   = aRecords.find(r => r.ZACTION_REF_NO === sActionRefNo);
+
+            // Store the selected record in the component model so it survives navigation
+            const oComponent = this.getOwnerComponent();
+            const oDetailModel = new JSONModel({
+                record: oRecord || {},
+                source: sSource
+            });
+            oComponent.setModel(oDetailModel, "detailData");
+
+            // Navigate via the router
+            this.getOwnerComponent().getRouter().navTo("RouteView2", {
+                actionRefNo: encodeURIComponent(sActionRefNo),
+                source: sSource
+            });
+        },
+
+        // ── Create Violation ─────────────────────────────────────────────────
+
+        onCreateViolation() {
+            this.getOwnerComponent().getRouter().navTo("RouteView3");
+        },
+
+        // ── Search ────────────────────────────────────────────────────────────
 
         onSearchCurrent(oEvent) {
             this._applySearch("currentTable", CURRENT_COLUMNS, oEvent.getParameter("newValue"));

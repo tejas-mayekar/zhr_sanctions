@@ -34,8 +34,7 @@
                             icon="sap-icon://activity-items"
                             iconDensityAware="false"
                             design="Horizontal"
-                            
-                class="sapUiResponsiveContentPadding custom-tab-filter"
+                            class="sapUiResponsiveContentPadding custom-tab-filter"
                             key="current"
                         >
                             <t:Table
@@ -64,6 +63,25 @@
                                         <Text id="_IDGenText" text="No data available" />
                                     </VBox>
                                 </t:noData>
+                                <!-- Frozen "Actions" column — index 0, frozen on the LEFT -->
+                                <t:columns>
+                                    <t:Column
+                                        id="currentActionsCol"
+                                        width="8rem"
+                                        hAlign="Center"
+                                    >
+                                        <Label id="_IDGenLabel3" text="Actions" />
+                                        <t:template>
+                                            <Button id="_IDGenButton7"
+                                                icon="sap-icon://detail-view"
+                                                text="Details"
+                                                type="Transparent"
+                                                press=".onViewDetails"
+                                            />
+                                        </t:template>
+                                    </t:Column>
+                                </t:columns>
+
                                 <t:extension>
                                     <OverflowToolbar id="_IDGenOverflowToolbar" style="Standard">
                                         <HBox id="_IDGenHBox"
@@ -87,8 +105,15 @@
                                             tooltip="Refresh"
                                             press=".onSearch"
                                         />
+                                        <Button id="_IDGenButton2"
+                                            tooltip="Create Violation"
+                                            type="Emphasized"
+                                            text="Create Violation"
+                                            press=".onCreateViolation"
+                                        />
                                     </OverflowToolbar>
                                 </t:extension>
+
                                 <t:footer>
                                     <OverflowToolbar id="_IDGenOverflowToolbar1">
                                         <Label id="_IDGenLabel"
@@ -102,7 +127,6 @@
 
                         <!-- ─── HISTORY TAB ─── -->
                         <IconTabFilter
-
                             id="tabHistory"
                             text="History"
                             icon="sap-icon://history"
@@ -136,6 +160,25 @@
                                         <Text id="_IDGenText1" text="No history available" />
                                     </VBox>
                                 </t:noData>
+                                <!-- Frozen "Actions" column — index 0, frozen on the LEFT -->
+                                <t:columns>
+                                    <t:Column
+                                        id="historyActionsCol"
+                                        width="8rem"
+                                        hAlign="Center"
+                                    >
+                                        <Label id="_IDGenLabel33" text="Actions" />
+                                        <t:template>
+                                            <Button id="_IDGenButton8"
+                                                icon="sap-icon://detail-view"
+                                                text="Details"
+                                                type="Transparent"
+                                                press=".onViewDetailsHistory"
+                                            />
+                                        </t:template>
+                                    </t:Column>
+                                </t:columns>
+
                                 <t:extension>
                                     <OverflowToolbar id="_IDGenOverflowToolbar2" style="Standard">
                                         <HBox id="_IDGenHBox1"
@@ -159,8 +202,10 @@
                                             tooltip="Refresh"
                                             press=".onRefreshHistory"
                                         />
+                                        
                                     </OverflowToolbar>
                                 </t:extension>
+
                                 <t:footer>
                                     <OverflowToolbar id="_IDGenOverflowToolbar3">
                                         <Label id="_IDGenLabel1"

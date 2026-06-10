@@ -1,0 +1,96 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:form="sap.ui.layout.form"
+>
+    <Dialog
+        id="regularizeDialog"
+        title="Regularize Attendance"
+        icon="sap-icon://edit"
+        contentWidth="36rem"
+        resizable="true"
+        draggable="true"
+    >
+        <content>
+            <VBox class="sapUiSmallMargin">
+
+                <!-- Read-only context strip -->
+                <MessageStrip
+                    id="regularizeInfoStrip"
+                    text="Regularizing record {detailData>/record/ZACTION_REF_NO} for {detailData>/record/ZempName} on {detailData>/record/ZincDate}"
+                    type="Information"
+                    showIcon="true"
+                    showCloseButton="false"
+                    class="sapUiSmallMarginBottom"
+                />
+
+                <form:SimpleForm
+                    id="regularizeForm"
+                    editable="true"
+                    layout="ResponsiveGridLayout"
+                    labelSpanL="5"
+                    labelSpanM="5"
+                    labelSpanS="12"
+                    emptySpanL="0"
+                    emptySpanM="0"
+                    columnsL="1"
+                    columnsM="1"
+                >
+                    <form:content>
+
+                        <!-- Punch In -->
+                        <Label text="Punch In Time" required="true" />
+                        <TimePicker
+                            id="regularizePunchIn"
+                            value="{regularize>/punchIn}"
+                            valueFormat="HH:mm:ss"
+                            displayFormat="HH:mm:ss"
+                            placeholder="HH:MM:SS"
+                            width="100%"
+                        />
+
+                        <!-- Punch Out -->
+                        <Label text="Punch Out Time" required="true" />
+                        <TimePicker
+                            id="regularizePunchOut"
+                            value="{regularize>/punchOut}"
+                            valueFormat="HH:mm:ss"
+                            displayFormat="HH:mm:ss"
+                            placeholder="HH:MM:SS"
+                            width="100%"
+                        />
+
+                        <!-- Reason -->
+                        <Label text="Reason / Remarks" required="true" />
+                        <TextArea
+                            id="regularizeReason"
+                            value="{regularize>/reason}"
+                            rows="3"
+                            maxLength="255"
+                            growing="false"
+                            width="100%"
+                            placeholder="Enter reason for regularization..."
+                        />
+
+                    </form:content>
+                </form:SimpleForm>
+            </VBox>
+        </content>
+
+        <beginButton>
+            <Button
+                id="btnRegularizeSubmit"
+                text="Submit"
+                type="Emphasized"
+                press=".onRegularizeSubmit"
+            />
+        </beginButton>
+        <endButton>
+            <Button
+                id="btnRegularizeCancel"
+                text="Cancel"
+                press=".onRegularizeCancel"
+            />
+        </endButton>
+    </Dialog>
+</core:FragmentDefinition>
