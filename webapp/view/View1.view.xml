@@ -16,6 +16,16 @@
                 <f:heading>
                     <Title id="_IDGenTitle" text="{i18n>title}" />
                 </f:heading>
+                <f:actions>
+                    <Button
+                        id="hc"
+                        text="HC Portal"
+                        type="Ghost"
+                        width="10rem"
+                        icon="sap-icon://key-user-settings"
+                        press=".onHCPortal"
+                    />
+                </f:actions>
             </f:DynamicPageTitle>
         </f:title>
 
@@ -46,8 +56,8 @@
                                 threshold="15"
                                 scrollThreshold="50"
                                 enableBusyIndicator="true"
-                                visibleRowCountMode="Auto"
-                                minAutoRowCount="5"
+                                
+                                rowMode="Auto"
                             >
                                 <t:noData>
                                     <VBox id="_IDGenVBox1"
@@ -143,8 +153,8 @@
                                 threshold="15"
                                 scrollThreshold="50"
                                 enableBusyIndicator="true"
-                                visibleRowCountMode="Auto"
-                                minAutoRowCount="5"
+                                
+                                rowMode="Auto"
                             >
                                 <t:noData>
                                     <VBox id="_IDGenVBox2"

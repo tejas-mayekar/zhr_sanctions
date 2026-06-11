@@ -1,0 +1,99 @@
+<mvc:View
+    controllerName="zhrsanctions.controller.HCPortalPage"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:core="sap.ui.core"
+    xmlns:f="sap.f"
+    xmlns:t="sap.ui.table"
+    xmlns="sap.m"
+>
+
+    <f:DynamicPage id="_IDGenDynamicPage"  
+        fitContent="true"
+    >
+        <f:title>
+            <f:DynamicPageTitle id="_IDGenDynamicPageTitle1"  >
+                <f:heading>
+                    <Title id="_IDGenTitle1"   text="HC Portal" />
+                </f:heading>
+            </f:DynamicPageTitle>
+        </f:title>
+
+        <f:content>
+         <IconTabBar id="_IDGenIconTabBar"
+                     
+                    expanded="true"
+                    stretchContentHeight="true"
+                    class="sapUiResponsiveContentPadding"
+                    select=".onTabSelect"
+                >
+                    <!-- ─── CURRENT TAB ─── -->
+                    <items >
+                        <IconTabFilter id="_IDGenIconTabFilter"
+                             
+                            text="Current"
+                            icon="sap-icon://activity-items"
+                            iconDensityAware="false"
+                            design="Horizontal"
+                            class="sapUiResponsiveContentPadding custom-tab-filter"
+                            key="current"
+                        >
+                            <t:Table id="_IDGenTable"
+                                 
+                                selectionMode="None"
+                                enableSelectAll="false"
+                                rows="{path: '/HDR_STRSet'}"
+                                threshold="15"
+                                scrollThreshold="50"
+                                enableBusyIndicator="true"
+                                rowMode="Auto"
+                            >
+                                <t:noData>
+                                    <VBox id="_IDGenVBox4"  
+                                        alignItems="Center"
+                                        justifyContent="Center"
+                                        class="sapUiMediumMargin"
+                                    >
+                                        <core:Icon id="_IDGenIcon4"  
+                                            src="sap-icon://inbox"
+                                            size="3rem"
+                                            color="sapContent_NonInteractiveIconColor"
+                                            class="sapUiSmallMarginBottom"
+                                        />
+                                        <Text id="_IDGenText31"   text="No data available" />
+                                    </VBox>
+                                </t:noData>
+                                <!-- Frozen "Actions" column — index 0, frozen on the LEFT -->
+                                <t:columns>
+                                    <t:Column id="_IDGenColumn"
+                                         
+                                        width="8rem"
+                                        hAlign="Center"
+                                    >
+                                        <Label id="_IDGenLabel2"   text="Actions" />
+                                        <t:template>
+                                            <Button id="_IDGenButton6"  
+                                                icon="sap-icon://detail-view"
+                                                text="Details"
+                                                type="Transparent"
+                                                press=".onViewDetails"
+                                            />
+                                        </t:template>
+                                    </t:Column>
+                                </t:columns>
+
+
+                                <t:footer>
+                                    <OverflowToolbar id="_IDGenOverflowToolbar6"  >
+                                        <Label id="_IDGenLabel34"  
+                                            visible="{= ${/currentCount} > 0 }"
+                                            text="Number of Violations: {/currentCount}"
+                                        />
+                                    </OverflowToolbar>
+                                </t:footer>
+                            </t:Table>
+                        </IconTabFilter>
+                    </items>
+                </IconTabBar>
+                </f:content>
+    </f:DynamicPage>
+</mvc:View>

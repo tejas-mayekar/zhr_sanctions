@@ -143,11 +143,6 @@ sap.ui.define([
                 return;
             }
 
-            // Validate Action Ref No is not empty (since it's the unique key)
-            if (!oPayload.ZactionRefNo || oPayload.ZactionRefNo.trim() === "") {
-                sap.m.MessageBox.error("Action Reference Number is mandatory and must be unique.");
-                return;
-            }
 
             // Get default OData model
             const oModel = this.getOwnerComponent().getModel() || this.getView().getModel("mainService");

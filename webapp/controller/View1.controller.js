@@ -98,19 +98,6 @@ sap.ui.define([
                 console.error("Failed to initialize OData model:", error);
             }
         },
-
-        // ── Edm.Time Formatter ────────────────────────────────────────────────
-        //
-        // OData v2 returns Edm.Time values as plain objects: { ms: 28800000 }
-        // where `ms` is the number of milliseconds since midnight.
-        // This helper converts that (or a raw number) into a "HH:mm:ss" string.
-        //
-        // Accepted input shapes
-        //   { ms: 28800000 }   → "08:00:00"   (standard ODataModel v2 object)
-        //   28800000           → "08:00:00"   (raw number, just in case)
-        //   "08:00:00"         → "08:00:00"   (already a string — returned as-is)
-        //   null / undefined   → ""
-
         formatEdmTime(oTime) {
             if (oTime === null || oTime === undefined) {
                 return "";
@@ -140,15 +127,6 @@ sap.ui.define([
             return `${hh}:${mm}:${ss}`;
         },
 
-        // ── Column builder ────────────────────────────────────────────────────
-        // The frozen Actions column is declared first in the XML (index 0).
-        // Data columns are appended after it so the Actions button stays
-        // frozen on the LEFT edge while the rest of the columns scroll.
-        //
-        // Columns flagged with `isTime: true` use a binding with a formatter
-        // so that Edm.Time objects render as "HH:mm:ss" instead of
-        // "[object Object]".
-
         _buildColumns(sTableId, aConfig) {
             const oTable = this.byId(sTableId);
 
@@ -172,7 +150,6 @@ sap.ui.define([
                 });
         },
 
-        // ── Main Search (Current tab only) ────────────────────────────────────
 
         async onSearch() {
             try {
@@ -207,8 +184,6 @@ sap.ui.define([
             }
         },
 
-        // ── Tab Select — refresh History on every visit ───────────────────────
-
         onTabSelect(oEvent) {
             const sKey = oEvent.getParameter("key");
             if (sKey === "history") {
@@ -218,12 +193,6 @@ sap.ui.define([
         onPayrollDeductionPress() {
 
         },
-        // ── View Details ──────────────────────────────────────────────────────
-
-        /**
-         * Called by the "Details" button in the Current (HDR_STRSet) table.
-         * Reads the row context from the JSONModel and navigates to the object page.
-         */
         onViewDetails(oEvent) {
             const oButton = oEvent.getSource();
             const oContext = oButton.getBindingContext(); // context on the default (JSON) model
@@ -234,61 +203,48 @@ sap.ui.define([
             this._navigateToDetail(sActionRefNo, "current");
         },
 
-        /**
-         * Called by the "Details" button in the History (HDR_HISTSet) table.
-         */
         onViewDetailsHistory(oEvent) {
             const oButton = oEvent.getSource();
             const oContext = oButton.getBindingContext();
             if (!oContext) {
                 return;
             }
-            const sActionRefNo = oContext.getProperty("ZACTION_REF_NO");
-            this._navigateToDetail(sActionRefNo, "history");
+            const sActionRefNo = oContext.getProperty("ZactionRefNo");
+            this._navigateToDetail(sActionRefNo, "prevdetail");
         },
+       _navigateToDetail(sActionRefNo, sSource) {
+    if (!sActionRefNo) {
+        sap.m.MessageToast.show("Cannot open details: record has no Action Ref No.");
+        return;
+    }
 
-        /**
-         * Shared navigation helper.
-         * Passes the full row data to the detail view via a named model so the
-         * object page does not need a round-trip for the data it already has.
-         *
-         * @param {string} sActionRefNo   - The key of the record.
-         * @param {string} sSource        - "current" | "history"  (used by the detail page to know which entity was opened)
-         */
-        _navigateToDetail(sActionRefNo, sSource) {
-            if (!sActionRefNo) {
-                sap.m.MessageToast.show("Cannot open details: record has no Action Ref No.");
-                return;
-            }
+    const oUIModel = this.getView().getModel();
+    const sSetKey = sSource === "prevdetail" ? "ITM_STRSet" : "HDR_STRSet";
+    const aRecords = oUIModel.getProperty(`/${sSetKey}`) || [];
+    const oRecord = aRecords.find(r => (r.ZACTION_REF_NO || r.ZactionRefNo) === sActionRefNo);
 
-            // Find the full record from the JSON model so the object page has all fields immediately
-            const oUIModel = this.getView().getModel();
-            const sSetKey = sSource === "history" ? "ITM_STRSet" : "HDR_STRSet";
-            const aRecords = oUIModel.getProperty(`/${sSetKey}`) || [];
-            const oRecord = aRecords.find(r => (r.ZACTION_REF_NO || r.ZactionRefNo) === sActionRefNo);
+    const oDetailModel = new JSONModel({
+        record: oRecord || {},
+        source: sSource
+    });
+    this.getOwnerComponent().setModel(oDetailModel, "detailData");
 
-            // Store the selected record in the component model so it survives navigation
-            const oComponent = this.getOwnerComponent();
-            const oDetailModel = new JSONModel({
-                record: oRecord || {},
-                source: sSource
-            });
-            oComponent.setModel(oDetailModel, "detailData");
+    // Route depends on which tab triggered the navigation
+    const sRouteName = sSource === "prevdetail"
+        ? "RouteOldViolationDetailpage"   // note lowercase 'p' — matches manifest exactly
+        : "RouteViolationDetailPage";
 
-            // Navigate via the router
-            this.getOwnerComponent().getRouter().navTo("RouteViolationDetailPage", {
-                actionRefNo: encodeURIComponent(sActionRefNo),
-                source: sSource
-            });
-        },
-
-        // ── Create Violation ─────────────────────────────────────────────────
+    this.getOwnerComponent().getRouter().navTo(sRouteName, {
+        actionRefNo: encodeURIComponent(sActionRefNo)
+    });
+},
 
         onCreateViolation() {
             this.getOwnerComponent().getRouter().navTo("RouteFileViolation");
         },
-
-        // ── Search ────────────────────────────────────────────────────────────
+        onHCPortal() {
+            this.getOwnerComponent().getRouter().navTo("RouteHCPortal");
+        },
 
         onSearchCurrent(oEvent) {
             this._applySearch("currentTable", CURRENT_COLUMNS, oEvent.getParameter("newValue"));
@@ -312,9 +268,6 @@ sap.ui.define([
                 aFilters.length ? [new Filter({ filters: aFilters, and: false })] : []
             );
         },
-
-        // ── Refresh ───────────────────────────────────────────────────────────
-
         onRefreshCurrent() {
             this.onSearch();
         },
@@ -322,8 +275,6 @@ sap.ui.define([
         onRefreshHistory() {
             this._loadHistory();
         },
-
-        // ── Load History (ITM_STRSet) ─────────────────────────────────────────
 
         async _loadHistory() {
             try {
@@ -341,11 +292,6 @@ sap.ui.define([
                 ODataUtils.handleODataError(error, "Failed to load history.");
             }
         },
-
-        // ── OData Fetch ───────────────────────────────────────────────────────
-        // Delegated to ODataUtils.fetchOData — kept as a thin shim so any
-        // remaining call site (e.g. sub-classes or test stubs) still resolves.
-
         fetchOData(modelName, sEntityPath, aFilters) {
             const oModel = this.getView().getModel(modelName);
             return ODataUtils.fetchOData(oModel, sEntityPath, aFilters);
