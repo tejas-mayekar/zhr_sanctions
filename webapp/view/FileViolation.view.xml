@@ -1,0 +1,321 @@
+<mvc:View
+    controllerName="zhrsanctions.controller.FileViolation"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:f="sap.f"
+    xmlns:core="sap.ui.core"
+    xmlns:form="sap.ui.layout.form"
+    xmlns="sap.m"
+>
+    <f:DynamicPage
+        id="CreatePage"
+        fitContent="true"
+        showFooter="true"
+    >
+        <!-- ─── Header ─── -->
+        <f:title>
+            <f:DynamicPageTitle id="_IDGenDynamicPageTitle2">
+                <f:navigationActions>
+                    <Button
+                        id="createbtnBack"
+                        icon="sap-icon://nav-back"
+                        tooltip="Back to list"
+                        press=".onNavBack"
+                    />
+                </f:navigationActions>
+                <f:heading>
+                    <Title id="createPageTitle" text="Create Violation" />
+                </f:heading>
+            </f:DynamicPageTitle>
+        </f:title>
+
+        <!-- ─── Content ─── -->
+        <f:content>
+            <VBox id="_IDGenVBox"
+                class="sapUiMediumMargin"
+            >
+                <!-- ── Section 1: Employee & Position Details ── -->
+                <Panel id="panelEmployeeInfo"
+                    headerText="Employee &amp; Position Information"
+                    expandable="true"
+                    expanded="true"
+                    class="sapUiSmallMarginBottom"
+                >
+                    <form:SimpleForm
+                        id="formEmployeeInfo"
+                        editable="true"
+                        layout="ResponsiveGridLayout"
+                        labelSpanL="4"
+                        labelSpanM="4"
+                        labelSpanS="12"
+                        emptySpanL="0"
+                        emptySpanM="0"
+                        columnsL="2"
+                        columnsM="2"
+                    >
+                        <form:content>
+                            <core:Title id="titleEmpGen" text="General Details" />
+                            <Label id="lblZempId" text="Employee ID" required="true" />
+                            <Input id="inputZempId" placeholder="Enter Employee ID" maxLength="10" />
+
+                            <Label id="lblZempName" text="Employee Name" />
+                            <Input id="inputZempName" placeholder="Enter Employee Name" maxLength="60" editable="false" />
+
+                            <Label id="lblZempType" text="Employee Type" />
+                            <Input id="inputZempType" placeholder="Enter Employee Type" maxLength="60" editable="false"  />
+
+                            <Label id="lblZempTypeDesc" text="Employee Type Description" />
+                            <Input id="inputZempTypeDesc" placeholder="Enter Type Description" maxLength="100" editable="false" />
+
+                            <Label id="lblZempClass" text="Employee Class" />
+                            <Input id="inputZempClass" placeholder="Enter Employee Class" maxLength="60" editable="false" />
+
+                            <Label id="lblZempClassDesc" text="Employee Class Description" />
+                            <Input id="inputZempClassDesc" placeholder="Enter Class Description" maxLength="100" editable="false" />
+
+                            <Label id="lblZcompany" text="Company" />
+                            <Input id="inputZcompany" placeholder="Enter Company" maxLength="60" editable="false"  />
+
+                            <Label id="lblZnationality" text="Nationality" />
+                            <Input id="inputZnationality" placeholder="Enter Nationality" maxLength="60" editable="false" />
+
+                            <Label id="lblZhiredate" text="Hire Date" />
+                            <DatePicker id="dpZhiredate" displayFormat="yyyy-MM-dd" placeholder="yyyy-mm-dd" editable="false" />
+<Label id="lblZpaygrade" text="Pay Grade" />
+<Input id="inputZpaygrade" editable="false" />
+                            <core:Title id="titleEmpPos" text="Position &amp; Location" />
+                            <Label id="lblZposition" text="Position" />
+                            <Input id="inputZposition" placeholder="Enter Position" maxLength="60" editable="false" />
+
+                            <Label id="lblZjobtitle" text="Job Title" />
+                            <Input id="inputZjobtitle" placeholder="Enter Job Title" maxLength="50" editable="false" />
+
+                            <Label id="lblZjobclassification" text="Job Classification" />
+                            <Input id="inputZjobclassification" placeholder="Enter Job Classification" maxLength="30" editable="false" />
+
+                            <Label id="lblZlocation" text="Location" />
+                            <Input id="inputZlocation" placeholder="Enter Location" maxLength="60" editable="false" />
+
+                            <Label id="lblZlocationgroup" text="Location Group" />
+                            <Input id="inputZlocationgroup" placeholder="Enter Location Group" maxLength="60" editable="false" />
+
+                            <Label id="lblZworkschedule" text="Work Schedule" />
+                            <Input id="inputZworkschedule" placeholder="Enter Work Schedule" maxLength="60" editable="false" />
+
+                            <Label id="lblZlatestNode" text="Latest Node" />
+                            <Input id="inputZlatestNode" placeholder="Enter Latest Node" maxLength="60" editable="false" />
+
+                            <Label id="lblZstdWeekHrs" text="Std Weekly Hours" />
+                            <Input id="inputZstdWeekHrs" type="Number" placeholder="0" editable="false" />
+
+                            <Label id="lblZwrkDyWeek" text="Working Days / Week" />
+                            <Input id="inputZwrkDyWeek" type="Number" placeholder="0" editable="false" />
+
+                            <core:Title id="titleEmpIndicators" text="Indicators (Zn0 - Zn7)" />
+                            <Label id="lblZn0" text="Zn0 Num" />
+                            <Input id="inputZn0" type="Number" placeholder="0" editable="false" />
+                            <Label id="lblZn1" text="Business Unit" />
+                            <Input id="inputZn1" type="Number" placeholder="0" editable="false" />
+                            <Label id="lblZn2" text="Division" />
+                            <Input id="inputZn2" type="Number" placeholder="0" editable="false" />
+                            <Label id="lblZn3" text="Department" />
+                            <Input id="inputZn3" type="Number" placeholder="0" editable="false" />
+                            <Label id="lblZn4" text="Zn4 Num"  visible="false" />
+                            <Input id="inputZn4" type="Number"  placeholder="0"  visible="false" editable="false"/>
+                            <Label id="lblZn5" text="Zn5 Num"  visible="false"/>
+                            <Input id="inputZn5" type="Number" placeholder="0" visible="false" editable="false" />
+                            <Label id="lblZn6" text="Zn6 Num"  visible="false"/>
+                            <Input id="inputZn6" type="Number" placeholder="0" visible="false" editable="false" />
+                            <Label id="lblZn7" text="Zn7 Num"  visible="false"/>
+                            <Input id="inputZn7" type="Number" placeholder="0" visible="false" editable="false" />
+                        </form:content>
+                    </form:SimpleForm>
+                </Panel>
+
+                <!-- ── Section 2: Violation & Incident Details ── -->
+                <Panel id="panelViolationInfo"
+                    headerText="Violation &amp; Incident Details"
+                    expandable="true"
+                    expanded="true"
+                    class="sapUiSmallMarginBottom"
+                >
+                    <form:SimpleForm
+                        id="formViolationInfo"
+                        editable="true"
+                        layout="ResponsiveGridLayout"
+                        labelSpanL="4"
+                        labelSpanM="4"
+                        labelSpanS="12"
+                        emptySpanL="0"
+                        emptySpanM="0"
+                        columnsL="2"
+                        columnsM="2"
+                    >
+                        <form:content>
+                            <core:Title id="titleViolKeys" text="Keys &amp; Category" />
+                            <!-- <Label id="lblZactionRefNo" text="Action Reference No" />
+                            <Input id="inputZactionRefNo" placeholder="Enter Reference Number" maxLength="10" /> -->
+
+                            <Label id="lblZincDate" text="Incident Date" required="true" />
+                            <DatePicker id="dpZincDate" displayFormat="yyyy-MM-dd" placeholder="yyyy-mm-dd" />
+
+                            <Label id="lblZincCategory" text="Incident Category" />
+                            <Input id="inputZincCategory" placeholder="Enter Category" maxLength="60" />
+
+                            <Label id="lblZincType" text="Incident Type" />
+                            <Input id="inputZincType" placeholder="Enter Type" maxLength="10" />
+
+                            <Label id="lblZaction" text="Action" />
+                            <Input id="inputZaction" placeholder="Enter Action" maxLength="50" />
+
+                            <Label id="lblZstatus" text="Status" />
+                            <Input id="inputZstatus" placeholder="Enter Status" maxLength="50" />
+
+                            <Label id="lblZsanction" text="Sanction" />
+                            <Input id="inputZsanction" placeholder="Enter Sanction" maxLength="60" />
+
+                            <Label id="lblZremark" text="Remarks" />
+                            <Input id="inputZremark" placeholder="Enter Remarks" maxLength="60" />
+
+                            <core:Title id="titleViolTimeline" text="Timeline &amp; Hours" />
+                            <Label id="lblZincDisDate" text="Incident Disc. Date" />
+                            <DatePicker id="dpZincDisDate" displayFormat="yyyy-MM-dd" placeholder="yyyy-mm-dd" />
+
+                            <Label id="lblZinitatedBy" text="Initiated By" />
+                            <Input id="inputZinitatedBy" placeholder="Enter Initiated By Name" maxLength="50" />
+
+                            <Label id="lblZinitDate" text="Initiated Date" />
+                            <DatePicker id="dpZinitDate" displayFormat="yyyy-MM-dd" placeholder="yyyy-mm-dd" />
+
+                            <Label id="lblZfirstIncDate" text="First Incident Date" />
+                            <DatePicker id="dpZfirstIncDate" displayFormat="yyyy-MM-dd" placeholder="yyyy-mm-dd" />
+
+                            <Label id="lblZawaitingactionfrom" text="Awaiting Action From" />
+                            <DatePicker id="dpZawaitingactionfrom" displayFormat="yyyy-MM-dd" placeholder="yyyy-mm-dd" />
+
+                            <Label id="lblZlastaction" text="Last Action Date" />
+                            <DatePicker id="dpZlastaction" displayFormat="yyyy-MM-dd" placeholder="yyyy-mm-dd" />
+
+                            <core:Title id="titleViolTimes" text="Shift &amp; Punch Hours" />
+                            <Label id="lblZschTimeIn" text="Scheduled In Time" />
+                            <TimePicker id="tpZschTimeIn" valueFormat="HH:mm:ss" displayFormat="HH:mm:ss" placeholder="HH:MM:SS" />
+
+                            <Label id="lblZschTimeOut" text="Scheduled Out Time" />
+                            <TimePicker id="tpZschTimeOut" valueFormat="HH:mm:ss" displayFormat="HH:mm:ss" placeholder="HH:MM:SS" />
+
+                            <Label id="lblZpunchintime" text="Punch In Time" />
+                            <TimePicker id="tpZpunchintime" valueFormat="HH:mm:ss" displayFormat="HH:mm:ss" placeholder="HH:MM:SS" />
+
+                            <Label id="lblZpunchouttime" text="Punch Out Time" />
+                            <TimePicker id="tpZpunchouttime" valueFormat="HH:mm:ss" displayFormat="HH:mm:ss" placeholder="HH:MM:SS" />
+
+                            <Label id="lblZdelayHrs" text="Delay Hours" />
+                            <Input id="inputZdelayHrs" type="Number" placeholder="0" />
+
+                            <Label id="lblZshortHrs" text="Short Hours" />
+                            <Input id="inputZshortHrs" type="Number" placeholder="0" />
+
+                            <Label id="lblZrepeatcount" text="Repeat Count"  visible="false"/>
+                            <Input id="inputZrepeatcount" type="Number" placeholder="0"  visible="false"/>
+
+                            <Label id="lblZsysyrepeatcount" text="Sys Repeat Count"  visible="false"/>
+                            <Input id="inputZsysyrepeatcount" type="Number" placeholder="0"  visible="false"/>
+                        </form:content>
+                    </form:SimpleForm>
+                </Panel>
+
+                <!-- ── Section 3: Approval Workflow & Action Remarks ── -->
+                <Panel id="panelWorkflowInfo"
+                    headerText="Approval Workflow &amp; Action Remarks"
+                    expandable="true"
+                    expanded="true"
+                >
+                    <form:SimpleForm
+                        id="formWorkflowInfo"
+                        editable="true"
+                        layout="ResponsiveGridLayout"
+                        labelSpanL="4"
+                        labelSpanM="4"
+                        labelSpanS="12"
+                        emptySpanL="0"
+                        emptySpanM="0"
+                        columnsL="2"
+                        columnsM="2"
+                    >
+                        <form:content>
+                            <core:Title id="titleManagerWorkflow" text="Line Manager &amp; HC Ops" />
+                            <Label id="lblZlinemanagername" text="Line Manager Name" />
+                            <Input id="inputZlinemanagername" placeholder="Enter Line Manager Name" maxLength="60" />
+
+                            <Label id="lblZlinemanageraction" text="Line Manager Action" />
+                            <Input id="inputZlinemanageraction" placeholder="Enter Action" maxLength="60" />
+
+                            <Label id="lblZlinemanageractiondate" text="Line Manager Action Date" />
+                            <DatePicker id="dpZlinemanageractiondate" displayFormat="yyyy-MM-dd" placeholder="yyyy-mm-dd" />
+
+                            <Label id="lblZlinemanagerremarks" text="Line Manager Remarks" />
+                            <Input id="inputZlinemanagerremarks" placeholder="Enter Remarks" maxLength="60" />
+
+                            <Label id="lblZhcopsname" text="HC Ops Name" />
+                            <Input id="inputZhcopsname" placeholder="Enter HC Ops Name" maxLength="60" />
+
+                            <Label id="lblZhcopsaction" text="HC Ops Action" />
+                            <Input id="inputZhcopsaction" placeholder="Enter Action" maxLength="60" />
+
+                            <Label id="lblZhcopsactiondate" text="HC Ops Action Date" />
+                            <DatePicker id="dpZhcopsactiondate" displayFormat="yyyy-MM-dd" placeholder="yyyy-mm-dd" />
+
+                            <Label id="lblZhcopsremark" text="HC Ops Remark" />
+                            <Input id="inputZhcopsremark" placeholder="Enter Remark" maxLength="60" />
+
+                            <core:Title id="titleExecWorkflow" text="HC EVP, Legal &amp; CEO" />
+                            <Label id="lblZhcevpname" text="HC EVP Name" />
+                            <Input id="inputZhcevpname" placeholder="Enter HC EVP Name" maxLength="60" />
+
+                            <Label id="lblZhcevpaction" text="HC EVP Action" />
+                            <Input id="inputZhcevpaction" placeholder="Enter Action" maxLength="60" />
+
+                            <Label id="lblZhcevpactiondate" text="HC EVP Action Date" />
+                            <DatePicker id="dpZhcevpactiondate" displayFormat="yyyy-MM-dd" placeholder="yyyy-mm-dd" />
+
+                            <Label id="lblZhcevpremark" text="HC EVP Remark" />
+                            <Input id="inputZhcevpremark" placeholder="Enter Remark" maxLength="60" />
+
+                            <Label id="lblZlegalmembername" text="Legal Member Name" />
+                            <Input id="inputZlegalmembername" placeholder="Enter Legal Member Name" maxLength="60" />
+
+                            <Label id="lblZlegalmemberaction" text="Legal Member Action" />
+                            <Input id="inputZlegalmemberaction" placeholder="Enter Action" maxLength="60" />
+
+                            <Label id="lblZlegalmemberactiondate" text="Legal Member Action Date" />
+                            <DatePicker id="dpZlegalmemberactiondate" displayFormat="yyyy-MM-dd" placeholder="yyyy-mm-dd" />
+
+                            <Label id="lblZlegalremark" text="Legal Remark" />
+                            <Input id="inputZlegalremark" placeholder="Enter Remark" maxLength="60" />
+
+                            <Label id="lblZceoname" text="CEO Name" />
+                            <Input id="inputZceoname" placeholder="Enter CEO Name" maxLength="60" />
+
+                            <Label id="lblZceoaction" text="CEO Action" />
+                            <Input id="inputZceoaction" placeholder="Enter Action" maxLength="60" />
+
+                            <Label id="lblZceoactiondate" text="CEO Action Date" />
+                            <DatePicker id="dpZceoactiondate" displayFormat="yyyy-MM-dd" placeholder="yyyy-mm-dd" />
+
+                            <Label id="lblZceoactionremark" text="CEO Action Remark" />
+                            <Input id="inputZceoactionremark" placeholder="Enter Remark" maxLength="60" />
+                        </form:content>
+                    </form:SimpleForm>
+                </Panel>
+            </VBox>
+        </f:content>
+
+        <!-- ─── Footer ─── -->
+        <f:footer>
+            <OverflowToolbar id="createPageFooterToolbar">
+                <ToolbarSpacer id="createPageFooterSpacer" />
+                <Button id="btnSave" text="Save" type="Accept" press=".onSave" />
+                <Button id="btnCancel" text="Cancel" type="Reject" press=".onCancel" />
+            </OverflowToolbar>
+        </f:footer>
+    </f:DynamicPage>
+</mvc:View>

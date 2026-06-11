@@ -14,7 +14,7 @@ sap.ui.define([
         { label: "Action Ref No", binding: "ZACTION_REF_NO", width: "11rem", sortProperty: "ZACTION_REF_NO", filterProperty: "ZACTION_REF_NO", visible: true },
         { label: "Employee ID", binding: "ZempId", width: "9rem", sortProperty: "ZempId", filterProperty: "ZempId", visible: true },
         { label: "Employee Name", binding: "ZempName", width: "14rem", sortProperty: "ZempName", filterProperty: "ZempName", visible: true },
-        { label: "Violation Type", binding: "ViolationType", width: "14rem", sortProperty: "ViolationType", filterProperty: "ViolationType", visible: true },
+        // { label: "Violation Type", binding: "ViolationType", width: "14rem", sortProperty: "ViolationType", filterProperty: "ViolationType", visible: true },
         { label: "Status", binding: "Status", width: "8rem", sortProperty: "Status", filterProperty: "Status", visible: false },
         { label: "Incident Date", binding: "ZincDate", width: "10rem", sortProperty: "ZincDate", filterProperty: "ZincDate", visible: true },
         { label: "Employee Type", binding: "ZempTypeDesc", width: "12rem", sortProperty: "ZempTypeDesc", filterProperty: "ZempTypeDesc", visible: true },
@@ -23,10 +23,10 @@ sap.ui.define([
         { label: "Department", binding: "Zn3", width: "14rem", sortProperty: "Zn3", filterProperty: "Zn3", visible: true },
         { label: "Position", binding: "Zposition", width: "16rem", sortProperty: "Zposition", filterProperty: "Zposition", visible: true },
         { label: "Job Title", binding: "ZjobTitle", width: "14rem", sortProperty: "ZjobTitle", filterProperty: "ZjobTitle", visible: true },
-        { label: "Punch In Time", binding: "Zpunchintime", width: "12rem", sortProperty: "Zpunchintime", filterProperty: "Zpunchintime", visible: true },
-        { label: "Punch Out Time", binding: "Zpunchouttime", width: "12rem", sortProperty: "Zpunchouttime", filterProperty: "Zpunchouttime", visible: true },
-        { label: "Scheduled In", binding: "ZschTimeIn", width: "12rem", sortProperty: "ZschTimeIn", filterProperty: "ZschTimeIn", visible: false },
-        { label: "Scheduled Out", binding: "ZschTimeOut", width: "12rem", sortProperty: "ZschTimeOut", filterProperty: "ZschTimeOut", visible: false },
+        { label: "Punch In Time", binding: "Zpunchintime", width: "12rem", sortProperty: "Zpunchintime", filterProperty: "Zpunchintime", visible: true, isTime: true },
+        { label: "Punch Out Time", binding: "Zpunchouttime", width: "12rem", sortProperty: "Zpunchouttime", filterProperty: "Zpunchouttime", visible: true, isTime: true },
+        { label: "Scheduled In", binding: "ZschTimeIn", width: "12rem", sortProperty: "ZschTimeIn", filterProperty: "ZschTimeIn", visible: false, isTime: true },
+        { label: "Scheduled Out", binding: "ZschTimeOut", width: "12rem", sortProperty: "ZschTimeOut", filterProperty: "ZschTimeOut", visible: false, isTime: true },
         { label: "Delay Hours", binding: "ZdelayHrs", width: "10rem", sortProperty: "ZdelayHrs", filterProperty: "ZdelayHrs", visible: true },
         { label: "Short Hours", binding: "ZshortHrs", width: "10rem", sortProperty: "ZshortHrs", filterProperty: "ZshortHrs", visible: true },
         { label: "Unauthorized Days", binding: "ZunautDays", width: "12rem", sortProperty: "ZunautDays", filterProperty: "ZunautDays", visible: false },
@@ -91,10 +91,55 @@ sap.ui.define([
             }
         },
 
+        // ── Edm.Time Formatter ────────────────────────────────────────────────
+        //
+        // OData v2 returns Edm.Time values as plain objects: { ms: 28800000 }
+        // where `ms` is the number of milliseconds since midnight.
+        // This helper converts that (or a raw number) into a "HH:mm:ss" string.
+        //
+        // Accepted input shapes
+        //   { ms: 28800000 }   → "08:00:00"   (standard ODataModel v2 object)
+        //   28800000           → "08:00:00"   (raw number, just in case)
+        //   "08:00:00"         → "08:00:00"   (already a string — returned as-is)
+        //   null / undefined   → ""
+
+        formatEdmTime(oTime) {
+            if (oTime === null || oTime === undefined) {
+                return "";
+            }
+
+            // Already a formatted string — pass through unchanged.
+            if (typeof oTime === "string") {
+                return oTime;
+            }
+
+            // Resolve the millisecond value from an object ({ ms: ... }) or a bare number.
+            let iMs;
+            if (typeof oTime === "object" && oTime.ms !== undefined) {
+                iMs = oTime.ms;
+            } else if (typeof oTime === "number") {
+                iMs = oTime;
+            } else {
+                // Unknown shape — return an empty string rather than "[object Object]".
+                return "";
+            }
+
+            const iSeconds = Math.floor(iMs / 1000);
+            const hh = String(Math.floor(iSeconds / 3600)).padStart(2, "0");
+            const mm = String(Math.floor((iSeconds % 3600) / 60)).padStart(2, "0");
+            const ss = String(iSeconds % 60).padStart(2, "0");
+
+            return `${hh}:${mm}:${ss}`;
+        },
+
         // ── Column builder ────────────────────────────────────────────────────
         // The frozen Actions column is declared first in the XML (index 0).
         // Data columns are appended after it so the Actions button stays
         // frozen on the LEFT edge while the rest of the columns scroll.
+        //
+        // Columns flagged with `isTime: true` use a binding with a formatter
+        // so that Edm.Time objects render as "HH:mm:ss" instead of
+        // "[object Object]".
 
         _buildColumns(sTableId, aConfig) {
             const oTable = this.byId(sTableId);
@@ -102,9 +147,15 @@ sap.ui.define([
             aConfig
                 .filter(cfg => cfg.visible)
                 .forEach(cfg => {
+                    // For time fields, supply a formatter reference so the Text
+                    // control calls this.formatEdmTime() whenever the value changes.
+                    const oBindingInfo = cfg.isTime
+                        ? { path: cfg.binding, formatter: this.formatEdmTime.bind(this) }
+                        : `{${cfg.binding}}`;
+
                     oTable.addColumn(new Column({
                         label: new Label({ text: cfg.label }),
-                        template: new Text({ text: `{${cfg.binding}}`, wrapping: false }),
+                        template: new Text({ text: oBindingInfo, wrapping: false }),
                         sortProperty: cfg.sortProperty,
                         filterProperty: cfg.filterProperty,
                         autoResizable: true,
@@ -150,7 +201,9 @@ sap.ui.define([
                 sap.m.MessageToast.show("An error occurred while loading data.");
             }
         },
+        onPayrollDeductionPress() {
 
+        },
         // ── View Details ──────────────────────────────────────────────────────
 
         /**
@@ -158,7 +211,7 @@ sap.ui.define([
          * Reads the row context from the JSONModel and navigates to the object page.
          */
         onViewDetails(oEvent) {
-            const oButton  = oEvent.getSource();
+            const oButton = oEvent.getSource();
             const oContext = oButton.getBindingContext(); // context on the default (JSON) model
             if (!oContext) {
                 return;
@@ -171,7 +224,7 @@ sap.ui.define([
          * Called by the "Details" button in the History (HDR_HISTSet) table.
          */
         onViewDetailsHistory(oEvent) {
-            const oButton  = oEvent.getSource();
+            const oButton = oEvent.getSource();
             const oContext = oButton.getBindingContext();
             if (!oContext) {
                 return;
@@ -195,10 +248,10 @@ sap.ui.define([
             }
 
             // Find the full record from the JSON model so the object page has all fields immediately
-            const oUIModel  = this.getView().getModel();
-            const sSetKey   = sSource === "history" ? "HDR_HISTSet" : "HDR_STRSet";
-            const aRecords  = oUIModel.getProperty(`/${sSetKey}`) || [];
-            const oRecord   = aRecords.find(r => r.ZACTION_REF_NO === sActionRefNo);
+            const oUIModel = this.getView().getModel();
+            const sSetKey = sSource === "history" ? "HDR_HISTSet" : "HDR_STRSet";
+            const aRecords = oUIModel.getProperty(`/${sSetKey}`) || [];
+            const oRecord = aRecords.find(r => r.ZACTION_REF_NO === sActionRefNo);
 
             // Store the selected record in the component model so it survives navigation
             const oComponent = this.getOwnerComponent();
@@ -209,7 +262,7 @@ sap.ui.define([
             oComponent.setModel(oDetailModel, "detailData");
 
             // Navigate via the router
-            this.getOwnerComponent().getRouter().navTo("RouteView2", {
+            this.getOwnerComponent().getRouter().navTo("RouteViolationDetailPage", {
                 actionRefNo: encodeURIComponent(sActionRefNo),
                 source: sSource
             });
@@ -218,7 +271,7 @@ sap.ui.define([
         // ── Create Violation ─────────────────────────────────────────────────
 
         onCreateViolation() {
-            this.getOwnerComponent().getRouter().navTo("RouteView3");
+            this.getOwnerComponent().getRouter().navTo("RouteFileViolation");
         },
 
         // ── Search ────────────────────────────────────────────────────────────

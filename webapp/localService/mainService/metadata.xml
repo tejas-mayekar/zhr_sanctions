@@ -52,11 +52,10 @@
             </EntityType>
             <EntityType Name="ITM_STR" sap:content-version="1">
                 <Key>
-                    <PropertyRef Name="ZactionRefNo"/>
                     <PropertyRef Name="ZempId"/>
                     <PropertyRef Name="ZincDate"/>
                 </Key>
-                <Property Name="ZactionRefNo" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Action reference Num" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="ZactionRefNo" Type="Edm.String" MaxLength="10" sap:unicode="false" sap:label="Action reference Num" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="ZempId" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Employee ID" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="ZincDate" Type="Edm.DateTime" Nullable="false" Precision="7" sap:unicode="false" sap:label="Incident date" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="ZempName" Type="Edm.String" MaxLength="60" sap:unicode="false" sap:label="Logical System" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
@@ -99,7 +98,7 @@
                 <Property Name="Zlastaction" Type="Edm.DateTime" Precision="7" sap:unicode="false" sap:label="Date" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="Zjobtitle" Type="Edm.String" MaxLength="50" sap:unicode="false" sap:label="c" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="Zjobclassification" Type="Edm.String" MaxLength="30" sap:unicode="false" sap:label="30 Characters" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zpaygrade" Type="Edm.DateTime" Precision="7" sap:unicode="false" sap:label="Date" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Zpaygrade" Type="Edm.String" MaxLength="5" sap:unicode="false" sap:label="Pay Grade" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="Zhiredate" Type="Edm.DateTime" Precision="7" sap:unicode="false" sap:label="Date" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="Znationality" Type="Edm.String" MaxLength="60" sap:unicode="false" sap:label="Logical System" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="Zlocationgroup" Type="Edm.String" MaxLength="60" sap:unicode="false" sap:label="Logical System" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
@@ -126,9 +125,17 @@
                 <Property Name="Zceoactiondate" Type="Edm.DateTime" Precision="7" sap:unicode="false" sap:label="Date" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="Zceoactionremark" Type="Edm.String" MaxLength="60" sap:unicode="false" sap:label="Logical System" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
             </EntityType>
+            <EntityType Name="EMP_SEARCH_HELP" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="EMP_ID"/>
+                </Key>
+                <Property Name="EMP_ID" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Employee Id" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Emp_name" Type="Edm.String" MaxLength="40" sap:unicode="false" sap:label="Employee Name" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+            </EntityType>
             <EntityContainer Name="ZHR_SACTIONS_APPLICATION_SRV_Entities" m:IsDefaultEntityContainer="true" sap:supported-formats="atom json xlsx">
                 <EntitySet Name="HDR_STRSet" EntityType="ZHR_SACTIONS_APPLICATION_SRV.HDR_STR" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:content-version="1"/>
                 <EntitySet Name="ITM_STRSet" EntityType="ZHR_SACTIONS_APPLICATION_SRV.ITM_STR" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:content-version="1"/>
+                <EntitySet Name="EMP_SEARCH_HELPSet" EntityType="ZHR_SACTIONS_APPLICATION_SRV.EMP_SEARCH_HELP" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:addressable="false" sap:content-version="1"/>
             </EntityContainer>
             <atom:link rel="self" href="/sap/opu/odata/sap/ZHR_SACTIONS_APPLICATION_SRV/$metadata" xmlns:atom="http://www.w3.org/2005/Atom"/>
             <atom:link rel="latest-version" href="/sap/opu/odata/sap/ZHR_SACTIONS_APPLICATION_SRV/$metadata" xmlns:atom="http://www.w3.org/2005/Atom"/>

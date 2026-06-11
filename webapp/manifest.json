@@ -100,17 +100,17 @@
           ]
         },
         {
-          "name": "RouteView2",
+          "name": "RouteViolationDetailPage",
           "pattern": "detail/{actionRefNo}/{source}",
           "target": [
-            "TargetView2"
+            "TargetViolationDetailPage"
           ]
         },
         {
-          "name": "RouteView3",
+          "name": "RouteFileViolation",
           "pattern": "create",
           "target": [
-            "TargetView3"
+            "TargetFileViolation"
           ]
         }
       ],
@@ -119,13 +119,13 @@
           "id": "View1",
           "name": "View1"
         },
-        "TargetView2": {
-          "id": "View2",
-          "name": "View2"
+        "TargetViolationDetailPage": {
+          "id": "ViolationDetailPage",
+          "name": "ViolationDetailPage"
         },
-        "TargetView3": {
-          "id": "View3",
-          "name": "View3"
+        "TargetFileViolation": {
+          "id": "FileViolation",
+          "name": "FileViolation"
         }
       }
     },
