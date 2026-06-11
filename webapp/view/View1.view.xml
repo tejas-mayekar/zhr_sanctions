@@ -25,6 +25,7 @@
                     expanded="true"
                     stretchContentHeight="true"
                     class="sapUiResponsiveContentPadding"
+                    select=".onTabSelect"
                 >
                     <!-- ─── CURRENT TAB ─── -->
                     <items >
@@ -138,7 +139,7 @@
                                 id="historyTable"
                                 selectionMode="None"
                                 enableSelectAll="false"
-                                rows="{path: '/HDR_HISTSet'}"
+                                rows="{path: '/ITM_STRSet'}"
                                 threshold="15"
                                 scrollThreshold="50"
                                 enableBusyIndicator="true"

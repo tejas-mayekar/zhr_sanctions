@@ -6,8 +6,9 @@ sap.ui.define([
     "sap/ui/model/json/JSONModel",
     "sap/ui/model/Filter",
     "sap/ui/model/FilterOperator",
-    "sap/ui/model/odata/v2/ODataModel"
-], (Controller, Column, Label, Text, JSONModel, Filter, FilterOperator, ODataModel) => {
+    "sap/ui/model/odata/v2/ODataModel",
+    "zhrsanctions/utils/ODataUtils"
+], (Controller, Column, Label, Text, JSONModel, Filter, FilterOperator, ODataModel, ODataUtils) => {
     "use strict";
 
     const CURRENT_COLUMNS = [
@@ -43,12 +44,19 @@ sap.ui.define([
     ];
 
     const HISTORY_COLUMNS = [
-        { label: "Action Ref No", binding: "ZACTION_REF_NO", width: "11rem", sortProperty: "ZACTION_REF_NO", filterProperty: "ZACTION_REF_NO", visible: true },
+        { label: "Action Ref No", binding: "ZactionRefNo", width: "11rem", sortProperty: "ZactionRefNo", filterProperty: "ZactionRefNo", visible: true },
         { label: "Employee ID", binding: "ZempId", width: "9rem", sortProperty: "ZempId", filterProperty: "ZempId", visible: true },
         { label: "Employee Name", binding: "ZempName", width: "14rem", sortProperty: "ZempName", filterProperty: "ZempName", visible: true },
-        { label: "Closed Date", binding: "ZlmIdActionDate", width: "10rem", sortProperty: "ZlmIdActionDate", filterProperty: "ZlmIdActionDate", visible: true },
-        { label: "Resolution", binding: "ZempTypeDesc", width: "14rem", sortProperty: "ZempTypeDesc", filterProperty: "ZempTypeDesc", visible: true },
-        { label: "Resolved By", binding: "ZlmIdName", width: "10rem", sortProperty: "ZlmIdName", filterProperty: "ZlmIdName", visible: true },
+        { label: "Incident Date", binding: "ZincDate", width: "10rem", sortProperty: "ZincDate", filterProperty: "ZincDate", visible: true },
+        { label: "Action", binding: "Zaction", width: "14rem", sortProperty: "Zaction", filterProperty: "Zaction", visible: true },
+        { label: "Status", binding: "Zstatus", width: "10rem", sortProperty: "Zstatus", filterProperty: "Zstatus", visible: true },
+        { label: "Sanction", binding: "Zsanction", width: "14rem", sortProperty: "Zsanction", filterProperty: "Zsanction", visible: true },
+        { label: "Initiated By", binding: "ZinitatedBy", width: "14rem", sortProperty: "ZinitatedBy", filterProperty: "ZinitatedBy", visible: true },
+        { label: "Initiated Date", binding: "ZinitDate", width: "12rem", sortProperty: "ZinitDate", filterProperty: "ZinitDate", visible: true },
+        { label: "Line Manager", binding: "Zlinemanagername", width: "14rem", sortProperty: "Zlinemanagername", filterProperty: "Zlinemanagername", visible: true },
+        { label: "LM Action", binding: "Zlinemanageraction", width: "12rem", sortProperty: "Zlinemanageraction", filterProperty: "Zlinemanageraction", visible: true },
+        { label: "LM Action Date", binding: "Zlinemanageractiondate", width: "12rem", sortProperty: "Zlinemanageractiondate", filterProperty: "Zlinemanageractiondate", visible: true },
+        { label: "Remark", binding: "Zremark", width: "16rem", sortProperty: "Zremark", filterProperty: "Zremark", visible: true },
     ];
 
     return Controller.extend("zhrsanctions.controller.View1", {
@@ -59,7 +67,7 @@ sap.ui.define([
                 currentCount: 0,
                 historyCount: 0,
                 HDR_STRSet: [],
-                HDR_HISTSet: []
+                ITM_STRSet: []
             });
             this.getView().setModel(oUIModel);
 
@@ -164,7 +172,7 @@ sap.ui.define([
                 });
         },
 
-        // ── Main Search ───────────────────────────────────────────────────────
+        // ── Main Search (Current tab only) ────────────────────────────────────
 
         async onSearch() {
             try {
@@ -176,13 +184,15 @@ sap.ui.define([
                     new Filter("ZlmIdName", FilterOperator.EQ, '200129')
                 ];
 
-                const aData = await this.fetchOData("mainService", "/HDR_STRSet", filters);
-                console.log("Fetched data:", aData);
+                const aCurrentData = await ODataUtils.fetchOData(
+                    this.getView().getModel("mainService"), "/HDR_STRSet", filters
+                );
+                console.log("Fetched current data:", aCurrentData);
 
-                if (aData && aData.length > 0) {
-                    oUIModel.setProperty("/HDR_STRSet", aData);
-                    oUIModel.setProperty("/currentCount", aData.length);
-                    sap.m.MessageToast.show(`Loaded ${aData.length} violations`);
+                if (aCurrentData && aCurrentData.length > 0) {
+                    oUIModel.setProperty("/HDR_STRSet", aCurrentData);
+                    oUIModel.setProperty("/currentCount", aCurrentData.length);
+                    sap.m.MessageToast.show(`Loaded ${aCurrentData.length} violations`);
                 } else {
                     oUIModel.setProperty("/HDR_STRSet", []);
                     oUIModel.setProperty("/currentCount", 0);
@@ -193,12 +203,16 @@ sap.ui.define([
 
             } catch (error) {
                 sap.ui.core.BusyIndicator.hide();
-                console.error("OData fetch error details:", {
-                    message: error.message,
-                    statusCode: error.statusCode,
-                    responseText: error.responseText
-                });
-                sap.m.MessageToast.show("An error occurred while loading data.");
+                ODataUtils.handleODataError(error, "Failed to load violations.");
+            }
+        },
+
+        // ── Tab Select — refresh History on every visit ───────────────────────
+
+        onTabSelect(oEvent) {
+            const sKey = oEvent.getParameter("key");
+            if (sKey === "history") {
+                this._loadHistory();
             }
         },
         onPayrollDeductionPress() {
@@ -249,9 +263,9 @@ sap.ui.define([
 
             // Find the full record from the JSON model so the object page has all fields immediately
             const oUIModel = this.getView().getModel();
-            const sSetKey = sSource === "history" ? "HDR_HISTSet" : "HDR_STRSet";
+            const sSetKey = sSource === "history" ? "ITM_STRSet" : "HDR_STRSet";
             const aRecords = oUIModel.getProperty(`/${sSetKey}`) || [];
-            const oRecord = aRecords.find(r => r.ZACTION_REF_NO === sActionRefNo);
+            const oRecord = aRecords.find(r => (r.ZACTION_REF_NO || r.ZactionRefNo) === sActionRefNo);
 
             // Store the selected record in the component model so it survives navigation
             const oComponent = this.getOwnerComponent();
@@ -306,43 +320,35 @@ sap.ui.define([
         },
 
         onRefreshHistory() {
-            this.byId("historyTable").getBinding("rows")?.refresh(true);
+            this._loadHistory();
+        },
+
+        // ── Load History (ITM_STRSet) ─────────────────────────────────────────
+
+        async _loadHistory() {
+            try {
+                const oUIModel = this.getView().getModel();
+                sap.ui.core.BusyIndicator.show(0);
+                const aHistoryData = await ODataUtils.fetchOData(
+                    this.getView().getModel("mainService"), "/ITM_STRSet", []
+                );
+                console.log("Fetched history data:", aHistoryData);
+                oUIModel.setProperty("/ITM_STRSet", aHistoryData || []);
+                oUIModel.setProperty("/historyCount", (aHistoryData || []).length);
+                sap.ui.core.BusyIndicator.hide();
+            } catch (error) {
+                sap.ui.core.BusyIndicator.hide();
+                ODataUtils.handleODataError(error, "Failed to load history.");
+            }
         },
 
         // ── OData Fetch ───────────────────────────────────────────────────────
+        // Delegated to ODataUtils.fetchOData — kept as a thin shim so any
+        // remaining call site (e.g. sub-classes or test stubs) still resolves.
 
-        fetchOData(modelName, entitySetPath, filters) {
+        fetchOData(modelName, sEntityPath, aFilters) {
             const oModel = this.getView().getModel(modelName);
-
-            if (!oModel) {
-                return Promise.reject(new Error(`Model '${modelName}' not found`));
-            }
-
-            if (typeof oModel.read !== "function") {
-                return Promise.reject(new Error(`Model '${modelName}' does not have read method`));
-            }
-
-            return new Promise((resolve, reject) => {
-                oModel.read(entitySetPath, {
-                    filters: filters || [],
-                    success: oData => {
-                        if (!oData || !oData.results) {
-                            reject(new Error("No data returned from service"));
-                        } else {
-                            resolve(oData.results);
-                        }
-                    },
-                    error: oError => {
-                        console.error("OData Error Response:", {
-                            statusCode: oError.statusCode,
-                            statusText: oError.statusText,
-                            message: oError.message,
-                            responseText: oError.responseText
-                        });
-                        reject(oError);
-                    }
-                });
-            });
+            return ODataUtils.fetchOData(oModel, sEntityPath, aFilters);
         }
 
     });

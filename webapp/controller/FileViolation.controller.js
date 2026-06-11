@@ -4,8 +4,9 @@ sap.ui.define([
     "sap/ui/core/Fragment",
     "sap/ui/model/json/JSONModel",
     "sap/m/MessageToast",
-    "sap/m/MessageBox"
-], (Controller, History, Fragment, JSONModel, MessageToast, MessageBox) => {
+    "sap/m/MessageBox",
+    "zhrsanctions/utils/ODataUtils"
+], (Controller, History, Fragment, JSONModel, MessageToast, MessageBox, ODataUtils) => {
     "use strict";
 
     return Controller.extend("zhrsanctions.controller.FileViolation", {
@@ -171,64 +172,11 @@ sap.ui.define([
         },
 
         /**
-         * Handle OData errors with specific error messages
+         * Handle OData errors — delegates to the shared ODataUtils helper.
          */
-        _handleODataError(oErr) {
-            let sErrorMessage = "Error creating violation record.";
-            let sDetails = "";
-
-            try {
-                // Extract the actual error message from the OData response
-                if (oErr.responseText) {
-                    const oErrorResponse = JSON.parse(oErr.responseText);
-                    const oError = oErrorResponse.error || oErrorResponse;
-
-                    if (oError.message && typeof oError.message === "object") {
-                        sErrorMessage = oError.message.value || oError.message;
-                    } else if (oError.message) {
-                        sErrorMessage = oError.message;
-                    }
-
-                    // Check for specific error codes
-                    // if (oError.code && oError.code.includes("/IWBEP/CM_MGW_RT/022")) {
-                    //     sErrorMessage = "Action Reference Number already exists. Please use a unique Action Ref No.";
-                    //     sDetails = "This violation record with the same Action Reference Number is already in the system.";
-                    // } else 
-                    if (oError.innererror && oError.innererror.errordetails) {
-                        const errorDetails = oError.innererror.errordetails[0];
-                        if (errorDetails && errorDetails.message) {
-                            sErrorMessage = errorDetails.message;
-                        }
-                    }
-                } else if (oErr.message) {
-                    sErrorMessage = oErr.message;
-                } else if (oErr.statusText) {
-                    sErrorMessage = oErr.statusText;
-                }
-            } catch (e) {
-                console.error("Error parsing error response:", e);
-                sErrorMessage = oErr.statusText || "An unexpected error occurred.";
-            }
-
-            // Display comprehensive error dialog
-            const sFullMessage = sDetails ? `${sErrorMessage}\n\n${sDetails}` : sErrorMessage;
-            sap.m.MessageBox.error(sFullMessage, {
-                title: "Save Error",
-                onClose: (sAction) => {
-                    // Optional: Highlight the field that caused the error
-                    if (sErrorMessage.includes("Action Reference Number")) {
-                        const oActionRefField = this.byId("inputZactionRefNo");
-                        if (oActionRefField) {
-                            oActionRefField.setValueState("Error");
-                            oActionRefField.setValueStateText("This Action Ref No already exists");
-                        }
-                    }
-                }
-            });
-
-            console.error("OData Error Details:", oErr);
-        }
-        ,
+        _handleODataError(oErr, sTitle) {
+            ODataUtils.handleODataError(oErr, sTitle || "Error creating violation record.");
+        },
 
         /**
          * Helper to convert TimePicker string "HH:mm:ss" to OData Edm.Time structure

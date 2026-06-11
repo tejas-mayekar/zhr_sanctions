@@ -4,8 +4,9 @@ sap.ui.define([
     "sap/ui/core/Fragment",
     "sap/ui/model/json/JSONModel",
     "sap/m/MessageToast",
-    "sap/m/MessageBox"
-], (Controller, History, Fragment, JSONModel, MessageToast, MessageBox) => {
+    "sap/m/MessageBox",
+    "zhrsanctions/utils/ODataUtils"
+], (Controller, History, Fragment, JSONModel, MessageToast, MessageBox, ODataUtils) => {
     "use strict";
 
     return Controller.extend("zhrsanctions.controller.ViolationDetailPage", {
@@ -288,10 +289,7 @@ _formatTimeForPayload(sTimeVal) {
                     },
                     error: (oErr) => {
                         sap.ui.core.BusyIndicator.hide();
-                        MessageBox.error(
-                            "Error submitting Regularization:\n" +
-                            (oErr.message || oErr.statusText || "Submission failed.")
-                        );
+                        ODataUtils.handleODataError(oErr, "Error submitting Regularization");
                     }
                 });
             } else {
@@ -433,10 +431,7 @@ _formatTimeForPayload(sTimeVal) {
                     },
                     error: (oErr) => {
                         sap.ui.core.BusyIndicator.hide();
-                        MessageBox.error(
-                            "Error submitting Payroll Deduction:\n" +
-                            (oErr.message || oErr.statusText || "Submission failed.")
-                        );
+                        ODataUtils.handleODataError(oErr, "Error submitting Payroll Deduction");
                     }
                 });
             } else {
