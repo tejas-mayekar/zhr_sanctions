@@ -103,7 +103,13 @@ sap.ui.define([], () => {
         },
         // ── Get User Id ──────────────────────────────────────────────────
         getuserId() {
-            return '200129'
+            var oUser = sap.ushell.Container.getService("UserInfo").getUser();
+            var sId = oUser.getId();   
+            if(sId === "DACO_EAMV04"){
+                return '200129'
+            }else{
+                return '200130'
+            }
         },
         
         // ── Edm.Time Builder ──────────────────────────────────────────────────
