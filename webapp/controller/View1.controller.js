@@ -100,7 +100,7 @@ sap.ui.define([
                 const oUIModel = this.getView().getModel();
                 sap.ui.core.BusyIndicator.show(0);
                 const filters = [
-                    new Filter("ZlmIdName", FilterOperator.EQ, '200129')
+                    new Filter("ZlmIdName", FilterOperator.EQ, ODataUtils.getuserId())
                 ];
                 const aCurrentData = await ODataUtils.fetchOData(
                     this.getView().getModel("mainService"), "/HDR_STRSet", filters
@@ -203,8 +203,11 @@ sap.ui.define([
             try {
                 const oUIModel = this.getView().getModel();
                 sap.ui.core.BusyIndicator.show(0);
+                const filters = [
+                    new Filter("ZlmIdName", FilterOperator.EQ, ODataUtils.getuserId())
+                ];
                 const aHistoryData = await ODataUtils.fetchOData(
-                    this.getView().getModel("mainService"), "/ITM_STRSet", []
+                    this.getView().getModel("mainService"), "/ITM_STRSet", filters
                 );
                 oUIModel.setProperty("/ITM_STRSet", aHistoryData || []);
                 oUIModel.setProperty("/historyCount", (aHistoryData || []).length);

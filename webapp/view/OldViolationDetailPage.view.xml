@@ -106,7 +106,16 @@
                                 text="Edit Violation"
                                 type="Emphasized"
                                 width="10rem"
+                                visible="{= !${/isEditOn} }"
                                 press=".onEditViolationPress"
+                            />
+                             <Button
+                                id="_IDGenButton14"
+                                text="Save Changes"
+                                type="Success"
+                                width="10rem"
+                                visible="{= ${/isEditOn} }"
+                                press=".onSaveViolationPress"
                             />
                             <Button
                                 id="_IDGenButton13"
@@ -153,27 +162,33 @@
                                 id="_IDGenLabel35"
                                 text="Employee ID"
                             />
-                            <Text
+                            <Input
                                 id="_IDGenText32"
-                                text="{detailData>/record/ZempId}"
+                                value="{detailData>/record/ZempId}"
+                                
+                                editable="{= ${/isEditOn} }"
                             />
 
                             <Label
                                 id="_IDGenLabel36"
                                 text="Employee Name"
                             />
-                            <Text
+                            <Input
                                 id="_IDGenText33"
-                                text="{detailData>/record/ZempName}"
+                                value="{detailData>/record/ZempName}"
+                                
+                                editable="{= ${/isEditOn} }"
                             />
 
                             <Label
                                 id="_IDGenLabel37"
                                 text="Employee Type"
                             />
-                            <Text
+                            <Input
                                 id="_IDGenText34"
-                                text="{detailData>/record/ZempTypeDesc}"
+                                value="{detailData>/record/ZempTypeDesc}"
+                            
+                                editable="{= ${/isEditOn} }"
                             />
 
                             <Label

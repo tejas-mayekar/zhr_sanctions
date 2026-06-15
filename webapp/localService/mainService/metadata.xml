@@ -8,6 +8,7 @@
                     <PropertyRef Name="ZempId"/>
                     <PropertyRef Name="ZACTION_REF_NO"/>
                 </Key>
+                <Property Name="Zishc" Type="Edm.Boolean" Nullable="false" sap:unicode="false" sap:label="Is Hc" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="ZempId" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Employee ID" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="ZACTION_REF_NO" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Action Reference ID" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="ZempDoj" Type="Edm.DateTime" Precision="7" sap:unicode="false" sap:label="Date of joining" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
@@ -55,6 +56,7 @@
                     <PropertyRef Name="ZempId"/>
                     <PropertyRef Name="ZincDate"/>
                 </Key>
+                <Property Name="ZlmIdName" Type="Edm.String" Nullable="false" MaxLength="50" sap:unicode="false" sap:label="LM Id" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="ZactionRefNo" Type="Edm.String" MaxLength="10" sap:unicode="false" sap:label="Action reference Num" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="ZempId" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Employee ID" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="ZincDate" Type="Edm.DateTime" Nullable="false" Precision="7" sap:unicode="false" sap:label="Incident date" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
