@@ -72,6 +72,12 @@ sap.ui.define([
 
             // Defer search until next tick to ensure model is attached
             setTimeout(() => this.onSearch(), 0);
+            var oUser = sap.ushell.Container.getService("UserInfo").getUser();
+            var sId = oUser.getId();        // user ID
+            var sName = oUser.getFullName(); // full name
+            var sEmail = oUser.getEmail();   // email (if available)
+            // use/attach to model
+            console.log("/user", { id: sId, name: sName, email: sEmail });
         }
         ,
 
