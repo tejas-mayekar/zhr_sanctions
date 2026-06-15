@@ -105,7 +105,7 @@ sap.ui.define([], () => {
         getuserId() {
             var oUser = sap.ushell.Container.getService("UserInfo").getUser();
             var sId = oUser.getId();   
-            if(sId === "DACO_EAMV04"){
+            if(sId == "DACO_EAMV04"){
                 return '200129'
             }else{
                 return '200130'
