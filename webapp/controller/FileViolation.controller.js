@@ -90,6 +90,7 @@ sap.ui.define([
 
                 // Workflow
                 Zlinemanagername:       this.byId("inputZlinemanagername").getValue(),
+                ZlmIdName:              ODataUtils.getuserId(),
                 Zlinemanageraction:     this.byId("inputZlinemanageraction").getValue(),
                 Zlinemanageractiondate: this.byId("dpZlinemanageractiondate").getDateValue(),
                 Zlinemanagerremarks:    this.byId("inputZlinemanagerremarks").getValue(),
