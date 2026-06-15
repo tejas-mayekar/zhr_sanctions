@@ -208,7 +208,7 @@ sap.ui.define([], () => {
                 Zsysyrepeatcount: p(oRecord.Zsysyrepeatcount),
 
                 // Workflow
-                Zlinemanagername: oRecord.ZlmIdName || "",
+                ZlmIdName: oRecord.ZlmIdName || "",
                 Zlinemanageraction: oRecord.Zlinemanageraction || "",
                 Zlinemanageractiondate: oRecord.ZlmIdActionDate || null,
                 Zlinemanagerremarks: oRecord.Zlinemanagerremarks || "",
