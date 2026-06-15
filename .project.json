@@ -1,0 +1,13 @@
+{
+  "mockpreview": {
+    "mockUri": "/sap/opu/odata/sap/ZHR_SACTIONS_APPLICATION_SRV/",
+    "metadataFilePath": "localService/mainService/metadata.xml",
+    "mockRequestsFilePath": "",
+    "loadJSONFiles": false,
+    "loadCustomRequests": false
+  },
+  "deploy": {
+    "destination": "DACCO",
+    "name": "ZHR_SANCTIONS"
+  }
+}
