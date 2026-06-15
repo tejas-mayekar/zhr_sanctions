@@ -1,39 +1,9 @@
 sap.ui.define([], () => {
     "use strict";
 
-    /**
-     * ODataUtils — shared helpers for all controllers in zhrsanctions.
-     *
-     * Usage in any controller:
-     *   sap.ui.define([
-     *       ...,
-     *       "zhrsanctions/utils/ODataUtils"
-     *   ], (..., ODataUtils) => {
-     *       ...
-     *       // Read
-     *       ODataUtils.fetchOData(oModel, "/HDR_STRSet", aFilters)
-     *           .then(aResults => { ... })
-     *           .catch(oErr => ODataUtils.handleODataError(oErr, "Load failed"));
-     *
-     *       // In an OData create/update error callback
-     *       error: (oErr) => ODataUtils.handleODataError(oErr, "Save failed")
-     *   });
-     */
     const ODataUtils = {
 
         // ── Error Handler ─────────────────────────────────────────────────────
-        //
-        // Parses an OData v2 error response and shows a sap.m.MessageBox.
-        //
-        // Priority for the message text:
-        //   1. innererror.errordetails[0].message  (most specific SAP ABAP message)
-        //   2. error.message  (top-level OData error)
-        //   3. oErr.message   (JS Error / network error)
-        //   4. oErr.statusText
-        //   5. Fallback generic string
-        //
-        // @param {object} oErr    – The error from the OData reject / error callback.
-        // @param {string} [sTitle] – Dialog title. Doubles as the fallback message text.
 
         handleODataError(oErr, sTitle) {
             let sErrorMessage = sTitle || "An error occurred.";
@@ -69,14 +39,7 @@ sap.ui.define([], () => {
             sap.m.MessageBox.error(sErrorMessage, { title: sTitle || "Error" });
         },
 
-        // ── OData Read (Promise wrapper) ───────────────────────────────────────
-        //
-        // Wraps ODataModel.read() in a Promise so callers can use async/await.
-        //
-        // @param {sap.ui.model.odata.v2.ODataModel} oModel       – An initialised ODataModel instance.
-        // @param {string}                            sEntityPath  – Entity set path, e.g. "/HDR_STRSet".
-        // @param {sap.ui.model.Filter[]}             [aFilters]   – Optional filter array.
-        // @returns {Promise<object[]>}  Resolves with the results array.
+        // ── OData Read ────────────────────────────────────────────────────────
 
         fetchOData(oModel, sEntityPath, aFilters) {
             if (!oModel) {
@@ -107,6 +70,162 @@ sap.ui.define([], () => {
                     }
                 });
             });
+        },
+
+        // ── Edm.Time Formatter ────────────────────────────────────────────────
+        //
+        // Accepts: { ms: 28800000 } | 28800000 | "08:00:00" | null | undefined
+        // Returns: "HH:mm:ss" string
+
+        formatEdmTime(oTime) {
+            if (oTime === null || oTime === undefined) {
+                return "";
+            }
+            if (typeof oTime === "string") {
+                return oTime;
+            }
+
+            let iMs;
+            if (typeof oTime === "object" && oTime.ms !== undefined) {
+                iMs = oTime.ms;
+            } else if (typeof oTime === "number") {
+                iMs = oTime;
+            } else {
+                return "";
+            }
+
+            const iSeconds = Math.floor(iMs / 1000);
+            const hh = String(Math.floor(iSeconds / 3600)).padStart(2, "0");
+            const mm = String(Math.floor((iSeconds % 3600) / 60)).padStart(2, "0");
+            const ss = String(iSeconds % 60).padStart(2, "0");
+
+            return `${hh}:${mm}:${ss}`;
+        },
+
+        // ── Edm.Time Builder ──────────────────────────────────────────────────
+        //
+        // Converts "HH:mm:ss" or "HH:mm" string → { ms, __edmType } for OData payload.
+
+        formatTimeForPayload(sTimeVal) {
+            if (!sTimeVal) {
+                return null;
+            }
+            const aParts = sTimeVal.split(":");
+            if (aParts.length >= 2) {
+                const iHours   = parseInt(aParts[0], 10);
+                const iMinutes = parseInt(aParts[1], 10);
+                const iSeconds = aParts[2] ? parseInt(aParts[2], 10) : 0;
+                const iMs = ((iHours * 60 + iMinutes) * 60 + iSeconds) * 1000;
+                return { ms: iMs, __edmType: "Edm.Time" };
+            }
+            return null;
+        },
+
+        // ── Byte/Int Parser ───────────────────────────────────────────────────
+        //
+        // Safe parseInt for Edm.Byte fields — returns 0 on NaN.
+
+        parseByte(val) {
+            const iVal = parseInt(val, 10);
+            return isNaN(iVal) ? 0 : iVal;
+        },
+
+        // ── ITM_STR Payload Builder ───────────────────────────────────────────
+        //
+        // Builds full ITM_STRSet payload from a detailData record.
+        // oOverrides: any fields to override (e.g. Zaction, Zremark, Zpunchintime).
+
+        buildITMPayload(oRecord, oOverrides) {
+            const p = this.parseByte.bind(this);
+
+            const oBase = {
+                // Employee
+                ZempId:            oRecord.ZempId            || "",
+                ZempName:          oRecord.ZempName          || "",
+                ZempType:          oRecord.ZempType          || "",
+                ZempTypeDesc:      oRecord.ZempTypeDesc      || "",
+                ZempClass:         oRecord.ZempClass         || "",
+                ZempClassDesc:     oRecord.ZempClassDesc     || "",
+                Zcompany:          oRecord.Zcompany          || "",
+                Znationality:      oRecord.Znationality      || "",
+                Zhiredate:         oRecord.ZhireDate         || null,
+                Zpaygrade:         oRecord.ZpayGrade         || null,
+                Zposition:         oRecord.Zposition         || "",
+                Zjobtitle:         oRecord.ZjobTitle         || "",
+                Zjobclassification:oRecord.Zjobclassification|| "",
+                Zlocation:         oRecord.Zlocation         || "",
+                Zlocationgroup:    oRecord.ZlocGroup         || "",
+                Zworkschedule:     oRecord.Zworkschedule     || "",
+                ZlatestNode:       oRecord.ZlatestNode       || "",
+                ZstdWeekHrs:       p(oRecord.ZstdWeekHrs),
+                ZwrkDyWeek:        p(oRecord.ZwrkDyWeek),
+
+                // Indicators
+                Zn0: p(oRecord.Zn0),
+                Zn1: p(oRecord.Zn1),
+                Zn2: p(oRecord.Zn2),
+                Zn3: p(oRecord.Zn3),
+                Zn4: p(oRecord.Zn4),
+                Zn5: p(oRecord.Zn5),
+                Zn6: p(oRecord.Zn6),
+                Zn7: p(oRecord.Zn7),
+
+                // Violation
+                ZactionRefNo:      oRecord.ZACTION_REF_NO   || "",
+                ZincDate:          oRecord.ZincDate          || null,
+                ZincCategory:      oRecord.ZincCategory      || "",
+                ZincType:          oRecord.ZincType          || "",
+                Zaction:           oRecord.Zaction           || "",
+                Zstatus:           oRecord.Status            || "",
+                Zsanction:         oRecord.Zsanction         || "",
+                Zremark:           oRecord.Zremark           || "",
+
+                // Timeline
+                ZincDisDate:          oRecord.ZincDisDate          || null,
+                ZinitatedBy:          oRecord.ZinitatedBy          || "",
+                ZinitDate:            oRecord.ZinitDate            || null,
+                ZfirstIncDate:        oRecord.ZfirstIncDate        || null,
+                Zawaitingactionfrom:  oRecord.Zawaitingactionfrom  || null,
+                Zlastaction:          oRecord.Zlastaction          || null,
+
+                // Times
+                ZschTimeIn:    oRecord.ZschTimeIn    || null,
+                ZschTimeOut:   oRecord.ZschTimeOut   || null,
+                Zpunchintime:  oRecord.Zpunchintime  || null,
+                Zpunchouttime: oRecord.Zpunchouttime || null,
+                ZdelayHrs:     p(oRecord.ZdelayHrs),
+                ZshortHrs:     p(oRecord.ZshortHrs),
+                Zrepeatcount:      p(oRecord.Zrepeatcount),
+                Zsysyrepeatcount:  p(oRecord.Zsysyrepeatcount),
+
+                // Workflow
+                Zlinemanagername:       oRecord.ZlmIdName            || "",
+                Zlinemanageraction:     oRecord.Zlinemanageraction    || "",
+                Zlinemanageractiondate: oRecord.ZlmIdActionDate       || null,
+                Zlinemanagerremarks:    oRecord.Zlinemanagerremarks   || "",
+
+                Zhcopsname:       oRecord.Zhcopsname       || "",
+                Zhcopsaction:     oRecord.Zhcopsaction     || "",
+                Zhcopsactiondate: oRecord.Zhcopsactiondate || null,
+                Zhcopsremark:     oRecord.Zhcopsremark     || "",
+
+                Zhcevpname:       oRecord.Zhcevpname       || "",
+                Zhcevpaction:     oRecord.Zhcevpaction     || "",
+                Zhcevpactiondate: oRecord.Zhcevpactiondate || null,
+                Zhcevpremark:     oRecord.Zhcevpremark     || "",
+
+                Zlegalmembername:       oRecord.Zlegalmembername       || "",
+                Zlegalmemberaction:     oRecord.Zlegalmemberaction     || "",
+                Zlegalmemberactiondate: oRecord.Zlegalmemberactiondate || null,
+                Zlegalremark:           oRecord.Zlegalremark           || "",
+
+                Zceoname:         oRecord.Zceoname         || "",
+                Zceoaction:       oRecord.Zceoaction       || "",
+                Zceoactiondate:   oRecord.Zceoactiondate   || null,
+                Zceoactionremark: oRecord.Zceoactionremark || ""
+            };
+
+            return Object.assign(oBase, oOverrides || {});
         }
     };
 

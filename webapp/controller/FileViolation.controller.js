@@ -1,19 +1,18 @@
 sap.ui.define([
-    "sap/ui/core/mvc/Controller",
-    "sap/ui/core/routing/History",
-    "sap/ui/core/Fragment",
-    "sap/ui/model/json/JSONModel",
+    "zhrsanctions/controller/BaseController",
     "sap/m/MessageToast",
     "sap/m/MessageBox",
     "zhrsanctions/utils/ODataUtils"
-], (Controller, History, Fragment, JSONModel, MessageToast, MessageBox, ODataUtils) => {
+], (BaseController, MessageToast, MessageBox, ODataUtils) => {
     "use strict";
 
-    return Controller.extend("zhrsanctions.controller.FileViolation", {
+    return BaseController.extend("zhrsanctions.controller.FileViolation", {
 
         onInit() {
-            const oRouter = this.getOwnerComponent().getRouter();
-            oRouter.getRoute("RouteFileViolation").attachPatternMatched(this._onRouteMatched, this);
+            this.getOwnerComponent()
+                .getRouter()
+                .getRoute("RouteFileViolation")
+                .attachPatternMatched(this._onRouteMatched, this);
         },
 
         _onRouteMatched() {
@@ -23,178 +22,125 @@ sap.ui.define([
             }
         },
 
-        // ── Navigation ────────────────────────────────────────────────────────
-
-        onNavBack() {
-            const oHistory = History.getInstance();
-            const sPrevHash = oHistory.getPreviousHash();
-
-            if (sPrevHash !== undefined) {
-                window.history.go(-1);
-            } else {
-                this.getOwnerComponent().getRouter().navTo("RouteView1", {}, true);
-            }
-        },
-
-        // ── Actions ───────────────────────────────────────────────────────────
-
         onCancel() {
             this.onNavBack();
         },
 
         onSave() {
-            const parseByte = (sVal) => {
-                const iVal = parseInt(sVal, 10);
-                return isNaN(iVal) ? 0 : iVal;
-            };
+            const p = ODataUtils.parseByte.bind(ODataUtils);
 
             const oPayload = {
-                // Section 1: Employee Details
-                ZempId: this.byId("inputZempId").getValue(),
-                ZempName: this.byId("inputZempName").getValue(),
-                ZempType: this.byId("inputZempType").getValue(),
-                ZempTypeDesc: this.byId("inputZempTypeDesc").getValue(),
-                ZempClass: this.byId("inputZempClass").getValue(),
-                ZempClassDesc: this.byId("inputZempClassDesc").getValue(),
-                Zcompany: this.byId("inputZcompany").getValue(),
-                Znationality: this.byId("inputZnationality").getValue(),
-                Zhiredate: this.byId("dpZhiredate").getDateValue(),
-                Zpaygrade: this.byId("inputZpaygrade").getValue(),
-                Zposition: this.byId("inputZposition").getValue(),
-                Zjobtitle: this.byId("inputZjobtitle").getValue(),
+                // Employee
+                ZempId:             this.byId("inputZempId").getValue(),
+                ZempName:           this.byId("inputZempName").getValue(),
+                ZempType:           this.byId("inputZempType").getValue(),
+                ZempTypeDesc:       this.byId("inputZempTypeDesc").getValue(),
+                ZempClass:          this.byId("inputZempClass").getValue(),
+                ZempClassDesc:      this.byId("inputZempClassDesc").getValue(),
+                Zcompany:           this.byId("inputZcompany").getValue(),
+                Znationality:       this.byId("inputZnationality").getValue(),
+                Zhiredate:          this.byId("dpZhiredate").getDateValue(),
+                Zpaygrade:          this.byId("inputZpaygrade").getValue(),
+                Zposition:          this.byId("inputZposition").getValue(),
+                Zjobtitle:          this.byId("inputZjobtitle").getValue(),
                 Zjobclassification: this.byId("inputZjobclassification").getValue(),
-                Zlocation: this.byId("inputZlocation").getValue(),
-                Zlocationgroup: this.byId("inputZlocationgroup").getValue(),
-                Zworkschedule: this.byId("inputZworkschedule").getValue(),
-                ZlatestNode: this.byId("inputZlatestNode").getValue(),
-                ZstdWeekHrs: parseByte(this.byId("inputZstdWeekHrs").getValue()),
-                ZwrkDyWeek: parseByte(this.byId("inputZwrkDyWeek").getValue()),
+                Zlocation:          this.byId("inputZlocation").getValue(),
+                Zlocationgroup:     this.byId("inputZlocationgroup").getValue(),
+                Zworkschedule:      this.byId("inputZworkschedule").getValue(),
+                ZlatestNode:        this.byId("inputZlatestNode").getValue(),
+                ZstdWeekHrs:        p(this.byId("inputZstdWeekHrs").getValue()),
+                ZwrkDyWeek:         p(this.byId("inputZwrkDyWeek").getValue()),
 
                 // Indicators
-                Zn0: parseByte(this.byId("inputZn0").getValue()),
-                Zn1: parseByte(this.byId("inputZn1").getValue()),
-                Zn2: parseByte(this.byId("inputZn2").getValue()),
-                Zn3: parseByte(this.byId("inputZn3").getValue()),
-                Zn4: parseByte(this.byId("inputZn4").getValue()),
-                Zn5: parseByte(this.byId("inputZn5").getValue()),
-                Zn6: parseByte(this.byId("inputZn6").getValue()),
-                Zn7: parseByte(this.byId("inputZn7").getValue()),
+                Zn0: p(this.byId("inputZn0").getValue()),
+                Zn1: p(this.byId("inputZn1").getValue()),
+                Zn2: p(this.byId("inputZn2").getValue()),
+                Zn3: p(this.byId("inputZn3").getValue()),
+                Zn4: p(this.byId("inputZn4").getValue()),
+                Zn5: p(this.byId("inputZn5").getValue()),
+                Zn6: p(this.byId("inputZn6").getValue()),
+                Zn7: p(this.byId("inputZn7").getValue()),
 
-                // Section 2: Violation & Incident Details
-                // ZactionRefNo: this.byId("inputZactionRefNo").getValue(),
-                ZincDate: this.byId("dpZincDate").getDateValue(),
+                // Violation
+                ZincDate:     this.byId("dpZincDate").getDateValue(),
                 ZincCategory: this.byId("inputZincCategory").getValue(),
-                ZincType: this.byId("inputZincType").getValue(),
-                Zaction: this.byId("inputZaction").getValue(),
-                Zstatus: this.byId("inputZstatus").getValue(),
-                Zsanction: this.byId("inputZsanction").getValue(),
-                Zremark: this.byId("inputZremark").getValue(),
+                ZincType:     this.byId("inputZincType").getValue(),
+                Zaction:      this.byId("inputZaction").getValue(),
+                Zstatus:      this.byId("inputZstatus").getValue(),
+                Zsanction:    this.byId("inputZsanction").getValue(),
+                Zremark:      this.byId("inputZremark").getValue(),
 
                 // Timeline
-                ZincDisDate: this.byId("dpZincDisDate").getDateValue(),
-                ZinitatedBy: this.byId("inputZinitatedBy").getValue(),
-                ZinitDate: this.byId("dpZinitDate").getDateValue(),
-                ZfirstIncDate: this.byId("dpZfirstIncDate").getDateValue(),
+                ZincDisDate:         this.byId("dpZincDisDate").getDateValue(),
+                ZinitatedBy:         this.byId("inputZinitatedBy").getValue(),
+                ZinitDate:           this.byId("dpZinitDate").getDateValue(),
+                ZfirstIncDate:       this.byId("dpZfirstIncDate").getDateValue(),
                 Zawaitingactionfrom: this.byId("dpZawaitingactionfrom").getDateValue(),
-                Zlastaction: this.byId("dpZlastaction").getDateValue(),
+                Zlastaction:         this.byId("dpZlastaction").getDateValue(),
 
                 // Times
-                ZschTimeIn: this._formatTime(this.byId("tpZschTimeIn").getValue()),
-                ZschTimeOut: this._formatTime(this.byId("tpZschTimeOut").getValue()),
-                Zpunchintime: this._formatTime(this.byId("tpZpunchintime").getValue()),
-                Zpunchouttime: this._formatTime(this.byId("tpZpunchouttime").getValue()),
-                ZdelayHrs: parseByte(this.byId("inputZdelayHrs").getValue()),
-                ZshortHrs: parseByte(this.byId("inputZshortHrs").getValue()),
-                Zrepeatcount: parseByte(this.byId("inputZrepeatcount").getValue()),
-                Zsysyrepeatcount: parseByte(this.byId("inputZsysyrepeatcount").getValue()),
+                ZschTimeIn:    ODataUtils.formatTimeForPayload(this.byId("tpZschTimeIn").getValue()),
+                ZschTimeOut:   ODataUtils.formatTimeForPayload(this.byId("tpZschTimeOut").getValue()),
+                Zpunchintime:  ODataUtils.formatTimeForPayload(this.byId("tpZpunchintime").getValue()),
+                Zpunchouttime: ODataUtils.formatTimeForPayload(this.byId("tpZpunchouttime").getValue()),
+                ZdelayHrs:         p(this.byId("inputZdelayHrs").getValue()),
+                ZshortHrs:         p(this.byId("inputZshortHrs").getValue()),
+                Zrepeatcount:      p(this.byId("inputZrepeatcount").getValue()),
+                Zsysyrepeatcount:  p(this.byId("inputZsysyrepeatcount").getValue()),
 
-                // Section 3: Workflow Actions
-                Zlinemanagername: this.byId("inputZlinemanagername").getValue(),
-                Zlinemanageraction: this.byId("inputZlinemanageraction").getValue(),
+                // Workflow
+                Zlinemanagername:       this.byId("inputZlinemanagername").getValue(),
+                Zlinemanageraction:     this.byId("inputZlinemanageraction").getValue(),
                 Zlinemanageractiondate: this.byId("dpZlinemanageractiondate").getDateValue(),
-                Zlinemanagerremarks: this.byId("inputZlinemanagerremarks").getValue(),
+                Zlinemanagerremarks:    this.byId("inputZlinemanagerremarks").getValue(),
 
-                Zhcopsname: this.byId("inputZhcopsname").getValue(),
-                Zhcopsaction: this.byId("inputZhcopsaction").getValue(),
+                Zhcopsname:       this.byId("inputZhcopsname").getValue(),
+                Zhcopsaction:     this.byId("inputZhcopsaction").getValue(),
                 Zhcopsactiondate: this.byId("dpZhcopsactiondate").getDateValue(),
-                Zhcopsremark: this.byId("inputZhcopsremark").getValue(),
+                Zhcopsremark:     this.byId("inputZhcopsremark").getValue(),
 
-                Zhcevpname: this.byId("inputZhcevpname").getValue(),
-                Zhcevpaction: this.byId("inputZhcevpaction").getValue(),
+                Zhcevpname:       this.byId("inputZhcevpname").getValue(),
+                Zhcevpaction:     this.byId("inputZhcevpaction").getValue(),
                 Zhcevpactiondate: this.byId("dpZhcevpactiondate").getDateValue(),
-                Zhcevpremark: this.byId("inputZhcevpremark").getValue(),
+                Zhcevpremark:     this.byId("inputZhcevpremark").getValue(),
 
-                Zlegalmembername: this.byId("inputZlegalmembername").getValue(),
-                Zlegalmemberaction: this.byId("inputZlegalmemberaction").getValue(),
+                Zlegalmembername:       this.byId("inputZlegalmembername").getValue(),
+                Zlegalmemberaction:     this.byId("inputZlegalmemberaction").getValue(),
                 Zlegalmemberactiondate: this.byId("dpZlegalmemberactiondate").getDateValue(),
-                Zlegalremark: this.byId("inputZlegalremark").getValue(),
+                Zlegalremark:           this.byId("inputZlegalremark").getValue(),
 
-                Zceoname: this.byId("inputZceoname").getValue(),
-                Zceoaction: this.byId("inputZceoaction").getValue(),
-                Zceoactiondate: this.byId("dpZceoactiondate").getDateValue(),
+                Zceoname:         this.byId("inputZceoname").getValue(),
+                Zceoaction:       this.byId("inputZceoaction").getValue(),
+                Zceoactiondate:   this.byId("dpZceoactiondate").getDateValue(),
                 Zceoactionremark: this.byId("inputZceoactionremark").getValue()
             };
 
-            console.log("Retrieved FileViolation payload data:", oPayload);
-
-            // Mandatory Key Validation
             if (!oPayload.ZempId || !oPayload.ZincDate) {
-                sap.m.MessageBox.error("Please fill in all mandatory key fields:\n- Employee ID\n- Incident Date");
+                MessageBox.error("Please fill in all mandatory key fields:\n- Employee ID\n- Incident Date");
                 return;
             }
 
-
-            // Get default OData model
             const oModel = this.getOwnerComponent().getModel() || this.getView().getModel("mainService");
-
-            if (oModel) {
-                sap.ui.core.BusyIndicator.show(0);
-
-                oModel.create("/ITM_STRSet", oPayload, {
-                    success: (oData) => {
-                        sap.ui.core.BusyIndicator.hide();
-                        sap.m.MessageToast.show("Violation record created successfully.");
-                        this.onNavBack();
-                    },
-                    error: (oErr) => {
-                        sap.ui.core.BusyIndicator.hide();
-                        this._handleODataError(oErr);
-                    }
-                });
-            } else {
-                sap.m.MessageBox.warning("No active OData service connected. Payload logged to console:\n" + JSON.stringify(oPayload, null, 2));
+            if (!oModel) {
+                MessageBox.warning(
+                    "No active OData service connected. Payload logged to console:\n" +
+                    JSON.stringify(oPayload, null, 2)
+                );
+                return;
             }
-        },
 
-        /**
-         * Handle OData errors — delegates to the shared ODataUtils helper.
-         */
-        _handleODataError(oErr, sTitle) {
-            ODataUtils.handleODataError(oErr, sTitle || "Error creating violation record.");
-        },
-
-        /**
-         * Helper to convert TimePicker string "HH:mm:ss" to OData Edm.Time structure
-         * @param {string} sTimeVal - Time string
-         * @returns {object|null} - Edm.Time representation
-         */
-        _formatTime(sTimeVal) {
-            if (!sTimeVal) {
-                return null;
-            }
-            const aParts = sTimeVal.split(":");
-            if (aParts.length >= 2) {
-                const iHours = parseInt(aParts[0], 10);
-                const iMinutes = parseInt(aParts[1], 10);
-                const iSeconds = aParts[2] ? parseInt(aParts[2], 10) : 0;
-                const iMs = ((iHours * 60 + iMinutes) * 60 + iSeconds) * 1000;
-                return {
-                    ms: iMs,
-                    __edmType: "Edm.Time"
-                };
-            }
-            return null;
+            sap.ui.core.BusyIndicator.show(0);
+            oModel.create("/ITM_STRSet", oPayload, {
+                success: () => {
+                    sap.ui.core.BusyIndicator.hide();
+                    MessageToast.show("Violation record created successfully.");
+                    this.onNavBack();
+                },
+                error: (oErr) => {
+                    sap.ui.core.BusyIndicator.hide();
+                    ODataUtils.handleODataError(oErr, "Error creating violation record.");
+                }
+            });
         }
-
     });
 });
