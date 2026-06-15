@@ -36,7 +36,6 @@ sap.ui.define([
                 ITM_STRSet:   []
             }));
 
-            this.initODataModel();
             this._buildColumns("_IDGenTable", HISTORY_COLUMNS);
 
             this.getOwnerComponent()

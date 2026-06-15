@@ -24,6 +24,7 @@
                         width="10rem"
                         icon="sap-icon://key-user-settings"
                         press=".onHCPortal"
+                        visible="{= ${/isHC} }"
                     />
                 </f:actions>
             </f:DynamicPageTitle>

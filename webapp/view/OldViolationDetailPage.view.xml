@@ -6,30 +6,30 @@
     xmlns:form="sap.ui.layout.form"
     xmlns="sap.m"
 >
-    <f:DynamicPage id="_IDGenDynamicPage1"
-         
+    <f:DynamicPage
+        id="_IDGenDynamicPage1"
         fitContent="true"
     >
         <!-- ─── Header ─── -->
         <f:title>
-            <f:DynamicPageTitle id="_IDGenDynamicPageTitle4"  >
+            <f:DynamicPageTitle id="_IDGenDynamicPageTitle4">
                 <f:navigationActions>
-                    <Button id="_IDGenButton11"
-                         
+                    <Button
+                        id="_IDGenButton11"
                         icon="sap-icon://nav-back"
                         tooltip="Back to list"
                         press=".onNavBack"
                     />
                 </f:navigationActions>
                 <f:heading>
-                    <Title id="_IDGenTitle2"
-                         
+                    <Title
+                        id="_IDGenTitle2"
                         text="Violation Details – {detailData>/record/ZactionRefNo}"
                     />
                 </f:heading>
                 <f:snappedHeading>
-                    <Title id="_IDGenTitle3"
-                         
+                    <Title
+                        id="_IDGenTitle3"
                         text="{detailData>/record/ZactionRefNo}"
                     />
                 </f:snappedHeading>
@@ -37,25 +37,25 @@
         </f:title>
 
         <f:header>
-            <f:DynamicPageHeader id="_IDGenDynamicPageHeader"
-                 
+            <f:DynamicPageHeader
+                id="_IDGenDynamicPageHeader"
                 pinnable="true"
             >
-                <HBox id="_IDGenHBox4"
-                     
+                <HBox
+                    id="_IDGenHBox4"
                     wrap="Wrap"
                     class="sapUiSmallMargin"
                     width="100%"
                     justifyContent="SpaceBetween"
                 >
                     <!-- Employee snapshot card -->
-                    <VBox id="_IDGenVBox5"
-                         
+                    <VBox
+                        id="_IDGenVBox5"
                         class="sapUiSmallMarginEnd"
                         width="50rem"
                     >
-                        <ObjectHeader id="_IDGenObjectHeader"
-                             
+                        <ObjectHeader
+                            id="_IDGenObjectHeader"
                             title="{detailData>/record/ZempName}"
                             number="{detailData>/record/ZempId}"
                             numberUnit="Employee ID"
@@ -63,31 +63,31 @@
                             backgroundDesign="Transparent"
                         >
                             <attributes>
-                                <ObjectAttribute id="_IDGenObjectAttribute"
-                                     
+                                <ObjectAttribute
+                                    id="_IDGenObjectAttribute"
                                     title="Company"
                                     text="{detailData>/record/Zcompany}"
                                 />
-                                <ObjectAttribute id="_IDGenObjectAttribute1"
-                                     
+                                <ObjectAttribute
+                                    id="_IDGenObjectAttribute1"
                                     title="Department"
                                     text="{detailData>/record/Zn3}"
                                 />
-                                <ObjectAttribute id="_IDGenObjectAttribute2"
-                                     
+                                <ObjectAttribute
+                                    id="_IDGenObjectAttribute2"
                                     title="Position"
                                     text="{detailData>/record/Zposition}"
                                 />
                             </attributes>
                             <statuses>
-                                <ObjectStatus id="_IDGenObjectStatus"
-                                     
+                                <ObjectStatus
+                                    id="_IDGenObjectStatus"
                                     title="Violation"
                                     text="{detailData>/record/ViolationType}"
                                     state="Warning"
                                 />
-                                <ObjectStatus id="_IDGenObjectStatus1"
-                                     
+                                <ObjectStatus
+                                    id="_IDGenObjectStatus1"
                                     title="Incident Date"
                                     text="{detailData>/record/ZincDate}"
                                 />
@@ -95,13 +95,26 @@
                         </ObjectHeader>
                     </VBox>
 
-                    <VBox id="_IDGenVBox6"  >
-                        <HBox id="_IDGenHBox5"   justifyContent="SpaceBetween" width="11rem">
-                            <Button id="_IDGenButton12"  
+                    <VBox id="_IDGenVBox6">
+                        <HBox
+                            id="_IDGenHBox5"
+                            justifyContent="SpaceBetween"
+                            width="21rem"
+                        >
+                            <Button
+                                id="_IDGenButton12"
                                 text="Edit Violation"
                                 type="Emphasized"
                                 width="10rem"
                                 press=".onEditViolationPress"
+                            />
+                            <Button
+                                id="_IDGenButton13"
+                                text="Cancel"
+                                type="Negative"
+                                width="10rem"
+                                visible="{= ${/isEditOn} }"
+                                press=".onEditCancelPress"
                             />
                         </HBox>
                     </VBox>
@@ -111,20 +124,20 @@
 
         <!-- ─── Content ─── -->
         <f:content>
-            <VBox id="_IDGenVBox7"
-                 
+            <VBox
+                id="_IDGenVBox7"
                 class="sapUiMediumMargin"
             >
                 <!-- ── Section 1: Employee Details ── -->
-                <Panel id="_IDGenPanel"
-                     
+                <Panel
+                    id="_IDGenPanel"
                     headerText="Employee Information"
                     expandable="true"
                     expanded="true"
                     class="sapUiSmallMarginBottom"
                 >
-                    <form:SimpleForm id="_IDGenSimpleForm"
-                         
+                    <form:SimpleForm
+                        id="_IDGenSimpleForm"
                         editable="false"
                         layout="ResponsiveGridLayout"
                         labelSpanL="4"
@@ -136,58 +149,136 @@
                         columnsM="2"
                     >
                         <form:content>
-                            <Label id="_IDGenLabel35"   text="Employee ID" />
-                            <Text id="_IDGenText32"   text="{detailData>/record/ZempId}" />
+                            <Label
+                                id="_IDGenLabel35"
+                                text="Employee ID"
+                            />
+                            <Text
+                                id="_IDGenText32"
+                                text="{detailData>/record/ZempId}"
+                            />
 
-                            <Label id="_IDGenLabel36"   text="Employee Name" />
-                            <Text id="_IDGenText33"   text="{detailData>/record/ZempName}" />
+                            <Label
+                                id="_IDGenLabel36"
+                                text="Employee Name"
+                            />
+                            <Text
+                                id="_IDGenText33"
+                                text="{detailData>/record/ZempName}"
+                            />
 
-                            <Label id="_IDGenLabel37"   text="Employee Type" />
-                            <Text id="_IDGenText34"   text="{detailData>/record/ZempTypeDesc}" />
+                            <Label
+                                id="_IDGenLabel37"
+                                text="Employee Type"
+                            />
+                            <Text
+                                id="_IDGenText34"
+                                text="{detailData>/record/ZempTypeDesc}"
+                            />
 
-                            <Label id="_IDGenLabel38"   text="Employment Class" />
-                            <Text id="_IDGenText35"   text="{detailData>/record/ZempClass}" />
+                            <Label
+                                id="_IDGenLabel38"
+                                text="Employment Class"
+                            />
+                            <Text
+                                id="_IDGenText35"
+                                text="{detailData>/record/ZempClass}"
+                            />
 
-                            <Label id="_IDGenLabel39"   text="Company" />
-                            <Text id="_IDGenText36"   text="{detailData>/record/Zcompany}" />
+                            <Label
+                                id="_IDGenLabel39"
+                                text="Company"
+                            />
+                            <Text
+                                id="_IDGenText36"
+                                text="{detailData>/record/Zcompany}"
+                            />
 
-                            <Label id="_IDGenLabel40"   text="Department" />
-                            <Text id="_IDGenText37"   text="{detailData>/record/Zn3}" />
+                            <Label
+                                id="_IDGenLabel40"
+                                text="Department"
+                            />
+                            <Text
+                                id="_IDGenText37"
+                                text="{detailData>/record/Zn3}"
+                            />
 
-                            <Label id="_IDGenLabel41"   text="Position" />
-                            <Text id="_IDGenText38"   text="{detailData>/record/Zposition}" />
+                            <Label
+                                id="_IDGenLabel41"
+                                text="Position"
+                            />
+                            <Text
+                                id="_IDGenText38"
+                                text="{detailData>/record/Zposition}"
+                            />
 
-                            <Label id="_IDGenLabel42"   text="Job Title" />
-                            <Text id="_IDGenText39"   text="{detailData>/record/ZjobTitle}" />
+                            <Label
+                                id="_IDGenLabel42"
+                                text="Job Title"
+                            />
+                            <Text
+                                id="_IDGenText39"
+                                text="{detailData>/record/ZjobTitle}"
+                            />
 
-                            <Label id="_IDGenLabel43"   text="Pay Grade" />
-                            <Text id="_IDGenText40"   text="{detailData>/record/ZpayGrade}" />
+                            <Label
+                                id="_IDGenLabel43"
+                                text="Pay Grade"
+                            />
+                            <Text
+                                id="_IDGenText40"
+                                text="{detailData>/record/ZpayGrade}"
+                            />
 
-                            <Label id="_IDGenLabel44"   text="Nationality" />
-                            <Text id="_IDGenText41"   text="{detailData>/record/Znationality}" />
+                            <Label
+                                id="_IDGenLabel44"
+                                text="Nationality"
+                            />
+                            <Text
+                                id="_IDGenText41"
+                                text="{detailData>/record/Znationality}"
+                            />
 
-                            <Label id="_IDGenLabel45"   text="Hire Date" />
-                            <Text id="_IDGenText42"   text="{detailData>/record/ZhireDate}" />
+                            <Label
+                                id="_IDGenLabel45"
+                                text="Hire Date"
+                            />
+                            <Text
+                                id="_IDGenText42"
+                                text="{detailData>/record/ZhireDate}"
+                            />
 
-                            <Label id="_IDGenLabel46"   text="Location" />
-                            <Text id="_IDGenText43"   text="{detailData>/record/Zlocation}" />
+                            <Label
+                                id="_IDGenLabel46"
+                                text="Location"
+                            />
+                            <Text
+                                id="_IDGenText43"
+                                text="{detailData>/record/Zlocation}"
+                            />
 
-                            <Label id="_IDGenLabel47"   text="Location Group" />
-                            <Text id="_IDGenText44"   text="{detailData>/record/ZlocGroup}" />
+                            <Label
+                                id="_IDGenLabel47"
+                                text="Location Group"
+                            />
+                            <Text
+                                id="_IDGenText44"
+                                text="{detailData>/record/ZlocGroup}"
+                            />
                         </form:content>
                     </form:SimpleForm>
                 </Panel>
 
                 <!-- ── Section 2: Violation Details ── -->
-                <Panel id="_IDGenPanel1"
-                     
+                <Panel
+                    id="_IDGenPanel1"
                     headerText="Violation Details"
                     expandable="true"
                     expanded="true"
                     class="sapUiSmallMarginBottom"
                 >
-                    <form:SimpleForm id="_IDGenSimpleForm1"
-                         
+                    <form:SimpleForm
+                        id="_IDGenSimpleForm1"
                         editable="false"
                         layout="ResponsiveGridLayout"
                         labelSpanL="4"
@@ -199,80 +290,156 @@
                         columnsM="2"
                     >
                         <form:content>
-                            <Label id="_IDGenLabel48"   text="Action Ref No" />
-                            <Text id="_IDGenText45"   text="{detailData>/record/ZACTION_REF_NO}" />
+                            <Label
+                                id="_IDGenLabel48"
+                                text="Action Ref No"
+                            />
+                            <Text
+                                id="_IDGenText45"
+                                text="{detailData>/record/ZACTION_REF_NO}"
+                            />
 
-                            <Label id="_IDGenLabel49"   text="Violation Type" />
-                            <Text id="_IDGenText46"   text="{detailData>/record/ViolationType}" />
+                            <Label
+                                id="_IDGenLabel49"
+                                text="Violation Type"
+                            />
+                            <Text
+                                id="_IDGenText46"
+                                text="{detailData>/record/ViolationType}"
+                            />
 
-                            <Label id="_IDGenLabel50"   text="Status" />
-                            <Text id="_IDGenText47"   text="{detailData>/record/Status}" />
+                            <Label
+                                id="_IDGenLabel50"
+                                text="Status"
+                            />
+                            <Text
+                                id="_IDGenText47"
+                                text="{detailData>/record/Status}"
+                            />
 
-                            <Label id="_IDGenLabel51"   text="Incident Date" />
-                            <Text id="_IDGenText48"   text="{detailData>/record/ZincDate}" />
+                            <Label
+                                id="_IDGenLabel51"
+                                text="Incident Date"
+                            />
+                            <Text
+                                id="_IDGenText48"
+                                text="{detailData>/record/ZincDate}"
+                            />
 
-                            <Label id="_IDGenLabel52"   text="Punch In Time" />
-                            <Text id="_IDGenText49"  
+                            <Label
+                                id="_IDGenLabel52"
+                                text="Punch In Time"
+                            />
+                            <Text
+                                id="_IDGenText49"
                                 text="{
                                     path: 'detailData>/record/Zpunchintime',
                                     formatter: '.formatEdmTime'
                                 }"
                             />
 
-                            <Label id="_IDGenLabel53"   text="Punch Out Time" />
-                            <Text id="_IDGenText50"  
+                            <Label
+                                id="_IDGenLabel53"
+                                text="Punch Out Time"
+                            />
+                            <Text
+                                id="_IDGenText50"
                                 text="{
                                     path: 'detailData>/record/Zpunchouttime',
                                     formatter: '.formatEdmTime'
                                 }"
                             />
 
-                            <Label id="_IDGenLabel54"   text="Scheduled In" />
-                            <Text id="_IDGenText51"  
+                            <Label
+                                id="_IDGenLabel54"
+                                text="Scheduled In"
+                            />
+                            <Text
+                                id="_IDGenText51"
                                 text="{
                                     path: 'detailData>/record/ZschTimeIn',
                                     formatter: '.formatEdmTime'
                                 }"
                             />
 
-                            <Label id="_IDGenLabel55"   text="Scheduled Out" />
-                            <Text id="_IDGenText52"  
+                            <Label
+                                id="_IDGenLabel55"
+                                text="Scheduled Out"
+                            />
+                            <Text
+                                id="_IDGenText52"
                                 text="{
                                     path: 'detailData>/record/ZschTimeOut',
                                     formatter: '.formatEdmTime'
                                 }"
                             />
 
-                            <Label id="_IDGenLabel56"   text="Delay Hours" />
-                            <Text id="_IDGenText53"   text="{detailData>/record/ZdelayHrs}" />
+                            <Label
+                                id="_IDGenLabel56"
+                                text="Delay Hours"
+                            />
+                            <Text
+                                id="_IDGenText53"
+                                text="{detailData>/record/ZdelayHrs}"
+                            />
 
-                            <Label id="_IDGenLabel57"   text="Short Hours" />
-                            <Text id="_IDGenText54"   text="{detailData>/record/ZshortHrs}" />
+                            <Label
+                                id="_IDGenLabel57"
+                                text="Short Hours"
+                            />
+                            <Text
+                                id="_IDGenText54"
+                                text="{detailData>/record/ZshortHrs}"
+                            />
 
-                            <Label id="_IDGenLabel58"   text="Unauthorized Days" />
-                            <Text id="_IDGenText55"   text="{detailData>/record/ZunautDays}" />
+                            <Label
+                                id="_IDGenLabel58"
+                                text="Unauthorized Days"
+                            />
+                            <Text
+                                id="_IDGenText55"
+                                text="{detailData>/record/ZunautDays}"
+                            />
 
-                            <Label id="_IDGenLabel59"   text="Work Schedule" />
-                            <Text id="_IDGenText56"   text="{detailData>/record/Zworkschedule}" />
+                            <Label
+                                id="_IDGenLabel59"
+                                text="Work Schedule"
+                            />
+                            <Text
+                                id="_IDGenText56"
+                                text="{detailData>/record/Zworkschedule}"
+                            />
 
-                            <Label id="_IDGenLabel60"   text="Standard Weekly Hours" />
-                            <Text id="_IDGenText57"   text="{detailData>/record/ZstdWeekHrs}" />
+                            <Label
+                                id="_IDGenLabel60"
+                                text="Standard Weekly Hours"
+                            />
+                            <Text
+                                id="_IDGenText57"
+                                text="{detailData>/record/ZstdWeekHrs}"
+                            />
 
-                            <Label id="_IDGenLabel61"   text="Working Days/Week" />
-                            <Text id="_IDGenText58"   text="{detailData>/record/ZwrkDyWeek}" />
+                            <Label
+                                id="_IDGenLabel61"
+                                text="Working Days/Week"
+                            />
+                            <Text
+                                id="_IDGenText58"
+                                text="{detailData>/record/ZwrkDyWeek}"
+                            />
                         </form:content>
                     </form:SimpleForm>
                 </Panel>
 
                 <!-- ── Section 3: Manager / Resolution ── -->
-                <Panel id="_IDGenPanel2"
-                     
+                <Panel
+                    id="_IDGenPanel2"
                     headerText="Manager &amp; Resolution"
                     expandable="true"
                     expanded="true"
                 >
-                    <form:SimpleForm id="_IDGenSimpleForm2"
-                         
+                    <form:SimpleForm
+                        id="_IDGenSimpleForm2"
                         editable="false"
                         layout="ResponsiveGridLayout"
                         labelSpanL="4"
@@ -284,11 +451,23 @@
                         columnsM="2"
                     >
                         <form:content>
-                            <Label id="_IDGenLabel62"   text="Manager ID" />
-                            <Text id="_IDGenText59"   text="{detailData>/record/ZlmIdName}" />
+                            <Label
+                                id="_IDGenLabel62"
+                                text="Manager ID"
+                            />
+                            <Text
+                                id="_IDGenText59"
+                                text="{detailData>/record/ZlmIdName}"
+                            />
 
-                            <Label id="_IDGenLabel63"   text="Manager Action Date" />
-                            <Text id="_IDGenText60"   text="{detailData>/record/ZlmIdActionDate}" />
+                            <Label
+                                id="_IDGenLabel63"
+                                text="Manager Action Date"
+                            />
+                            <Text
+                                id="_IDGenText60"
+                                text="{detailData>/record/ZlmIdActionDate}"
+                            />
                         </form:content>
                     </form:SimpleForm>
                 </Panel>

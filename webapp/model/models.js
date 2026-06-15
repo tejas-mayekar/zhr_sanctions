@@ -1,20 +1,26 @@
 sap.ui.define([
     "sap/ui/model/json/JSONModel",
+    "sap/ui/model/odata/v2/ODataModel",
     "sap/ui/Device"
-], 
-function (JSONModel, Device) {
+], (JSONModel, ODataModel, Device) => {
     "use strict";
 
+    const SERVICE_URL = "/sap/opu/odata/sap/ZHR_SACTIONS_APPLICATION_SRV/";
+
     return {
-        /**
-         * Provides runtime information for the device the UI5 app is running on as a JSONModel.
-         * @returns {sap.ui.model.json.JSONModel} The device model.
-         */
-        createDeviceModel: function () {
-            var oModel = new JSONModel(Device);
+
+        createDeviceModel() {
+            const oModel = new JSONModel(Device);
             oModel.setDefaultBindingMode("OneWay");
             return oModel;
+        },
+
+        createODataModel() {
+            return new ODataModel(SERVICE_URL, {
+                json:              true,
+                loadMetadataAsync: true,
+                useBatch:          false
+            });
         }
     };
-
 });
