@@ -181,6 +181,8 @@ sap.ui.define([
             } catch (error) {
                 sap.ui.core.BusyIndicator.hide();
                 ODataUtils.handleODataError(error, "Failed to load violations.");
+            }finally{   
+                sap.ui.core.BusyIndicator.hide();
             }
         },
 
@@ -212,32 +214,32 @@ sap.ui.define([
             const sActionRefNo = oContext.getProperty("ZactionRefNo");
             this._navigateToDetail(sActionRefNo, "prevdetail");
         },
-       _navigateToDetail(sActionRefNo, sSource) {
-    if (!sActionRefNo) {
-        sap.m.MessageToast.show("Cannot open details: record has no Action Ref No.");
-        return;
-    }
+        _navigateToDetail(sActionRefNo, sSource) {
+            if (!sActionRefNo) {
+                sap.m.MessageToast.show("Cannot open details: record has no Action Ref No.");
+                return;
+            }
 
-    const oUIModel = this.getView().getModel();
-    const sSetKey = sSource === "prevdetail" ? "ITM_STRSet" : "HDR_STRSet";
-    const aRecords = oUIModel.getProperty(`/${sSetKey}`) || [];
-    const oRecord = aRecords.find(r => (r.ZACTION_REF_NO || r.ZactionRefNo) === sActionRefNo);
+            const oUIModel = this.getView().getModel();
+            const sSetKey = sSource === "prevdetail" ? "ITM_STRSet" : "HDR_STRSet";
+            const aRecords = oUIModel.getProperty(`/${sSetKey}`) || [];
+            const oRecord = aRecords.find(r => (r.ZACTION_REF_NO || r.ZactionRefNo) === sActionRefNo);
 
-    const oDetailModel = new JSONModel({
-        record: oRecord || {},
-        source: sSource
-    });
-    this.getOwnerComponent().setModel(oDetailModel, "detailData");
+            const oDetailModel = new JSONModel({
+                record: oRecord || {},
+                source: sSource
+            });
+            this.getOwnerComponent().setModel(oDetailModel, "detailData");
 
-    // Route depends on which tab triggered the navigation
-    const sRouteName = sSource === "prevdetail"
-        ? "RouteOldViolationDetailpage"   // note lowercase 'p' — matches manifest exactly
-        : "RouteViolationDetailPage";
+            // Route depends on which tab triggered the navigation
+            const sRouteName = sSource === "prevdetail"
+                ? "RouteOldViolationDetailpage"   // note lowercase 'p' — matches manifest exactly
+                : "RouteViolationDetailPage";
 
-    this.getOwnerComponent().getRouter().navTo(sRouteName, {
-        actionRefNo: encodeURIComponent(sActionRefNo)
-    });
-},
+            this.getOwnerComponent().getRouter().navTo(sRouteName, {
+                actionRefNo: encodeURIComponent(sActionRefNo)
+            });
+        },
 
         onCreateViolation() {
             this.getOwnerComponent().getRouter().navTo("RouteFileViolation");
@@ -290,6 +292,9 @@ sap.ui.define([
             } catch (error) {
                 sap.ui.core.BusyIndicator.hide();
                 ODataUtils.handleODataError(error, "Failed to load history.");
+            }finally{
+                
+                sap.ui.core.BusyIndicator.hide();
             }
         },
         fetchOData(modelName, sEntityPath, aFilters) {
