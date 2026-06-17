@@ -2,8 +2,9 @@ sap.ui.define([
     "zhrsanctions/controller/BaseController",
     "sap/m/MessageToast",
     "sap/m/MessageBox",
-    "zhrsanctions/utils/ODataUtils"
-], (BaseController, MessageToast, MessageBox, ODataUtils) => {
+    "zhrsanctions/utils/ODataUtils",
+    "zhrsanctions/utils/SearchHelpHandler"
+], (BaseController, MessageToast, MessageBox, ODataUtils,ValueHelpHandler) => {
     "use strict";
 
     return BaseController.extend("zhrsanctions.controller.FileViolation", {
@@ -21,7 +22,18 @@ sap.ui.define([
                 this.getView().setModel(oDetailModel, "detailData");
             }
         },
+        onValueHelpRequest: function (oEvent) {
+            console.log("onValueHelpRequest triggered");
+            ValueHelpHandler.openValueHelpDialog(this, oEvent);
+        },
 
+        onValueHelpLiveSearch: function (oEvent) {
+            ValueHelpHandler.liveSearchValueHelpDialog(oEvent);
+        },
+
+        onValueHelpClose: function (oEvent) {
+            ValueHelpHandler.closeValueHelpDialog(this, oEvent);
+        },
         onCancel() {
             this.onNavBack();
         },

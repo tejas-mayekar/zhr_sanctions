@@ -1,165 +1,165 @@
 {
-	"_version": "1.84.0",
-	"sap.app": {
-		"id": "zhrsanctions",
-		"type": "application",
-		"i18n": "i18n/i18n.properties",
-		"applicationVersion": {
-			"version": "0.0.1"
-		},
-		"title": "{{appTitle}}",
-		"description": "{{appDescription}}",
-		"resources": "resources.json",
-		"sourceTemplate": {
-			"id": "@sap/generator-fiori:basic",
-			"version": "1.24.0",
-			"toolsId": "78951f45-0f06-40a1-a4c2-65bb8638be75"
-		},
-		"dataSources": {
-			"mainService": {
-				"uri": "/sap/opu/odata/sap/ZHR_SACTIONS_APPLICATION_SRV/",
-				"type": "OData",
-				"settings": {
-					"annotations": [],
-					"localUri": "localService/mainService/metadata.xml",
-					"odataVersion": "2.0"
-				}
-			}
-		}
-	},
-	"sap.ui": {
-		"technology": "UI5",
-		"icons": {
-			"icon": "",
-			"favIcon": "",
-			"phone": "",
-			"phone@2": "",
-			"tablet": "",
-			"tablet@2": ""
-		},
-		"deviceTypes": {
-			"desktop": true,
-			"tablet": true,
-			"phone": true
-		}
-	},
-	"sap.ui5": {
-		"flexEnabled": true,
-		"dependencies": {
-			"minUI5Version": "1.147.0",
-			"libs": {
-				"sap.m": {},
-				"sap.ui.core": {},
-				"sap.f": {},
-				"sap.ui.layout": {}
-			}
-		},
-		"contentDensities": {
-			"compact": true,
-			"cozy": true
-		},
-		"models": {
-			"i18n": {
-				"type": "sap.ui.model.resource.ResourceModel",
-				"settings": {
-					"bundleName": "zhrsanctions.i18n.i18n"
-				}
-			},
-			"": {
-				"type": "sap.ui.model.odata.v2.ODataModel",
-				"dataSource": "mainService",
-				"preload": true,
-				"settings": {}
-			}
-		},
-		"resources": {
-			"css": [
-				{
-					"uri": "css/style.css"
-				}
-			]
-		},
-		"routing": {
-			"config": {
-				"routerClass": "sap.m.routing.Router",
-				"controlAggregation": "pages",
-				"controlId": "app",
-				"transition": "slide",
-				"type": "View",
-				"viewType": "XML",
-				"path": "zhrsanctions.view",
-				"async": true,
-				"viewPath": "zhrsanctions.view"
-			},
-			"routes": [
-				{
-					"name": "RouteView1",
-					"pattern": ":?query:",
-					"target": [
-						"TargetView1"
-					]
-				},
-				{
-					"name": "RouteViolationDetailPage",
-					"pattern": "detail/{actionRefNo}",
-					"target": [
-						"TargetViolationDetailPage"
-					]
-				},
-				{
-					"name": "RouteOldViolationDetailpage",
-					"pattern": "prevdetail/{actionRefNo}",
-					"target": [
-						"TargetOldViolationDetailPage"
-					]
-				},
-				{
-					"name": "RouteFileViolation",
-					"pattern": "create",
-					"target": [
-						"TargetFileViolation"
-					]
-				},
-				{
-					"name": "RouteHCPortal",
-					"pattern": "hcportal",
-					"target": [
-						"TargetHCPortal"
-					]
-				}
-			],
-			"targets": {
-				"TargetView1": {
-					"id": "View1",
-					"name": "View1"
-				},
-				"TargetViolationDetailPage": {
-					"id": "ViolationDetailPage",
-					"name": "ViolationDetailPage"
-				},
-				"TargetOldViolationDetailPage": {
-					"id": "OldViolationDetailPage",
-					"name": "OldViolationDetailPage"
-				},
-				"TargetFileViolation": {
-					"id": "FileViolation",
-					"name": "FileViolation"
-				},
-				"TargetHCPortal": {
-					"id": "HCPortalPage",
-					"name": "HCPortalPage"
-				}
-			}
-		},
-		"rootView": {
-			"viewName": "zhrsanctions.view.App",
-			"type": "XML",
-			"id": "App",
-			"async": true
-		}
-	},
-	"sap.platform.abap": {
-		"uri": "/sap/bc/ui5_ui5/sap/zhr_sanctions/webapp",
-		"_version": "1.1.0"
-	}
+  "_version": "1.84.0",
+  "sap.app": {
+    "id": "zhrsanctions",
+    "type": "application",
+    "i18n": "i18n/i18n.properties",
+    "applicationVersion": {
+      "version": "0.0.1"
+    },
+    "title": "{{appTitle}}",
+    "description": "{{appDescription}}",
+    "resources": "resources.json",
+    "sourceTemplate": {
+      "id": "@sap/generator-fiori:basic",
+      "version": "1.24.0",
+      "toolsId": "78951f45-0f06-40a1-a4c2-65bb8638be75"
+    },
+    "dataSources": {
+      "mainService": {
+        "uri": "/sap/opu/odata/sap/ZHR_SACTIONS_APPLICATION_SRV/",
+        "type": "OData",
+        "settings": {
+          "annotations": [],
+          "localUri": "localService/mainService/metadata.xml",
+          "odataVersion": "2.0"
+        }
+      }
+    }
+  },
+  "sap.ui": {
+    "technology": "UI5",
+    "icons": {
+      "icon": "",
+      "favIcon": "",
+      "phone": "",
+      "phone@2": "",
+      "tablet": "",
+      "tablet@2": ""
+    },
+    "deviceTypes": {
+      "desktop": true,
+      "tablet": true,
+      "phone": true
+    }
+  },
+  "sap.ui5": {
+    "flexEnabled": true,
+    "dependencies": {
+      "minUI5Version": "1.147.0",
+      "libs": {
+        "sap.m": {},
+        "sap.ui.core": {},
+        "sap.f": {},
+        "sap.ui.layout": {}
+      }
+    },
+    "contentDensities": {
+      "compact": true,
+      "cozy": true
+    },
+    "models": {
+      "i18n": {
+        "type": "sap.ui.model.resource.ResourceModel",
+        "settings": {
+          "bundleName": "zhrsanctions.i18n.i18n"
+        }
+      },
+      "": {
+        "type": "sap.ui.model.odata.v2.ODataModel",
+        "dataSource": "mainService",
+        "preload": true,
+        "settings": {}
+      }
+    },
+    "resources": {
+      "css": [
+        {
+          "uri": "css/style.css"
+        }
+      ]
+    },
+    "routing": {
+      "config": {
+        "routerClass": "sap.m.routing.Router",
+        "controlAggregation": "pages",
+        "controlId": "app",
+        "transition": "slide",
+        "type": "View",
+        "viewType": "XML",
+        "path": "zhrsanctions.view",
+        "async": true,
+        "viewPath": "zhrsanctions.view"
+      },
+      "routes": [
+        {
+          "name": "RouteView1",
+          "pattern": ":?query:",
+          "target": [
+            "TargetView1"
+          ]
+        },
+        {
+          "name": "RouteViolationDetailPage",
+          "pattern": "detail/{actionRefNo}",
+          "target": [
+            "TargetViolationDetailPage"
+          ]
+        },
+        {
+          "name": "RouteOldViolationDetailpage",
+          "pattern": "prevdetail/{actionRefNo}",
+          "target": [
+            "TargetOldViolationDetailPage"
+          ]
+        },
+        {
+          "name": "RouteFileViolation",
+          "pattern": "create",
+          "target": [
+            "TargetFileViolation"
+          ]
+        },
+        {
+          "name": "RouteHCPortal",
+          "pattern": "hcportal",
+          "target": [
+            "TargetHCPortal"
+          ]
+        }
+      ],
+      "targets": {
+        "TargetView1": {
+          "id": "View1",
+          "name": "View1"
+        },
+        "TargetViolationDetailPage": {
+          "id": "ViolationDetailPage",
+          "name": "ViolationDetailPage"
+        },
+        "TargetOldViolationDetailPage": {
+          "id": "OldViolationDetailPage",
+          "name": "OldViolationDetailPage"
+        },
+        "TargetFileViolation": {
+          "id": "FileViolation",
+          "name": "FileViolation"
+        },
+        "TargetHCPortal": {
+          "id": "HCPortalPage",
+          "name": "HCPortalPage"
+        }
+      }
+    },
+    "rootView": {
+      "viewName": "zhrsanctions.view.App",
+      "type": "XML",
+      "id": "App",
+      "async": true
+    }
+  },
+  "sap.platform.abap": {
+    "uri": "/sap/bc/ui5_ui5/sap/zhr_sanctions/webapp",
+    "_version": "1.1.0"
+  }
 }

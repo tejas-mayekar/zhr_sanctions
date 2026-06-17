@@ -55,7 +55,9 @@
                         <form:content>
 
                             <Label id="lblReqZempId" text="Employee ID" required="true" />
-                            <Input id="inputZempId" placeholder="Enter Employee ID" maxLength="10" />
+                            <Input id="inputZempId" placeholder="Enter Employee ID" maxLength="10"
+                                            showValueHelp="true"
+                                            valueHelpRequest="onValueHelpRequest" />
 
                             <Label id="lblReqZincDate" text="Incident Date" required="true" />
                             <DatePicker id="dpZincDate" displayFormat="yyyy-MM-dd" placeholder="yyyy-mm-dd" />
@@ -94,7 +96,10 @@
                         <form:content>
                             <core:Title id="titleEmpGen" text="General Details" />
                             <Label id="lblZempName" text="Employee Name" />
-                            <Input id="inputZempName" placeholder="Enter Employee Name" maxLength="60" editable="false" />
+                            <Input id="inputZempName" 
+                            placeholder="Enter Employee Name" 
+                            maxLength="60" 
+                            editable="false"  />
 
                             <Label id="lblZempType" text="Employee Type" />
                             <Input id="inputZempType" placeholder="Enter Employee Type" maxLength="60" editable="false"  />

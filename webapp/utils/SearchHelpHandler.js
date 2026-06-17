@@ -1,0 +1,272 @@
+sap.ui.define([
+    "sap/ui/model/Filter",
+    "sap/ui/model/FilterOperator",
+    "sap/ui/model/json/JSONModel",
+    "sap/m/SelectDialog",
+    "sap/m/StandardListItem"
+], function (Filter, FilterOperator, JSONModel, SelectDialog, StandardListItem) {
+    "use strict";
+
+    return {
+        _config: {
+            "inputZempId": {
+                modelName: "mainService",
+                entitySetPath: "EMP_SEARCHHELPSet",
+                fieldName: "ZempId",
+                descriptionName: "ZempName",
+                title: "Employee Search Help",
+                filters: [
+                ]
+            },
+        },
+
+        fetchGLData: function (oController, modelname, entitySetPath, filters) {
+            var oModel = modelname
+                ? oController.getView().getModel(modelname)
+                : oController.getView().getModel();
+
+            return new Promise(function (resolve, reject) {
+                // Validate
+                if (!entitySetPath) {
+                    reject("entitySetPath is undefined");
+                    return;
+                }
+
+                // Normalize – MUST begin with '/'
+                if (!entitySetPath.startsWith("/")) {
+                    entitySetPath = "/" + entitySetPath;
+                }
+
+                oModel.read(entitySetPath, {
+                    filters: filters || [],
+                    success: function (oData) {
+                        resolve(oData.results);
+                    },
+                    error: function (oError) {
+                        reject(oError);
+                    }
+                });
+            });
+        },
+
+        /**
+         * Create the Value Help Dialog programmatically (internal fragment)
+         */
+        _createValueHelpDialog: function (oController, oView, sInputId, oFieldConfig, oInput) {
+            var that = this;
+
+            // Create SelectDialog programmatically
+            var oDialog = new SelectDialog(oView.getId() + "--" + sInputId + "Dialog", {
+                title: oFieldConfig.title || "Select",
+                rememberSelections: false,
+                contentWidth: "50%",
+                contentHeight: "60%",
+                liveChange: function (oEvent) {
+                    that.liveSearchValueHelpDialog(oEvent);
+                },
+                search: function (oEvent) {
+                    that.searchValueHelpDialog(oEvent);
+                },
+                confirm: function (oEvent) {
+                    that.closeValueHelpDialog(oController, oEvent);
+                },
+                cancel: function () {
+                    // Dialog closes automatically on cancel
+                }
+            });
+
+            // Add to view
+            oView.addDependent(oDialog);
+
+            // Store references
+            oDialog._input = oInput;
+            oDialog._inputId = sInputId;
+
+            // Create a local JSON model for dialog items
+            var oDialogModel = new JSONModel([]);
+            oDialog.setModel(oDialogModel, "valueHelpItems");
+
+            // Bind items to local JSON model
+            oDialog.bindAggregation("items", {
+                path: "valueHelpItems>/",
+                template: new StandardListItem({
+                    title: `{valueHelpItems>${oFieldConfig.fieldName}}`,
+                    description: `{valueHelpItems>${oFieldConfig.descriptionName}}`
+                })
+            });
+
+            // Add ESC key support
+            oDialog.addEventDelegate({
+                onkeydown: function (oEvent) {
+                    if (oEvent.key === "Escape" || oEvent.keyCode === 27) {
+                        oDialog.close();
+                        oEvent.preventDefault();
+                    }
+                }
+            });
+
+            return oDialog;
+        },
+
+        /**
+         * Open the Value Help Dialog
+         */
+        openValueHelpDialog: function (oController, oEvent) {
+            var oInput = oEvent.getSource();
+            var sInputId = oInput.getId().split("--").pop();
+            var sInputValue = oInput.getValue();
+            var oView = oController.getView();
+            var oFieldConfig = this._config[sInputId];
+
+            if (!oFieldConfig) {
+                return;
+            }
+
+            var that = this;
+
+            // Create dialog if it doesn't exist
+            if (!oController["_valueHelpDialog_" + sInputId]) {
+                oController["_valueHelpDialog_" + sInputId] = this._createValueHelpDialog(
+                    oController,
+                    oView,
+                    sInputId,
+                    oFieldConfig,
+                    oInput
+                );
+            }
+
+            var oDialog = oController["_valueHelpDialog_" + sInputId];
+
+            // Clear previous selections
+            if (oDialog.getSelectedItems) {
+                oDialog.getSelectedItems().forEach(function (item) {
+                    oDialog.removeSelectedItem(item);
+                });
+            }
+
+            // Store references (in case input reference changed)
+            oDialog._input = oInput;
+            oDialog._inputId = sInputId;
+
+            // Clear previous data and open dialog immediately with loading state
+            var oDialogModel = oDialog.getModel("valueHelpItems");
+            oDialogModel.setData([]);
+
+            // Open dialog first (empty with loading)
+            oDialog.setBusy(true);
+            oDialog.open(sInputValue);
+
+            // Prepare filters
+            var aFilters = oFieldConfig.filters ? [...oFieldConfig.filters] : [];
+            if (sInputValue) {
+                aFilters.push(new Filter({
+                    filters: [
+                        new Filter(oFieldConfig.fieldName, FilterOperator.Contains, sInputValue),
+                        new Filter(oFieldConfig.descriptionName, FilterOperator.Contains, sInputValue)
+                    ],
+                    and: false
+                }));
+            }
+
+            // Fetch data from API after dialog is open
+            that.fetchGLData(
+                oController,
+                oFieldConfig.modelName,
+                oFieldConfig.entitySetPath,
+                aFilters
+            ).then(function (aData) {
+                // Store all data for client-side filtering
+                oDialog._allData = aData;
+
+                // Set data to dialog model
+                oDialogModel.setData(aData);
+
+                // Remove loading indicator
+                oDialog.setBusy(false);
+            }).catch(function (oError) {
+                // Remove loading indicator
+                oDialog.setBusy(false);
+
+                var sErrorMsg = "Failed to load data. Please try again.";
+                if (oError && oError.message) {
+                    sErrorMsg += "\n\nDetails: " + oError.message;
+                }
+                if (oError && oError.statusCode) {
+                    sErrorMsg += "\nStatus: " + oError.statusCode;
+                }
+
+                sap.m.MessageBox.error(sErrorMsg);
+            });
+        },
+
+        /**
+         * Handle live search inside the Value Help Dialog (client-side filtering)
+         */
+        liveSearchValueHelpDialog: function (oEvent) {
+            var oDialog = oEvent.getSource();
+            var sValue = oEvent.getParameter("value");
+            var sInputId = oDialog._inputId;
+            var oFieldConfig = this._config[sInputId];
+
+            if (!oFieldConfig || !oDialog._allData) return;
+
+            var aFilteredData = oDialog._allData;
+
+            // Apply client-side filtering
+            if (sValue) {
+                var sValueLower = sValue.toLowerCase();
+                aFilteredData = oDialog._allData.filter(function (item) {
+                    var sName = (item[oFieldConfig.fieldName] || "").toString().toLowerCase();
+                    var sDesc = (item[oFieldConfig.descriptionName] || "").toString().toLowerCase();
+
+                    // Also check SupplierFullName if it exists (for vendor_input)
+                    var sFullName = item.SupplierFullName ? item.SupplierFullName.toString().toLowerCase() : "";
+
+                    return sName.includes(sValueLower) ||
+                        sDesc.includes(sValueLower) ||
+                        sFullName.includes(sValueLower);
+                });
+            }
+
+            // Update dialog model with filtered data
+            var oDialogModel = oDialog.getModel("valueHelpItems");
+            oDialogModel.setData(aFilteredData);
+        },
+
+        /**
+         * Handle search inside the Value Help Dialog (triggers on Enter key)
+         */
+        searchValueHelpDialog: function (oEvent) {
+            // Delegate to liveSearch for consistency
+            this.liveSearchValueHelpDialog(oEvent);
+        },
+
+        /**
+         * Close the dialog and set the selected value in the input
+         */
+        closeValueHelpDialog: function (oController, oEvent) {
+            var oSelectedItem = oEvent.getParameter("selectedItem");
+            var oDialog = oEvent.getSource();
+
+            // If dialog was cancelled (ESC), don't set any value
+            if (!oSelectedItem) {
+                return;
+            }
+
+            var sInputId = oDialog._inputId;
+            var oFieldConfig = this._config[sInputId];
+
+            if (!oDialog._input || !oFieldConfig) return;
+
+            // Get value from binding context
+            var oContext = oSelectedItem.getBindingContext("valueHelpItems");
+            var sValue = oContext ? oContext.getProperty(oFieldConfig.fieldName) : oSelectedItem.getTitle();
+
+            // Set value in input
+            oDialog._input.setValue(sValue);
+
+            // Optionally trigger change event
+            oDialog._input.fireChange({ value: sValue });
+        }
+    };
+});
