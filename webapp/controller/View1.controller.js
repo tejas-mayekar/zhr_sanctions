@@ -1,13 +1,12 @@
 sap.ui.define([
     "zhrsanctions/controller/BaseController",
-    "sap/ui/table/Column",
-    "sap/m/Label",
-    "sap/m/Text",
     "sap/ui/model/json/JSONModel",
+    
     "sap/ui/model/Filter",
     "sap/ui/model/FilterOperator",
-    "zhrsanctions/utils/ODataUtils"
-], (BaseController, Column, Label, Text, JSONModel, Filter, FilterOperator, ODataUtils) => {
+    "zhrsanctions/utils/ODataUtils",
+    "zhrsanctions/utils/TableUtils"
+], (BaseController, JSONModel,Filter, FilterOperator,ODataUtils, TableUtils) => {
     "use strict";
 
     const CURRENT_COLUMNS = [
@@ -68,39 +67,19 @@ sap.ui.define([
                 ITM_STRSet: []
             }));
 
-            this._buildColumns("currentTable", CURRENT_COLUMNS);
-            this._buildColumns("historyTable", HISTORY_COLUMNS);
+            TableUtils.buildTableColumns(this.byId("currentTable"), CURRENT_COLUMNS, this.formatEdmTime.bind(this));
+            TableUtils.buildTableColumns(this.byId("historyTable"), HISTORY_COLUMNS, this.formatEdmTime.bind(this));
 
             // Defer search until next tick to ensure model is attached
             setTimeout(() => this.onSearch(), 0);
-            var oUser = sap.ushell.Container.getService("UserInfo").getUser();
-            var sId = oUser.getId();        // user ID
-            var sName = oUser.getFullName(); // full name
-            var sEmail = oUser.getEmail();   // email (if available)
-            // use/attach to model
-            console.log("/user", { id: sId, name: sName, email: sEmail });
+            // var oUser = sap.ushell.Container.getService("UserInfo").getUser();
+            // var sId = oUser.getId();        // user ID
+            // var sName = oUser.getFullName(); // full name
+            // var sEmail = oUser.getEmail();   // email (if available)
+            // // use/attach to model
+            // console.log("/user", { id: sId, name: sName, email: sEmail });
         }
         ,
-
-        _buildColumns(sTableId, aConfig) {
-            const oTable = this.byId(sTableId);
-            aConfig
-                .filter(cfg => cfg.visible)
-                .forEach(cfg => {
-                    const oBindingInfo = cfg.isTime
-                        ? { path: cfg.binding, formatter: this.formatEdmTime.bind(this) }
-                        : `{${cfg.binding}}`;
-
-                    oTable.addColumn(new Column({
-                        label: new Label({ text: cfg.label }),
-                        template: new Text({ text: oBindingInfo, wrapping: false }),
-                        sortProperty: cfg.sortProperty,
-                        filterProperty: cfg.filterProperty,
-                        autoResizable: true,
-                        width: cfg.width
-                    }));
-                });
-        },
 
         async onSearch() {
             try {

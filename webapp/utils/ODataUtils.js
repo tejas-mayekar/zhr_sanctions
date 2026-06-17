@@ -103,15 +103,14 @@ sap.ui.define([], () => {
         },
         // ── Get User Id ──────────────────────────────────────────────────
         getuserId() {
-            var oUser = sap.ushell.Container.getService("UserInfo").getUser();
-            var sId = oUser.getId();   
-            if(sId == "DACO_EAMV04"){
-                return '200129'
-            }else{
-                return '200130'
+            if (["localhost", "127.0.0.1"].includes(window.location.hostname)) {
+                return "200129";
             }
+
+            const sId = sap.ushell.Container.getService("UserInfo").getUser().getId();
+            return sId === "DACO_EAMV04" ? "200129" : "200130";
         },
-        
+
         // ── Edm.Time Builder ──────────────────────────────────────────────────
         //
         // Converts "HH:mm:ss" or "HH:mm" string → { ms, __edmType } for OData payload.

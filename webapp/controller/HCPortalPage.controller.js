@@ -1,13 +1,9 @@
 sap.ui.define([
     "zhrsanctions/controller/BaseController",
     "sap/ui/model/json/JSONModel",
-    "sap/ui/table/Column",
-    "sap/m/Label",
-    "sap/m/Text",
-    "sap/ui/model/Filter",
-    "sap/ui/model/FilterOperator",
-    "zhrsanctions/utils/ODataUtils"
-], (BaseController, JSONModel, Column, Label, Text, Filter, FilterOperator, ODataUtils) => {
+    "zhrsanctions/utils/ODataUtils",
+    "zhrsanctions/utils/TableUtils"
+], (BaseController, JSONModel, ODataUtils, TableUtils) => {
     "use strict";
 
     /* eslint-disable camelcase */
@@ -36,7 +32,7 @@ sap.ui.define([
                 ITM_STRSet:   []
             }));
 
-            this._buildColumns("_IDGenTable", HISTORY_COLUMNS);
+            TableUtils.buildTableColumns(this.byId("_IDGenTable"), HISTORY_COLUMNS, this.formatEdmTime.bind(this));
 
             this.getOwnerComponent()
                 .getRouter()
@@ -64,51 +60,12 @@ sap.ui.define([
             }
         },
 
-        _buildColumns(sTableId, aConfig) {
-            const oTable = this.byId(sTableId);
-            if (!oTable) {
-                return;
-            }
-            aConfig
-                .filter(cfg => cfg.visible)
-                .forEach(cfg => {
-                    const oBindingInfo = cfg.isTime
-                        ? { path: cfg.binding, formatter: this.formatEdmTime.bind(this) }
-                        : `{${cfg.binding}}`;
-
-                    oTable.addColumn(new Column({
-                        label:          new Label({ text: cfg.label }),
-                        template:       new Text({ text: oBindingInfo, wrapping: false }),
-                        sortProperty:   cfg.sortProperty,
-                        filterProperty: cfg.filterProperty,
-                        autoResizable:  true,
-                        width:          cfg.width
-                    }));
-                });
-        },
-
         onSearchHistory(oEvent) {
-            this._applySearch("_IDGenTable", HISTORY_COLUMNS, oEvent.getParameter("newValue"));
+            TableUtils.applyTableSearch(this.byId("_IDGenTable"), HISTORY_COLUMNS, oEvent.getParameter("newValue"));
         },
 
         onRefreshHistory() {
             this._loadHistory();
-        },
-
-        _applySearch(sTableId, aConfig, sQuery) {
-            const oBinding = this.byId(sTableId).getBinding("rows");
-            if (!oBinding) {
-                return;
-            }
-            const aFilters = sQuery
-                ? aConfig
-                    .filter(cfg => cfg.visible && cfg.filterProperty)
-                    .map(cfg => new Filter(cfg.filterProperty, FilterOperator.Contains, sQuery))
-                : [];
-
-            oBinding.filter(
-                aFilters.length ? [new Filter({ filters: aFilters, and: false })] : []
-            );
         },
 
         onViewDetails(oEvent) {
