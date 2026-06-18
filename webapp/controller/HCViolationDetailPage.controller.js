@@ -55,44 +55,40 @@ sap.ui.define([
         },
 
         onSubmitTakeAction() {
-            const oRegularizeModel = this.getView().getModel("regularize");
-            const oDetailModel = this.getView().getModel("detailData");
-            const oActionData = oRegularizeModel.getData();
-            const oRecord = oDetailModel.getData().record;
+    const oRegularizeModel = this.getView().getModel("regularize");
+    const oDetailModel = this.getView().getModel("detailData");
+    const oActionData = oRegularizeModel.getData();
+    const oRecord = oDetailModel.getData().record;
 
-            // Validate inputs
-            if (!oActionData.ZincCategory || !oActionData.ZincType) {
-                sap.m.MessageBox.error("Please fill all required fields");
-                return;
-            }
+    if (!oActionData.ZincCategory || !oActionData.ZincType) {
+        sap.m.MessageBox.error("Please fill all required fields");
+        return;
+    }
 
-            // Get OData model and submit
-            const oODataModel = this.getOwnerComponent().getModel();
+    const oODataModel = this.getOwnerComponent().getModel();
 
-            // Build override payload with action data
-            const oOverrides = {
-                ZincCategory: oActionData.ZincCategory,
-                ZincType: oActionData.ZincType,
-                Zlinemanageraction: oActionData.Zlinemanageraction,
-                Zlinemanagerremarks: oActionData.reason,
-                Zlinemanageractiondate: new Date(),
-                Zstatus: "SUBMITTED"
-            };
+    const oOverrides = {
+        ZincCategory:           oActionData.ZincCategory,
+        ZincType:               oActionData.ZincType,
+        Zlinemanageraction:     oActionData.Zlinemanageraction,
+        Zlinemanagerremarks:    oActionData.reason,
+        Zlinemanageractiondate: new Date(),
+        Zstatus:                "SUBMITTED",
+        ZlmIdName:              ODataUtils.getuserId()   // ← stamp current user
+    };
 
-            ODataUtils.submitTakeAction(oODataModel, oRecord, oOverrides)
-                .then(() => {
-                    MessageToast.show("Action submitted successfully");
-                    this._oTakeActionDialog.close();
-                    oRegularizeModel.setData({
-                        ZincCategory: "",
-                        ZincType: "",
-                        reason: "",
-                        actionOptions: []
-                    });
-                })
-                .catch((oError) => {
-                    console.error("Failed to submit action:", oError);
-                });
-        }
+    // Add ODataUtils import at the top of the controller — it's already available
+    ODataUtils.submitTakeAction(oODataModel, oRecord, oOverrides)
+        .then(() => {
+            sap.m.MessageToast.show("Action submitted successfully");
+            this._oTakeActionDialog.close();
+            oRegularizeModel.setData({
+                ZincCategory: "", ZincType: "", reason: "", actionOptions: []
+            });
+        })
+        .catch((oError) => {
+            console.error("Failed to submit action:", oError);
+        });
+}
     });
 });
