@@ -159,36 +159,35 @@ sap.ui.define([], () => {
                 ZempClassDesc: oRecord.ZempClassDesc || "",
                 Zcompany: oRecord.Zcompany || "",
                 Znationality: oRecord.Znationality || "",
-                // ITM_STR uses 'Zhiredate', HDR_STR uses 'ZhireDate'
-                Zhiredate: oRecord.Zhiredate || oRecord.ZhireDate || null,
-                // ITM_STR uses 'Zpaygrade', HDR_STR uses 'ZpayGrade'
-                Zpaygrade: oRecord.Zpaygrade || oRecord.ZpayGrade || null,
+                Zhiredate: oRecord.ZhireDate || null,
+                Zpaygrade: oRecord.ZpayGrade || null,
                 Zposition: oRecord.Zposition || "",
-                // ITM_STR uses 'Zjobtitle', HDR_STR uses 'ZjobTitle'
-                Zjobtitle: oRecord.Zjobtitle || oRecord.ZjobTitle || "",
+                Zjobtitle: oRecord.ZjobTitle || "",
                 Zjobclassification: oRecord.Zjobclassification || "",
                 Zlocation: oRecord.Zlocation || "",
-                // ITM_STR uses 'Zlocationgroup', HDR_STR uses 'ZlocGroup'
-                Zlocationgroup: oRecord.Zlocationgroup || oRecord.ZlocGroup || "",
+                Zlocationgroup: oRecord.ZlocGroup || "",
                 Zworkschedule: oRecord.Zworkschedule || "",
                 ZlatestNode: oRecord.ZlatestNode || "",
                 ZstdWeekHrs: p(oRecord.ZstdWeekHrs),
                 ZwrkDyWeek: p(oRecord.ZwrkDyWeek),
 
                 // Indicators
-                Zn0: p(oRecord.Zn0), Zn1: p(oRecord.Zn1),
-                Zn2: p(oRecord.Zn2), Zn3: p(oRecord.Zn3),
-                Zn4: p(oRecord.Zn4), Zn5: p(oRecord.Zn5),
-                Zn6: p(oRecord.Zn6), Zn7: p(oRecord.Zn7),
+                Zn0: p(oRecord.Zn0),
+                Zn1: p(oRecord.Zn1),
+                Zn2: p(oRecord.Zn2),
+                Zn3: p(oRecord.Zn3),
+                Zn4: p(oRecord.Zn4),
+                Zn5: p(oRecord.Zn5),
+                Zn6: p(oRecord.Zn6),
+                Zn7: p(oRecord.Zn7),
 
-                // Violation — resolve key from either casing
-                ZactionRefNo: oRecord.ZACTION_REF_NO || oRecord.ZactionRefNo || "",
+                // Violation
+                ZactionRefNo: oRecord.ZACTION_REF_NO || "",
                 ZincDate: oRecord.ZincDate || null,
                 ZincCategory: oRecord.ZincCategory || "",
                 ZincType: oRecord.ZincType || "",
                 Zaction: oRecord.Zaction || "",
-                // ITM_STR uses 'Zstatus', HDR_STR uses 'Status'
-                Zstatus: oRecord.Zstatus || oRecord.Status || "",
+                Zstatus: oRecord.Status || "",
                 Zsanction: oRecord.Zsanction || "",
                 Zremark: oRecord.Zremark || "",
 
@@ -210,12 +209,10 @@ sap.ui.define([], () => {
                 Zrepeatcount: p(oRecord.Zrepeatcount),
                 Zsysyrepeatcount: p(oRecord.Zsysyrepeatcount),
 
-                // Workflow — ITM_STR uses 'Zlinemanagername', HDR_STR uses 'ZlmIdName' for the ID
+                // Workflow
                 ZlmIdName: oRecord.ZlmIdName || "",
-                Zlinemanagername: oRecord.Zlinemanagername || "",
                 Zlinemanageraction: oRecord.Zlinemanageraction || "",
-                // ITM_STR uses 'Zlinemanageractiondate', HDR_STR uses 'ZlmIdActionDate'
-                Zlinemanageractiondate: oRecord.Zlinemanageractiondate || oRecord.ZlmIdActionDate || null,
+                Zlinemanageractiondate: oRecord.ZlmIdActionDate || null,
                 Zlinemanagerremarks: oRecord.Zlinemanagerremarks || "",
 
                 Zhcopsname: oRecord.Zhcopsname || "",
@@ -250,133 +247,135 @@ sap.ui.define([], () => {
         // oOverrides: action input fields { ZincCategory, ZincType, reason, etc }
 
         submitTakeAction(oModel, oRecord, oOverrides) {
-    if (!oModel) {
-        return Promise.reject(new Error("ODataUtils.submitTakeAction: oModel is null or undefined."));
-    }
-
-    const sActionRefNo = oRecord.ZACTION_REF_NO || oRecord.ZactionRefNo;
-    const sEmpId = oRecord.ZempId;
-    let sIncDate = oRecord.ZincDate;
-
-    if (!sActionRefNo || !sEmpId || !sIncDate) {
-        return Promise.reject(new Error("ODataUtils.submitTakeAction: ZactionRefNo, ZempId and ZincDate are required."));
-    }
-
-    // Convert date to proper OData DateTime format: datetime'YYYY-MM-DDTHH:mm:ss'
-    // WITHOUT wrapping in additional quotes
-    let sDateFormatted = this._formatDatetimeForKey(sIncDate);
-
-    // Build entity key path WITHOUT datetime wrapper (it's handled above)
-    const sEntityPath = `/ITM_STRSet(ZactionRefNo='${sActionRefNo}',ZempId='${sEmpId}',ZincDate=${sDateFormatted})`;
-
-    console.log("submitTakeAction: entity path =", sEntityPath);
-
-    // Build payload but EXCLUDE key fields
-    let oPayload = this.buildITMPayload(oRecord, oOverrides || {});
-    
-    // Remove key fields from payload to avoid conflicts
-    delete oPayload.ZactionRefNo;
-    delete oPayload.ZempId;
-    delete oPayload.ZincDate;
-
-    // Format all date/time fields properly
-    oPayload = this._formatPayloadForOData(oPayload);
-
-    console.log("submitTakeAction: payload =", JSON.stringify(oPayload));
-
-    return new Promise((resolve, reject) => {
-        oModel.update(sEntityPath, oPayload, {
-            bMerge: false,
-            success: (oResponse) => {
-                console.log("ODataUtils.submitTakeAction: Success", oResponse);
-                resolve(oResponse);
-            },
-            error: (oError) => {
-                console.error("ODataUtils.submitTakeAction: Error", oError);
-                this.handleODataError(oError, "Failed to submit action");
-                reject(oError);
+            if (!oModel) {
+                return Promise.reject(new Error("ODataUtils.submitTakeAction: oModel is null or undefined."));
             }
-        });
-    });
-},
 
-// New helper for formatting DateTime key values
-_formatDatetimeForKey(vDate) {
-    if (!vDate) {
-        return null;
-    }
+            if (!oRecord || !oRecord.ZempId) {
+                return Promise.reject(new Error("ODataUtils.submitTakeAction: oRecord or ZempId is missing."));
+            }
 
-    let dDate;
-    
-    if (vDate instanceof Date) {
-        dDate = vDate;
-    } else if (typeof vDate === "string" && vDate.startsWith("/Date(")) {
-        // OData ticks format: /Date(1747440000000)/ → convert to Date
-        const iMs = parseInt(vDate.replace(/\/Date\((\d+)\)\//, "$1"), 10);
-        dDate = new Date(iMs);
-    } else if (typeof vDate === "string") {
-        // Already a string, assume ISO format
-        dDate = new Date(vDate);
-    } else {
-        return null;
-    }
+            if (!oRecord.ZactionRefNo) {
+                return Promise.reject(new Error("ODataUtils.submitTakeAction: ZactionRefNo is required for update."));
+            }
 
-    // Format as: datetime'YYYY-MM-DDTHH:mm:ss' (no surrounding quotes!)
-    const pad = (n) => String(n).padStart(2, "0");
-    return `datetime'${dDate.getUTCFullYear()}-${pad(dDate.getUTCMonth() + 1)}-${pad(dDate.getUTCDate())}T${pad(dDate.getUTCHours())}:${pad(dDate.getUTCMinutes())}:${pad(dDate.getUTCSeconds())}'`;
-},
+            // Build the payload with action details
+            const oPayload = this.buildITMPayload(oRecord, oOverrides || {});
+            var finalPayload = this._formatPayloadForOData(oPayload)
+            // Construct the entity path with the key (typically ZactionRefNo)
+            const sEntityPath = "/ITM_STRSet(ZactionRefNo='2',ZempId='200040',ZincDate=datetime'2026-05-17T00:00:00')";
+            // const sEntityPath = "/ITM_STRSet(ZactionRefNo='"+ oRecord.ZactionRefNo +"')";
+            debugger
+            return new Promise((resolve, reject) => {
+                oModel.update(sEntityPath, finalPayload, {
+                    success: (oResponse) => {
+                        console.log("ODataUtils.submitTakeAction: Success", oResponse);
+                        resolve(oResponse);
+                    },
+                    error: (oError) => {
+                        console.error("ODataUtils.submitTakeAction: Error", oError);
+                        this.handleODataError(oError, "Failed to submit action");
+                        reject(oError);
+                    }
+                });
+            });
+        },
+        _formatPayloadForOData(oPayload) {
+            const oFormatted = { ...oPayload };
 
-_formatPayloadForOData(oPayload) {
-    const oFormatted = { ...oPayload };
+            const aDateFields = [
+                "Zhiredate", "ZincDisDate", "ZinitDate", "ZfirstIncDate", "ZincDate",
+                "Zawaitingactionfrom", "Zlastaction", "Zlinemanageractiondate",
+                "Zhcopsactiondate", "Zhcevpactiondate", "Zlegalmemberactiondate",
+                "Zceoactiondate"
+            ];
+            aDateFields.forEach(sField => {
+                oFormatted[sField] = this.formatDateTimeForPayload(oFormatted[sField]);
+            });
 
-    // Date fields that need /Date(ms)/ format in payload
-    const aDateFields = [
-        "Zhiredate", "ZincDisDate", "ZinitDate", "ZfirstIncDate",
-        "Zawaitingactionfrom", "Zlastaction", "Zlinemanageractiondate",
-        "Zhcopsactiondate", "Zhcevpactiondate", "Zlegalmemberactiondate",
-        "Zceoactiondate"
-    ];
+            const aTimeFields = [
+                "ZschTimeIn", "ZschTimeOut", "Zpunchintime", "Zpunchouttime"
+            ];
+            aTimeFields.forEach(sField => {
+                oFormatted[sField] = this.formatTimeDurationForPayload(oFormatted[sField]);
+            });
 
-    aDateFields.forEach(sField => {
-        if (oFormatted[sField]) {
-            oFormatted[sField] = this._formatDateForPayload(oFormatted[sField]);
-        }
-    });
+            return oFormatted;
+        },
+        // ── Edm.DateTime → "/Date(ms)/" ─────────────────────────────────────────
+        //
+        // Accepts: Date | ISO string ("2026-06-16T00:00:00.000Z") | "/Date(ms)/" | null
+        // Returns: "/Date(ms)/" string, or null
 
-    // Time fields that need { ms: ..., __edmType: "Edm.Time" } format
-    const aTimeFields = [
-        "ZschTimeIn", "ZschTimeOut", "Zpunchintime", "Zpunchouttime"
-    ];
+        formatDateTimeForPayload(vDate) {
+            if (vDate === null || vDate === undefined || vDate === "") {
+                return null;
+            }
 
-    aTimeFields.forEach(sField => {
-        if (oFormatted[sField]) {
-            oFormatted[sField] = this.formatTimeForPayload(oFormatted[sField]);
-        }
-    });
+            // Already in /Date(ms)/ form
+            if (typeof vDate === "string" && vDate.startsWith("/Date(")) {
+                return vDate;
+            }
 
-    return oFormatted;
-},
+            let dDate;
+            if (vDate instanceof Date) {
+                dDate = vDate;
+            } else if (typeof vDate === "string") {
+                dDate = new Date(vDate);
+            } else {
+                return null;
+            }
 
-_formatDateForPayload(vDate) {
-    if (!vDate) return null;
+            if (isNaN(dDate.getTime())) {
+                return null;
+            }
 
-    let dDate;
-    if (vDate instanceof Date) {
-        dDate = vDate;
-    } else if (typeof vDate === "string" && vDate.startsWith("/Date(")) {
-        const iMs = parseInt(vDate.replace(/\/Date\((\d+)\)\//, "$1"), 10);
-        dDate = new Date(iMs);
-    } else if (typeof vDate === "string") {
-        dDate = new Date(vDate);
-    } else {
-        return null;
-    }
+            return `/Date(${dDate.getTime()})/`;
+        },
 
-    // Return in OData format: /Date(milliseconds)/
-    return `/Date(${dDate.getTime()})/`;
-}
+        // ── Edm.Time → "PnDTnHnMnS" ──────────────────────────────────────────────
+        //
+        // Accepts: { ms, __edmType } | number (ms) | "HH:mm:ss" string | null
+        // Returns: ISO 8601 duration string e.g. "P00DT08H30M00S", or null
 
+        formatTimeDurationForPayload(vTime) {
+            if (vTime === null || vTime === undefined || vTime === "") {
+                return null;
+            }
 
+            let iMs;
+
+            if (typeof vTime === "object" && vTime.ms !== undefined) {
+                iMs = vTime.ms;
+            } else if (typeof vTime === "number") {
+                iMs = vTime;
+            } else if (typeof vTime === "string") {
+                // Already a duration string
+                if (/^P\d+DT\d+H\d+M\d+S$/.test(vTime)) {
+                    return vTime;
+                }
+                // "HH:mm:ss" or "HH:mm"
+                const aParts = vTime.split(":");
+                if (aParts.length < 2) {
+                    return null;
+                }
+                const iHours = parseInt(aParts[0], 10) || 0;
+                const iMinutes = parseInt(aParts[1], 10) || 0;
+                const iSeconds = aParts[2] ? (parseInt(aParts[2], 10) || 0) : 0;
+                iMs = ((iHours * 60 + iMinutes) * 60 + iSeconds) * 1000;
+            } else {
+                return null;
+            }
+
+            const iTotalSeconds = Math.floor(iMs / 1000);
+            const iDays = Math.floor(iTotalSeconds / 86400);
+            const iHours = Math.floor((iTotalSeconds % 86400) / 3600);
+            const iMinutes = Math.floor((iTotalSeconds % 3600) / 60);
+            const iSeconds = iTotalSeconds % 60;
+
+            const pad = n => String(n).padStart(2, "0");
+            return `P${pad(iDays)}DT${pad(iHours)}H${pad(iMinutes)}M${pad(iSeconds)}S`;
+        },
 
     };
 
