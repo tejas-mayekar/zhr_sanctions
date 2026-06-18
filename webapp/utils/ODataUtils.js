@@ -101,7 +101,9 @@ sap.ui.define([], () => {
 
             return `${hh}:${mm}:${ss}`;
         },
+
         // ── Get User Id ──────────────────────────────────────────────────
+
         getuserId() {
             if (["localhost", "127.0.0.1"].includes(window.location.hostname)) {
                 return "200129";
@@ -114,6 +116,7 @@ sap.ui.define([], () => {
         // ── Edm.Time Builder ──────────────────────────────────────────────────
         //
         // Converts "HH:mm:ss" or "HH:mm" string → { ms, __edmType } for OData payload.
+
         formatTimeForPayload(sTimeVal) {
             if (!sTimeVal) {
                 return null;
@@ -234,7 +237,50 @@ sap.ui.define([], () => {
             };
 
             return Object.assign(oBase, oOverrides || {});
-        }
+        },
+
+        // ── Submit Take Action ────────────────────────────────────────────────
+        //
+        // Creates a new ITM_STRSet entry with action details.
+        // oModel: OData model
+        // oRecord: detail page record (from detailData model)
+        // oOverrides: action input fields { ZincCategory, ZincType, reason, etc }
+
+    submitTakeAction(oModel, oRecord, oOverrides) {
+    if (!oModel) {
+        return Promise.reject(new Error("ODataUtils.submitTakeAction: oModel is null or undefined."));
+    }
+
+    if (!oRecord || !oRecord.ZempId) {
+        return Promise.reject(new Error("ODataUtils.submitTakeAction: oRecord or ZempId is missing."));
+    }
+
+    if (!oRecord.ZactionRefNo) {
+        return Promise.reject(new Error("ODataUtils.submitTakeAction: ZactionRefNo is required for update."));
+    }
+
+    // Build the payload with action details
+    const oPayload = this.buildITMPayload(oRecord, oOverrides || {});
+
+    // Construct the entity path with the key (typically ZactionRefNo)
+    const sEntityPath = `/ITM_STRSet('${oRecord.ZactionRefNo}')`;
+
+    return new Promise((resolve, reject) => {
+        oModel.update(sEntityPath, oPayload, {
+            success: (oResponse) => {
+                console.log("ODataUtils.submitTakeAction: Success", oResponse);
+                resolve(oResponse);
+            },
+            error: (oError) => {
+                console.error("ODataUtils.submitTakeAction: Error", oError);
+                this.handleODataError(oError, "Failed to submit action");
+                reject(oError);
+            }
+        });
+    });
+}
+
+
     };
 
     return ODataUtils;

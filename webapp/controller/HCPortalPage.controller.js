@@ -51,7 +51,8 @@ sap.ui.define([
             try {
                 sap.ui.core.BusyIndicator.show(0);
                 const filters = [
-                    new Filter("ZlmIdName", FilterOperator.EQ, ODataUtils.getuserId())
+                    new Filter("ZlmIdName", FilterOperator.EQ, ODataUtils.getuserId()),
+                    new Filter("ZIsHc", FilterOperator.EQ, true)
 
                 ];
                 const aData = await ODataUtils.fetchOData(
@@ -90,11 +91,11 @@ sap.ui.define([
             const oRecord = aRecords.find(r => r.ZactionRefNo === sActionRefNo);
 
             this.getOwnerComponent().setModel(
-                new JSONModel({ record: oRecord || {}, source: "prevdetail" }),
+                new JSONModel({ record: oRecord || {}, source: "hcdetail" }),
                 "detailData"
             );
 
-            this.getOwnerComponent().getRouter().navTo("RouteOldViolationDetailpage", {
+            this.getOwnerComponent().getRouter().navTo("RouteHCViolationDetailpage", {
                 actionRefNo: encodeURIComponent(sActionRefNo)
             });
         }

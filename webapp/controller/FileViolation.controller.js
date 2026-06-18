@@ -148,7 +148,7 @@ sap.ui.define([
                 ZincDate:     this.byId("dpZincDate").getDateValue(),
                 ZincCategory: this.byId("inputZincCategory").getValue(),
                 ZincType:     this.byId("inputZincType").getValue(),
-                Zaction:      this.byId("inputZaction").getValue(),
+                Zaction:       "Report To HC",
                 Zstatus:      this.byId("inputZstatus").getValue(),
                 Zsanction:    this.byId("inputZsanction").getValue(),
                 Zremark:      this.byId("inputZremark").getValue(),

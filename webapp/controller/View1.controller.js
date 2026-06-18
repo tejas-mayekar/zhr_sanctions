@@ -190,7 +190,8 @@ sap.ui.define([
                 const oUIModel = this.getView().getModel();
                 sap.ui.core.BusyIndicator.show(0);
                 const filters = [
-                    new Filter("ZlmIdName", FilterOperator.EQ, ODataUtils.getuserId())
+                    new Filter("ZlmIdName", FilterOperator.EQ, ODataUtils.getuserId()),
+                    new Filter("ZIsHc", FilterOperator.EQ, false)
                 ];
                 const aHistoryData = await ODataUtils.fetchOData(
                     this.getView().getModel("mainService"), "/ITM_STRSet", filters

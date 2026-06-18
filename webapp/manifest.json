@@ -114,6 +114,13 @@
           ]
         },
         {
+          "name": "RouteHCViolationDetailpage",
+          "pattern": "hcdetail/{actionRefNo}",
+          "target": [
+            "TargetHCViolationDetailPage"
+          ]
+        },
+        {
           "name": "RouteFileViolation",
           "pattern": "create",
           "target": [
@@ -140,6 +147,10 @@
         "TargetOldViolationDetailPage": {
           "id": "OldViolationDetailPage",
           "name": "OldViolationDetailPage"
+        },
+        "TargetHCViolationDetailPage": {
+          "id": "HCViolationDetailPage",
+          "name": "HCViolationDetailPage"
         },
         "TargetFileViolation": {
           "id": "FileViolation",

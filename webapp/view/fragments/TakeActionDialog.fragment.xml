@@ -1,0 +1,75 @@
+<core:FragmentDefinition
+    xmlns:core="sap.ui.core"
+    xmlns:f="sap.f"
+    xmlns="sap.m"
+>
+    <Dialog
+        id="TakeActionDialog"
+        title="Take Action"
+        type="Standard"
+        class="sapUiResponsiveMargin"
+        contentWidth="600px"
+    >
+        <content>
+            <VBox
+                id="_IDGenVBox12"
+                class="sapUiMediumMargin"
+            >
+                <Label
+                    id="_IDGenLabel83"
+                    text="Violation Category"
+                    required="true"
+                />
+                <Input
+                    id="dIpZincCategory"
+                    value="{regularize>/ZincCategory}"
+                    width="100%"
+                    placeholder="Enter violation type"
+                />
+
+                <Label
+                    id="_IDGenLabel84"
+                    text="Incident Type"
+                    required="true"
+                    class="sapUiSmallMarginTop"
+                />
+                <Input
+                    id="dIpZincType"
+                    value="{regularize>/ZincType}"
+                    width="100%"
+                    placeholder="Enter incident type"
+                />
+
+                <Label
+                    id="_IDGenLabel85"
+                    text="Reason / Remarks"
+                    class="sapUiSmallMarginTop"
+                />
+                <TextArea
+                    id="dTaReason"
+                    value="{regularize>/reason}"
+                    width="100%"
+                    rows="4"
+                    placeholder="Enter reason or remarks"
+                />
+            </VBox>
+        </content>
+
+        <beginButton>
+            <Button
+                id="_IDGenButton16"
+                text="Submit"
+                type="Emphasized"
+                press=".onSubmitTakeAction"
+            />
+        </beginButton>
+
+        <endButton>
+            <Button
+                id="_IDGenButton17"
+                text="Cancel"
+                press=".onCloseTakeActionDialog"
+            />
+        </endButton>
+    </Dialog>
+</core:FragmentDefinition>
