@@ -12,7 +12,7 @@
         draggable="true"
     >
         <content>
-            <VBox class="sapUiSmallMargin">
+            <VBox id="_IDGenVBox9" class="sapUiSmallMargin">
 
                 <!-- Read-only context strip -->
                 <MessageStrip
@@ -39,7 +39,7 @@
                     <form:content>
 
                         <!-- Punch In -->
-                        <Label text="Punch In Time" required="true" />
+                        <Label id="_IDGenLabel64" text="Punch In Time" required="true" />
                         <TimePicker
                             id="regularizePunchIn"
                             value="{regularize>/punchIn}"
@@ -50,7 +50,7 @@
                         />
 
                         <!-- Punch Out -->
-                        <Label text="Punch Out Time" required="true" />
+                        <Label id="_IDGenLabel65" text="Punch Out Time" required="true" />
                         <TimePicker
                             id="regularizePunchOut"
                             value="{regularize>/punchOut}"
@@ -61,7 +61,7 @@
                         />
 
                         <!-- Reason -->
-                        <Label text="Reason / Remarks" required="true" />
+                        <Label id="_IDGenLabel66" text="Reason / Remarks" required="true" />
                         <TextArea
                             id="regularizeReason"
                             value="{regularize>/reason}"

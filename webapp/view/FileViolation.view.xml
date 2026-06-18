@@ -98,78 +98,79 @@
                             <Label id="lblZempName" text="Employee Name" />
                             <Input id="inputZempName" 
                             placeholder="Enter Employee Name" 
+                            value="{SHData>/selectedEmployeeData/ZempName}" 
                             maxLength="60" 
                             editable="false"  />
 
                             <Label id="lblZempType" text="Employee Type" />
-                            <Input id="inputZempType" placeholder="Enter Employee Type" maxLength="60" editable="false"  />
+                            <Input value="{SHData>/selectedEmployeeData/ZempType}"  id="inputZempType" placeholder="Enter Employee Type" maxLength="60" editable="false"  />
 
                             <Label id="lblZempTypeDesc" text="Employee Type Description" />
-                            <Input id="inputZempTypeDesc" placeholder="Enter Type Description" maxLength="100" editable="false" />
+                            <Input value="{SHData>/selectedEmployeeData/ZempClassDesc}" id="inputZempTypeDesc" placeholder="Enter Type Description" maxLength="100" editable="false" />
 
                             <Label id="lblZempClass" text="Employee Class" />
-                            <Input id="inputZempClass" placeholder="Enter Employee Class" maxLength="60" editable="false" />
+                            <Input value="{SHData>/selectedEmployeeData/ZempClass}" id="inputZempClass" placeholder="Enter Employee Class" maxLength="60" editable="false" />
 
                             <Label id="lblZempClassDesc" text="Employee Class Description" />
-                            <Input id="inputZempClassDesc" placeholder="Enter Class Description" maxLength="100" editable="false" />
+                            <Input value="{SHData>/selectedEmployeeData/ZempClassDesc}" id="inputZempClassDesc" placeholder="Enter Class Description" maxLength="100" editable="false" />
 
                             <Label id="lblZcompany" text="Company" />
-                            <Input id="inputZcompany" placeholder="Enter Company" maxLength="60" editable="false"  />
+                            <Input value="{SHData>/selectedEmployeeData/Zcompany}" id="inputZcompany" placeholder="Enter Company" maxLength="60" editable="false"  />
 
                             <Label id="lblZnationality" text="Nationality" />
-                            <Input id="inputZnationality" placeholder="Enter Nationality" maxLength="60" editable="false" />
+                            <Input value="{SHData>/selectedEmployeeData/Znationality}" id="inputZnationality" placeholder="Enter Nationality" maxLength="60" editable="false" />
 
                             <Label id="lblZhiredate" text="Hire Date" />
-                            <DatePicker id="dpZhiredate" displayFormat="yyyy-MM-dd" placeholder="yyyy-mm-dd" editable="false" />
+                            <Input value="{SHData>/selectedEmployeeData/ZempDoj}" id="dpZhiredate" editable="false" />
 
                             <Label id="lblZpaygrade" text="Pay Grade" />
                             <Input id="inputZpaygrade" editable="false" />
 
                             <core:Title id="titleEmpPos" text="Position &amp; Location" />
                             <Label id="lblZposition" text="Position" />
-                            <Input id="inputZposition" placeholder="Enter Position" maxLength="60" editable="false" />
+                            <Input value="{SHData>/selectedEmployeeData/Zposition}" id="inputZposition" placeholder="Enter Position" maxLength="60" editable="false" />
 
                             <Label id="lblZjobtitle" text="Job Title" />
-                            <Input id="inputZjobtitle" placeholder="Enter Job Title" maxLength="50" editable="false" />
+                            <Input value="{SHData>/selectedEmployeeData/ZjobTitle}" id="inputZjobtitle" placeholder="Enter Job Title" maxLength="50" editable="false" />
 
                             <Label id="lblZjobclassification" text="Job Classification" />
-                            <Input id="inputZjobclassification" placeholder="Enter Job Classification" maxLength="30" editable="false" />
+                            <Input value="{SHData>/selectedEmployeeData/ZjobClass}" id="inputZjobclassification" placeholder="Enter Job Classification" maxLength="30" editable="false" />
 
                             <Label id="lblZlocation" text="Location" />
-                            <Input id="inputZlocation" placeholder="Enter Location" maxLength="60" editable="false" />
+                            <Input value="{SHData>/selectedEmployeeData/Zlocation}" id="inputZlocation" placeholder="Enter Location" maxLength="60" editable="false" />
 
                             <Label id="lblZlocationgroup" text="Location Group" />
-                            <Input id="inputZlocationgroup" placeholder="Enter Location Group" maxLength="60" editable="false" />
+                            <Input value="{SHData>/selectedEmployeeData/ZlocGroup}" id="inputZlocationgroup" placeholder="Enter Location Group" maxLength="60" editable="false" />
 
                             <Label id="lblZworkschedule" text="Work Schedule" />
-                            <Input id="inputZworkschedule" placeholder="Enter Work Schedule" maxLength="60" editable="false" />
+                            <Input value="{SHData>/selectedEmployeeData/Zworkschedule}" id="inputZworkschedule" placeholder="Enter Work Schedule" maxLength="60" editable="false" />
 
                             <Label id="lblZlatestNode" text="Latest Node" />
-                            <Input id="inputZlatestNode" placeholder="Enter Latest Node" maxLength="60" editable="false" />
+                            <Input value="{SHData>/selectedEmployeeData/ZlatestNode}" id="inputZlatestNode" placeholder="Enter Latest Node" maxLength="60" editable="false" />
 
                             <Label id="lblZstdWeekHrs" text="Std Weekly Hours" />
-                            <Input id="inputZstdWeekHrs" type="Number" placeholder="0" editable="false" />
+                            <Input value="{SHData>/selectedEmployeeData/ZstdWeekHrs}" id="inputZstdWeekHrs" placeholder="0" editable="false" />
 
                             <Label id="lblZwrkDyWeek" text="Working Days / Week" />
-                            <Input id="inputZwrkDyWeek" type="Number" placeholder="0" editable="false" />
+                            <Input value="{SHData>/selectedEmployeeData/ZwrkDyWeek}" id="inputZwrkDyWeek" placeholder="0" editable="false" />
 
                             <core:Title id="titleEmpIndicators" text="Indicators (Zn0 - Zn7)" />
                             <Label id="lblZn0" text="Zn0 Num" />
-                            <Input id="inputZn0" type="Number" placeholder="0" editable="false" />
+                            <Input value="{SHData>/selectedEmployeeData/Zn0}" id="inputZn0"  placeholder="0" editable="false" />
                             <Label id="lblZn1" text="Business Unit" />
-                            <Input id="inputZn1" type="Number" placeholder="0" editable="false" />
+                            <Input value="{SHData>/selectedEmployeeData/Zn1}" id="inputZn1" placeholder="0" editable="false" />
                             <Label id="lblZn2" text="Division" />
-                            <Input id="inputZn2" type="Number" placeholder="0" editable="false" />
+                            <Input value="{SHData>/selectedEmployeeData/Zn2}" id="inputZn2" placeholder="0" editable="false" />
                             <Label id="lblZn3" text="Department" />
-                            <Input id="inputZn3" type="Number" placeholder="0" editable="false" />
+                            <Input value="{SHData>/selectedEmployeeData/Zn3}" id="inputZn3" placeholder="0" editable="false" />
                             <Label id="lblZn4" text="Zn4 Num"  visible="false" />
-                            <Input id="inputZn4" type="Number"  placeholder="0"  visible="false" editable="false"/>
+                            <Input value="{SHData>/selectedEmployeeData/Zn4}" id="inputZn4"  placeholder="0"  visible="false" editable="false"/>
                             <Label id="lblZn5" text="Zn5 Num"  visible="false"/>
-                            <Input id="inputZn5" type="Number" placeholder="0" visible="false" editable="false" />
+                            <Input value="{SHData>/selectedEmployeeData/Zn5}" id="inputZn5" placeholder="0" visible="false" editable="false" />
                             <Label id="lblZn6" text="Zn6 Num"  visible="false"/>
-                            <Input id="inputZn6" type="Number" placeholder="0" visible="false" editable="false" />
+                            <Input value="{SHData>/selectedEmployeeData/Zn6}" id="inputZn6" placeholder="0" visible="false" editable="false" />
                             <Label id="lblZn7" text="Zn7 Num"  visible="false"/>
-                            <Input id="inputZn7" type="Number" placeholder="0" visible="false" editable="false" />
+                            <Input value="{SHData>/selectedEmployeeData/Zn7}" id="inputZn7" placeholder="0" visible="false" editable="false" />
                         </form:content>
                     </form:SimpleForm>
                 </Panel>
@@ -217,7 +218,7 @@
                             <Input id="inputZinitatedBy" placeholder="Enter Initiated By Name" maxLength="50" editable="false" />
 
                             <Label id="lblZinitDate" text="Initiated Date" />
-                            <DatePicker id="dpZinitDate" displayFormat="yyyy-MM-dd" placeholder="yyyy-mm-dd" editable="false" />
+                            <DatePicker value="SHData>/selectedEmployeeData/initiatedDay" id="dpZinitDate" displayFormat="yyyy-MM-dd" placeholder="yyyy-mm-dd" editable="false" />
 
                             <Label id="lblZfirstIncDate" text="First Incident Date" />
                             <DatePicker id="dpZfirstIncDate" displayFormat="yyyy-MM-dd" placeholder="yyyy-mm-dd" editable="false" />
@@ -230,22 +231,34 @@
 
                             <core:Title id="titleViolTimes" text="Shift &amp; Punch Hours" />
                             <Label id="lblZschTimeIn" text="Scheduled In Time" />
-                            <TimePicker id="tpZschTimeIn" valueFormat="HH:mm:ss" displayFormat="HH:mm:ss" placeholder="HH:MM:SS"  editable="false" />
+                            <TimePicker id="tpZschTimeIn"  value="{
+                                    path: 'SHData>/selectedEmployeeData/ZschTimeIn',
+                                    formatter: '.formatEdmTime'
+                                }" valueFormat="HH:mm:ss" displayFormat="HH:mm:ss" placeholder="HH:MM:SS"  editable="false" />
 
                             <Label id="lblZschTimeOut" text="Scheduled Out Time" />
-                            <TimePicker id="tpZschTimeOut" valueFormat="HH:mm:ss" displayFormat="HH:mm:ss" placeholder="HH:MM:SS"  editable="false" />
+                            <TimePicker id="tpZschTimeOut" value="{
+                                    path: 'SHData>/selectedEmployeeData/ZschTimeOut',
+                                    formatter: '.formatEdmTime'
+                                }" valueFormat="HH:mm:ss" displayFormat="HH:mm:ss" placeholder="HH:MM:SS"  editable="false" />
 
                             <Label id="lblZpunchintime" text="Punch In Time" />
-                            <TimePicker id="tpZpunchintime" valueFormat="HH:mm:ss" displayFormat="HH:mm:ss" placeholder="HH:MM:SS"  editable="false" />
+                            <TimePicker id="tpZpunchintime" value="{
+                                    path: 'SHData>/selectedEmployeeData/Zpunchintime',
+                                    formatter: '.formatEdmTime'
+                                }" valueFormat="HH:mm:ss" displayFormat="HH:mm:ss" placeholder="HH:MM:SS"  editable="false" />
 
                             <Label id="lblZpunchouttime" text="Punch Out Time" />
-                            <TimePicker id="tpZpunchouttime" valueFormat="HH:mm:ss" displayFormat="HH:mm:ss" placeholder="HH:MM:SS"  editable="false" />
+                            <TimePicker id="tpZpunchouttime" value="{
+                                    path: 'SHData>/selectedEmployeeData/Zpunchouttime',
+                                    formatter: '.formatEdmTime'
+                                }" valueFormat="HH:mm:ss" displayFormat="HH:mm:ss" placeholder="HH:MM:SS"  editable="false" />
 
                             <Label id="lblZdelayHrs" text="Delay Hours" />
-                            <Input id="inputZdelayHrs" type="Number" placeholder="0" editable="false"  />
+                            <Input value="{SHData>/selectedEmployeeData/ZdelayHrs}" id="inputZdelayHrs" placeholder="0" editable="false"  />
 
                             <Label id="lblZshortHrs" text="Short Hours" />
-                            <Input id="inputZshortHrs" type="Number" placeholder="0" editable="false" />
+                            <Input value="{SHData>/selectedEmployeeData/ZshortHrs}" id="inputZshortHrs" placeholder="0" editable="false" />
 
                             <Label id="lblZrepeatcount" text="Repeat Count"  visible="false"/>
                             <Input id="inputZrepeatcount" type="Number" placeholder="0"  visible="false"/>
@@ -261,6 +274,7 @@
                     headerText="Approval Workflow &amp; Action Remarks"
                     expandable="true"
                     expanded="true"
+                    visible="false"
                 >
                     <form:SimpleForm
                         id="formWorkflowInfo"

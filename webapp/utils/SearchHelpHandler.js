@@ -248,7 +248,6 @@ sap.ui.define([
             var oSelectedItem = oEvent.getParameter("selectedItem");
             var oDialog = oEvent.getSource();
 
-            // If dialog was cancelled (ESC), don't set any value
             if (!oSelectedItem) {
                 return;
             }
@@ -258,15 +257,21 @@ sap.ui.define([
 
             if (!oDialog._input || !oFieldConfig) return;
 
-            // Get value from binding context
             var oContext = oSelectedItem.getBindingContext("valueHelpItems");
             var sValue = oContext ? oContext.getProperty(oFieldConfig.fieldName) : oSelectedItem.getTitle();
+            var oSelectedData = oContext ? oContext.getObject() : {};
 
-            // Set value in input
             oDialog._input.setValue(sValue);
+            oSelectedData.initiatedDay = new Date();
 
-            // Optionally trigger change event
+            // **Set to SHData model**
+            var oSHDataModel = oController.getView().getModel("SHData");
+            if (oSHDataModel) {
+                oSHDataModel.setProperty("/selectedEmployeeData", oSelectedData);
+            }
+
             oDialog._input.fireChange({ value: sValue });
         }
+
     };
 });

@@ -7,9 +7,9 @@ sap.ui.define([
     return BaseController.extend("zhrsanctions.controller.OldViolationDetailPage", {
 
         onInit() {
-               this.getView().setModel(new JSONModel({
-        isEditOn: false
-    }));
+            this.getView().setModel(new JSONModel({
+                isEditOn: false
+            }));
             this.getView().setModel(new JSONModel({
                 punchIn: "", punchOut: "", reason: ""
             }), "regularize");
@@ -19,10 +19,10 @@ sap.ui.define([
                 .getRoute("RouteOldViolationDetailpage")
                 .attachPatternMatched(this._onRouteMatched, this);
 
-    // Now this works because the default model exists
-    this.getView()
-        .getModel()
-        .setProperty("/isEditOn", false);
+            // Now this works because the default model exists
+            this.getView()
+                .getModel()
+                .setProperty("/isEditOn", false);
 
         },
 
@@ -37,19 +37,19 @@ sap.ui.define([
         },
         onEditViolationPress() {
 
-        
-    // Now this works because the default model exists
-    this.getView()
-        .getModel()
-        .setProperty("/isEditOn", true);
+
+            // Now this works because the default model exists
+            this.getView()
+                .getModel()
+                .setProperty("/isEditOn", true);
 
         },
         onEditCancelPress() {
 
-    // Now this works because the default model exists
-    this.getView()
-        .getModel()
-        .setProperty("/isEditOn", false);
+            // Now this works because the default model exists
+            this.getView()
+                .getModel()
+                .setProperty("/isEditOn", false);
         }
         // onNavBack inherited from BaseController
     });
