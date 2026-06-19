@@ -263,7 +263,7 @@ sap.ui.define([], () => {
             const oPayload = this.buildITMPayload(oRecord, oOverrides || {});
             var finalPayload = this._formatPayloadForOData(oPayload)
             // Construct the entity path with the key (typically ZactionRefNo)
-            const sEntityPath = "/ITM_STRSet(ZactionRefNo='2',ZempId='200040',ZincDate=datetime'2026-05-17T00:00:00')";
+            const sEntityPath = "/ITM_STRSet(ZactionRefNo='"+ oRecord.ZactionRefNo +"',ZempId='200040',ZincDate=datetime'2026-05-17T00:00:00')";
             // const sEntityPath = "/ITM_STRSet(ZactionRefNo='"+ oRecord.ZactionRefNo +"')";
             debugger
             return new Promise((resolve, reject) => {
@@ -284,7 +284,7 @@ sap.ui.define([], () => {
             const oFormatted = { ...oPayload };
 
             const aDateFields = [
-                "Zhiredate", "ZincDisDate", "ZinitDate", "ZfirstIncDate", "ZincDate",
+                "Zhiredate", "ZincDisDate", "ZinitDate", "ZfirstIncDate","ZincDate",
                 "Zawaitingactionfrom", "Zlastaction", "Zlinemanageractiondate",
                 "Zhcopsactiondate", "Zhcevpactiondate", "Zlegalmemberactiondate",
                 "Zceoactiondate"
