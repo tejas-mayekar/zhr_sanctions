@@ -3,8 +3,9 @@ sap.ui.define([
     "sap/ui/model/FilterOperator",
     "sap/ui/model/json/JSONModel",
     "sap/m/SelectDialog",
-    "sap/m/StandardListItem"
-], function (Filter, FilterOperator, JSONModel, SelectDialog, StandardListItem) {
+    "sap/m/StandardListItem",
+    "zhrsanctions/utils/ODataUtils",
+], function (Filter, FilterOperator, JSONModel, SelectDialog, StandardListItem, ODataUtils) {
     "use strict";
 
     return {
@@ -15,6 +16,16 @@ sap.ui.define([
                 fieldName: "ZempId",
                 descriptionName: "ZempName",
                 title: "Employee Search Help",
+                filters: [
+                    new Filter("ZlmIdName", FilterOperator.EQ, ODataUtils.getuserId())
+                ]
+            },
+            "dIpZincType": {
+                modelName: "mainService",
+                entitySetPath: "VIOALATION_SEARCHHELPSet",
+                fieldName: "Zviolationtype",
+                descriptionName: "Zviolationdesc",
+                title: "Violation Search Help",
                 filters: [
                 ]
             },
@@ -111,7 +122,10 @@ sap.ui.define([
         /**
          * Open the Value Help Dialog
          */
-        openValueHelpDialog: function (oController, oEvent) {
+        /**
+ * Open the Value Help Dialog
+ */
+        openValueHelpDialog: function (oController, oEvent, oIncidentDate) {
             var oInput = oEvent.getSource();
             var sInputId = oInput.getId().split("--").pop();
             var sInputValue = oInput.getValue();
@@ -144,20 +158,31 @@ sap.ui.define([
                 });
             }
 
-            // Store references (in case input reference changed)
+            // Store references
             oDialog._input = oInput;
             oDialog._inputId = sInputId;
+            oDialog._incidentDate = oIncidentDate; // Store the incident date
 
-            // Clear previous data and open dialog immediately with loading state
+            // Clear previous data
             var oDialogModel = oDialog.getModel("valueHelpItems");
             oDialogModel.setData([]);
 
-            // Open dialog first (empty with loading)
+            // Open dialog with loading state
             oDialog.setBusy(true);
             oDialog.open(sInputValue);
 
             // Prepare filters
             var aFilters = oFieldConfig.filters ? [...oFieldConfig.filters] : [];
+
+            // **Add incident date filter if provided**
+            if (oIncidentDate && sInputId === "inputZempId") {
+                aFilters.push(new Filter("ZincDate", FilterOperator.EQ, oIncidentDate));
+            }
+            if (oIncidentDate && sInputId === "dIpZincType") {
+                aFilters.push(new Filter("Zviolationcategory", FilterOperator.EQ, oIncidentDate));
+            }
+
+            // Add search text filter
             if (sInputValue) {
                 aFilters.push(new Filter({
                     filters: [
@@ -168,7 +193,7 @@ sap.ui.define([
                 }));
             }
 
-            // Fetch data from API after dialog is open
+            // Fetch data from API
             that.fetchGLData(
                 oController,
                 oFieldConfig.modelName,
@@ -184,10 +209,9 @@ sap.ui.define([
                 // Remove loading indicator
                 oDialog.setBusy(false);
             }).catch(function (oError) {
-                // Remove loading indicator
                 oDialog.setBusy(false);
 
-                var sErrorMsg = "Failed to load data. Please try again.";
+                var sErrorMsg = "Failed to load employee data. Please try again.";
                 if (oError && oError.message) {
                     sErrorMsg += "\n\nDetails: " + oError.message;
                 }
@@ -198,6 +222,7 @@ sap.ui.define([
                 sap.m.MessageBox.error(sErrorMsg);
             });
         },
+
 
         /**
          * Handle live search inside the Value Help Dialog (client-side filtering)

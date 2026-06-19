@@ -53,13 +53,13 @@
             </EntityType>
             <EntityType Name="ITM_STR" sap:content-version="1">
                 <Key>
-                    <PropertyRef Name="ZIsHc"/>
+                    <PropertyRef Name="ZactionRefNo"/>
                     <PropertyRef Name="ZempId"/>
                     <PropertyRef Name="ZincDate"/>
                 </Key>
                 <Property Name="ZIsHc" Type="Edm.Boolean" Nullable="false" sap:unicode="false" sap:label="Is HC" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="ZlmIdName" Type="Edm.String" Nullable="false" MaxLength="50" sap:unicode="false" sap:label="LM Id" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZactionRefNo" Type="Edm.String" MaxLength="10" sap:unicode="false" sap:label="Action reference Num" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="ZactionRefNo" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Action reference Num" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="ZempId" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Employee ID" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="ZincDate" Type="Edm.DateTime" Nullable="false" Precision="7" sap:unicode="false" sap:label="Incident date" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="ZempName" Type="Edm.String" MaxLength="60" sap:unicode="false" sap:label="Logical System" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
@@ -135,6 +135,7 @@
                     <PropertyRef Name="ZempName"/>
                 </Key>
                 <Property Name="ZempId" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Employee ID" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="ZincDate" Type="Edm.DateTime" Precision="7" sap:unicode="false" sap:label="Incident date" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="ZempDoj" Type="Edm.DateTime" Precision="7" sap:unicode="false" sap:label="Date of joining" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="ZempName" Type="Edm.String" Nullable="false" MaxLength="50" sap:unicode="false" sap:label="Employee Name" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="ZempMail" Type="Edm.String" MaxLength="241" sap:unicode="false" sap:label="E-Mail Address" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
@@ -173,10 +174,20 @@
                 <Property Name="ZlocGroup" Type="Edm.String" MaxLength="20" sap:unicode="false" sap:label="Location Group" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="Zlocation" Type="Edm.String" MaxLength="20" sap:unicode="false" sap:label="Location" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
             </EntityType>
+            <EntityType Name="VIOALATION_SEARCHHELP" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="Zviolationcategory"/>
+                    <PropertyRef Name="Zviolationtype"/>
+                </Key>
+                <Property Name="Zviolationcategory" Type="Edm.String" Nullable="false" MaxLength="1" sap:unicode="false" sap:label="Violation Category" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Zviolationtype" Type="Edm.String" Nullable="false" MaxLength="3" sap:unicode="false" sap:label="Violation Type" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Zviolationdesc" Type="Edm.String" Nullable="false" sap:unicode="false" sap:label="String" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+            </EntityType>
             <EntityContainer Name="ZHR_SACTIONS_APPLICATION_SRV_Entities" m:IsDefaultEntityContainer="true" sap:supported-formats="atom json xlsx">
                 <EntitySet Name="HDR_STRSet" EntityType="ZHR_SACTIONS_APPLICATION_SRV.HDR_STR" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:content-version="1"/>
                 <EntitySet Name="ITM_STRSet" EntityType="ZHR_SACTIONS_APPLICATION_SRV.ITM_STR" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:content-version="1"/>
                 <EntitySet Name="EMP_SEARCHHELPSet" EntityType="ZHR_SACTIONS_APPLICATION_SRV.EMP_SEARCHHELP" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:content-version="1"/>
+                <EntitySet Name="VIOALATION_SEARCHHELPSet" EntityType="ZHR_SACTIONS_APPLICATION_SRV.VIOALATION_SEARCHHELP" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:content-version="1"/>
             </EntityContainer>
             <atom:link rel="self" href="/sap/opu/odata/sap/ZHR_SACTIONS_APPLICATION_SRV/$metadata" xmlns:atom="http://www.w3.org/2005/Atom"/>
             <atom:link rel="latest-version" href="/sap/opu/odata/sap/ZHR_SACTIONS_APPLICATION_SRV/$metadata" xmlns:atom="http://www.w3.org/2005/Atom"/>

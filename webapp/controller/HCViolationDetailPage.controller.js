@@ -3,7 +3,8 @@ sap.ui.define([
     "sap/ui/model/json/JSONModel",
     "sap/m/MessageToast",
     "zhrsanctions/utils/ODataUtils",
-], (BaseController, JSONModel, MessageToast, ODataUtils) => {
+    "zhrsanctions/utils/SearchHelpHandler"
+], (BaseController, JSONModel, MessageToast, ODataUtils, ValueHelpHandler) => {
     "use strict";
 
     return BaseController.extend("zhrsanctions.controller.HCViolationDetailPage", {
@@ -40,6 +41,18 @@ sap.ui.define([
             });
         },
 
+        onGetCategoryType() {
+            var oSelect = this.getView().byId("violation_type");
+            if (oSelect) {
+                var sKey = oSelect.getSelectedKey();
+                this.getView().getModel("regularize").setData({
+                    ZincCategory: sKey,
+                });
+                return sKey;
+            }
+            return null;
+        },
+
         onTakeActionPress() {
             if (!this._oTakeActionDialog) {
                 this._oTakeActionDialog = sap.ui.xmlfragment(
@@ -55,7 +68,23 @@ sap.ui.define([
         onCloseTakeActionDialog() {
             this._oTakeActionDialog.close();
         },
+        onValueHelpRequest: function (oEvent) {
+            var CategoryValue = this.onGetCategoryType()
+            if (!CategoryValue) {
+                MessageBox.warning("Please select Incident Category before choosing Type.");
+                this.byId("violation_type").focus();
+                return;
+            }
+            ValueHelpHandler.openValueHelpDialog(this, oEvent, CategoryValue);
+        },
 
+        onValueHelpLiveSearch: function (oEvent) {
+            ValueHelpHandler.liveSearchValueHelpDialog(oEvent);
+        },
+
+        onValueHelpClose: function (oEvent) {
+            // Handled internally by SearchHelpHandler confirm callback
+        },
         onSubmitTakeAction() {
             const oRegularizeModel = this.getView().getModel("regularize");
             const oDetailModel = this.getView().getModel("detailData");
@@ -76,7 +105,7 @@ sap.ui.define([
                 Zlinemanageraction: oActionData.Zlinemanageraction,
                 Zlinemanagerremarks: oActionData.reason,
                 Zlinemanageractiondate: new Date(),
-                Zstatus: "SUBMITTED",
+                Zstatus: "COMPLETED",
                 ZlmIdName: ODataUtils.getuserId()   // ← stamp current user
             };
 

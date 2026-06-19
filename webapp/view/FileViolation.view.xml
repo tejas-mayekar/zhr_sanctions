@@ -59,6 +59,18 @@
                         columnsM="2"
                     >
                         <form:content>
+
+                               <Label
+                                id="lblReqZincDate"
+                                text="Incident Date"
+                                required="true"
+                            />
+                            <DatePicker
+                                id="dpZincDate"
+                                displayFormat="yyyy-MM-dd"
+                                placeholder="yyyy-mm-dd"
+                                change=".onIncidentDateChange"
+                            />
                             <Label
                                 id="lblReqZempId"
                                 text="Employee ID"
@@ -70,18 +82,10 @@
                                 maxLength="10"
                                 showValueHelp="true"
                                 valueHelpRequest="onValueHelpRequest"
+                                editable="false"
                             />
 
-                            <Label
-                                id="lblReqZincDate"
-                                text="Incident Date"
-                                required="true"
-                            />
-                            <DatePicker
-                                id="dpZincDate"
-                                displayFormat="yyyy-MM-dd"
-                                placeholder="yyyy-mm-dd"
-                            />
+                     
 
                             <Label
                                 id="lblZincDisDate"

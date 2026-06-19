@@ -263,7 +263,7 @@
 
                 <Panel id="_IDGenPanel5"
                      
-                    headerText="Violation Details"
+                    headerText="Manager Details"
                     expandable="true"
                     expanded="true"
                 >

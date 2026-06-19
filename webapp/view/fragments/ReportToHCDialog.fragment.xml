@@ -1,0 +1,64 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:form="sap.ui.layout.form"
+>
+    <Dialog
+        id="ReportToHCDialog"
+        title="Report To HC"
+        icon="sap-icon://edit"
+        contentWidth="36rem"
+        resizable="true"
+        draggable="true"
+    >
+        <content>
+            <VBox id="_IDGenVBox13"  class="sapUiSmallMargin">
+
+                <form:SimpleForm
+                    id="ReportToHCForm"
+                    editable="true"
+                    layout="ResponsiveGridLayout"
+                    labelSpanL="5"
+                    labelSpanM="5"
+                    labelSpanS="12"
+                    emptySpanL="0"
+                    emptySpanM="0"
+                    columnsL="1"
+                    columnsM="1"
+                >
+                    <form:content>
+
+                        <!-- Reason -->
+                        <Label id="_IDGenLabel82"  text="Reason / Remarks" required="true" />
+                        <TextArea
+                            id="ReportToHCReason"
+                            value="{regularize>/reason}"
+                            rows="3"
+                            maxLength="255"
+                            growing="false"
+                            width="100%"
+                            placeholder="Enter reason for regularization..."
+                        />
+
+                    </form:content>
+                </form:SimpleForm>
+            </VBox>
+        </content>
+
+        <beginButton>
+            <Button
+                id="btnReportToHCSubmit"
+                text="Submit"
+                type="Emphasized"
+                press=".onReportToHCSubmit"
+            />
+        </beginButton>
+        <endButton>
+            <Button
+                id="btnReportToHCCancel"
+                text="Cancel"
+                press=".onReportToHCCancel"
+            />
+        </endButton>
+    </Dialog>
+</core:FragmentDefinition>

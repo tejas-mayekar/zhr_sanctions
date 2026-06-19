@@ -20,13 +20,28 @@
                     text="Violation Category"
                     required="true"
                 />
-                <Input
-                    id="dIpZincCategory"
-                    value="{regularize>/ZincCategory}"
-                    width="100%"
-                    placeholder="Enter violation type"
-                />
-
+                <InputListItem
+                    id="_IDGenInputListItem"
+                    label="Enter Violation Category"
+                >
+                    <Select id="violation_type">
+                        <core:Item
+                            id="_IDGenItem"
+                            key="A"
+                            text="A - Violations related to working hours"
+                        />
+                        <core:Item
+                            id="_IDGenItem2"
+                            key="B"
+                            text="B - Violations related to work organization"
+                        />
+                        <core:Item
+                            id="_IDGenItem3"
+                            key="C"
+                            text="C - Violations related to employee conduct "
+                        />
+                    </Select>
+                </InputListItem>
                 <Label
                     id="_IDGenLabel84"
                     text="Incident Type"
@@ -37,6 +52,8 @@
                     id="dIpZincType"
                     value="{regularize>/ZincType}"
                     width="100%"
+                    showValueHelp="true"
+                    valueHelpRequest="onValueHelpRequest"
                     placeholder="Enter incident type"
                 />
 
