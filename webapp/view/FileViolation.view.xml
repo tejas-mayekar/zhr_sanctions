@@ -361,7 +361,7 @@
                             />
                             <Label
                                 id="lblZn0"
-                                text="Zn0 Num"
+                                text="Company"
                             />
                             <Input
                                 value="{SHData>/selectedEmployeeData/Zn0}"

@@ -157,7 +157,7 @@ sap.ui.define([
                 Zaction: "Report To HC",
                 Zstatus: "PENDING",
                 Zsanction: this.byId("inputZsanction").getValue(),
-                Zremark: this.byId("inputZremark").getValue(),
+                Zremark: "",
 
                 // Timeline
                 ZincDisDate: this.byId("dpZincDisDate").getDateValue(),
@@ -182,7 +182,7 @@ sap.ui.define([
                 ZlmIdName: ODataUtils.getuserId(),
                 Zlinemanageraction: this.byId("inputZlinemanageraction").getValue(),
                 Zlinemanageractiondate: this.byId("dpZlinemanageractiondate").getDateValue(),
-                Zlinemanagerremarks: this.byId("inputZlinemanagerremarks").getValue(),
+                Zlinemanagerremarks: this.byId("inputZremark").getValue(),
 
                 Zhcopsname: this.byId("inputZhcopsname").getValue(),
                 Zhcopsaction: this.byId("inputZhcopsaction").getValue(),

@@ -86,7 +86,7 @@
                                 <ObjectAttribute id="_IDGenObjectStatus2"
                                      
                                     title="Manager Remark"
-                                    text="{detailData>/record/Zremark}"
+                                    text="{detailData>/record/Zlinemanagerremarks}"
                                 />
                             </attributes>
                         </ObjectHeader>
@@ -101,11 +101,20 @@
                             <Button id="_IDGenButton15"
                                  
                                 text="Take Actions"
-                                type="Emphasized"
+                                type="Reject"
                                 width="10rem"
                                 visible="{= ${/isEditOn} }"
                                 enabled="{= ${/isEditOn} }"
                                 press=".onTakeActionPress"
+                            />
+                            <Button id="_IDGenButton12"
+                                 
+                                text="Take No Actions"
+                                type="Emphasized"
+                                width="10rem"
+                                visible="{= ${/isEditOn} }"
+                                enabled="{= ${/isEditOn} }"
+                                press=".onTakeNoActionPress"
                             />
                         </HBox>
                     </VBox>
@@ -306,7 +315,7 @@
                             />
                             <Text id="_IDGenText72" 
                                  
-                                text="{detailData>/record/Zremark}"
+                                text="{detailData>/record/Zlinemanagerremarks}"
                             />
 
                             <Label id="_IDGenLabel81"

@@ -73,9 +73,22 @@ sap.ui.define([
             }
             this._oTakeActionDialog.open();
         },
-
+       onTakeNoActionPress() {
+           if (!this._oTakeNoActionDialog) {
+                this._oTakeNoActionDialog = sap.ui.xmlfragment(
+                    this.getView().getId(),
+                    "zhrsanctions.view.fragments.TakeNoActionDialog",
+                    this
+                );
+                this.getView().addDependent(this._oTakeNoActionDialog);
+            }
+            this._oTakeNoActionDialog.open();
+        },
         onCloseTakeActionDialog() {
             this._oTakeActionDialog.close();
+        },
+        onCloseTakeNoActionDialog() {
+            this._oTakeNoActionDialog.close();
         },
         onValueHelpRequest: function (oEvent) {
             var CategoryValue = this.onGetCategoryType()
@@ -93,6 +106,38 @@ sap.ui.define([
 
         onValueHelpClose: function (oEvent) {
             // Handled internally by SearchHelpHandler confirm callback
+        },
+        onSubmitTakeNoAction() {
+            const oRegularizeModel = this.getView().getModel("regularize");
+            const oDetailModel = this.getView().getModel("detailData");
+            const oActionData = oRegularizeModel.getData();
+            const oRecord = oDetailModel.getData().record;
+
+            const oODataModel = this.getOwnerComponent().getModel();
+            oODataModel.setUseBatch(false)
+            const oOverrides = {
+                ZactionRefNo: oRecord.ZactionRefNo,
+                Zhcopsremark: oActionData.reason,
+                Zhcevpactiondate: new Date(),
+                Zstatus: "COMPLETED",
+                ZlmIdName: ODataUtils.getuserId()   // ← stamp current user
+            };
+
+            // Add ODataUtils import at the top of the controller — it's already available
+            ODataUtils.submitTakeAction(oODataModel, oRecord, oOverrides)
+                .then(() => {
+                    sap.m.MessageToast.show("Action submitted successfully");
+                    this._oTakeNoActionDialog.close();
+                    oRegularizeModel.setData({
+                        ZincCategory: "", ZincType: "", reason: "", actionOptions: []
+                    });
+                     this.getView()
+                .getModel()
+                .setProperty("/isEditOn", false);
+                })
+                .catch((oError) => {
+                    console.error("Failed to submit action:", oError);
+                });
         },
         onSubmitTakeAction() {
             const oRegularizeModel = this.getView().getModel("regularize");
