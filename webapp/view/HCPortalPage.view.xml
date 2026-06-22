@@ -6,125 +6,152 @@
     xmlns:t="sap.ui.table"
     xmlns="sap.m"
 >
-
-    <f:DynamicPage id="_IDGenDynamicPage"  
+    <f:DynamicPage
+        id="_IDGenDynamicPage"
         fitContent="true"
     >
         <f:title>
-            <f:DynamicPageTitle id="_IDGenDynamicPageTitle1"  >
+            <f:DynamicPageTitle id="_IDGenDynamicPageTitle1">
                 <f:navigationActions>
-                    <Button id="backBtn"
+                    <Button
+                        id="backBtn"
                         icon="sap-icon://nav-back"
                         tooltip="Back to main page"
                         press=".onNavBack"
                     />
                 </f:navigationActions>
                 <f:heading>
-                    <Title id="_IDGenTitle1"   text="HC Portal" />
+                    <Title
+                        id="_IDGenTitle1"
+                        text="HC Portal"
+                    />
                 </f:heading>
             </f:DynamicPageTitle>
         </f:title>
 
         <f:content>
-         <IconTabBar id="_IDGenIconTabBar"
-                     
-                    expanded="true"
-                    stretchContentHeight="true"
-                    class="sapUiResponsiveContentPadding"
-                    select=".onTabSelect"
-                >
-                    <!-- ─── CURRENT TAB ─── -->
-                    <items >
-                        <IconTabFilter id="_IDGenIconTabFilter"
-                             
-                            text="Current"
-                            icon="sap-icon://activity-items"
-                            iconDensityAware="false"
-                            design="Horizontal"
-                            class="sapUiResponsiveContentPadding custom-tab-filter"
-                            key="current"
+            <IconTabBar
+                id="_IDGenIconTabBar"
+                expanded="true"
+                stretchContentHeight="true"
+                class="sapUiResponsiveContentPadding"
+                select=".onTabSelect"
+            >
+                <!-- ─── CURRENT TAB ─── -->
+                <items>
+                    <IconTabFilter
+                        id="_IDGenIconTabFilter"
+                        text="Current"
+                        icon="sap-icon://activity-items"
+                        iconDensityAware="false"
+                        design="Horizontal"
+                        class="sapUiResponsiveContentPadding custom-tab-filter"
+                        key="current"
+                    >
+                        <t:Table
+                            id="HcTable"
+                            selectionMode="None"
+                            enableSelectAll="false"
+                            rows="{path: '/ITM_STRSet'}"
+                            threshold="15"
+                            scrollThreshold="50"
+                            enableBusyIndicator="true"
+                            rowMode="Auto"
                         >
-                            <t:Table id="_IDGenTable"
-                                 
-                                selectionMode="None"
-                                enableSelectAll="false"
-                                rows="{path: '/ITM_STRSet'}"
-                                threshold="15"
-                                scrollThreshold="50"
-                                enableBusyIndicator="true"
-                                rowMode="Auto"
-                            >
-                                <t:noData>
-                                    <VBox id="_IDGenVBox4"  
+                            <t:noData>
+                                <VBox
+                                    id="_IDGenVBox4"
+                                    alignItems="Center"
+                                    justifyContent="Center"
+                                    class="sapUiMediumMargin"
+                                >
+                                    <core:Icon
+                                        id="_IDGenIcon4"
+                                        src="sap-icon://inbox"
+                                        size="3rem"
+                                        color="sapContent_NonInteractiveIconColor"
+                                        class="sapUiSmallMarginBottom"
+                                    />
+                                    <Text
+                                        id="_IDGenText31"
+                                        text="No data available"
+                                    />
+                                </VBox>
+                            </t:noData>
+                            <!-- Frozen "Actions" column — index 0, frozen on the LEFT -->
+                            <t:columns>
+                                <t:Column
+                                    id="_IDGenColumn"
+                                    width="8rem"
+                                    hAlign="Center"
+                                >
+                                    <Label
+                                        id="_IDGenLabel2"
+                                        text="Actions"
+                                    />
+                                    <t:template>
+                                        <Button
+                                            id="_IDGenButton6"
+                                            icon="sap-icon://detail-view"
+                                            text="Details"
+                                            type="Transparent"
+                                            press=".onViewDetails"
+                                        />
+                                    </t:template>
+                                </t:Column>
+                            </t:columns>
+
+                            <t:extension>
+                                <OverflowToolbar
+                                    id="_IDGenOverflowToolbar4"
+                                    style="Standard"
+                                >
+                                    <HBox
+                                        id="_IDGenHBox2"
                                         alignItems="Center"
-                                        justifyContent="Center"
-                                        class="sapUiMediumMargin"
+                                        columnGap="0.5rem"
                                     >
-                                        <core:Icon id="_IDGenIcon4"  
-                                            src="sap-icon://inbox"
-                                            size="3rem"
-                                            color="sapContent_NonInteractiveIconColor"
-                                            class="sapUiSmallMarginBottom"
+                                        <core:Icon
+                                            id="_IDGenIcon5"
+                                            src="sap-icon://search"
                                         />
-                                        <Text id="_IDGenText31"   text="No data available" />
-                                    </VBox>
-                                </t:noData>
-                                <!-- Frozen "Actions" column — index 0, frozen on the LEFT -->
-                                <t:columns>
-                                    <t:Column id="_IDGenColumn"
-                                         
-                                        width="8rem"
-                                        hAlign="Center"
-                                    >
-                                        <Label id="_IDGenLabel2"   text="Actions" />
-                                        <t:template>
-                                            <Button id="_IDGenButton6"  
-                                                icon="sap-icon://detail-view"
-                                                text="Details"
-                                                type="Transparent"
-                                                press=".onViewDetails"
-                                            />
-                                        </t:template>
-                                    </t:Column>
-                                </t:columns>
+                                        <Input
+                                            id="_IDGenInput"
+                                            showClearIcon="true"
+                                            width="25rem"
+                                            placeholder="Search..."
+                                            liveChange=".onSearchHistory"
+                                        />
+                                    </HBox>
+                                    <ToolbarSpacer id="_IDGenToolbarSpacer2" />
+                                    <Button
+                                        id="_IDGenButton10"
+                                        icon="sap-icon://refresh"
+                                        tooltip="Refresh"
+                                        press=".onRefreshHistory"
+                                    />
+                                    <Button
+                                        id="_IDGenButtonExportHCData"
+                                        icon="sap-icon://excel-attachment"
+                                        tooltip="Export to Excel"
+                                        press=".onExportHCData"
+                                    />
+                                </OverflowToolbar>
+                            </t:extension>
 
-                                <t:extension>
-                                    <OverflowToolbar id="_IDGenOverflowToolbar4"  style="Standard">
-                                        <HBox id="_IDGenHBox2" 
-                                            alignItems="Center"
-                                            columnGap="0.5rem"
-                                        >
-                                            <core:Icon id="_IDGenIcon5"
-                                                src="sap-icon://search"
-                                            />
-                                            <Input id="_IDGenInput" 
-                                                showClearIcon="true"
-                                                width="25rem"
-                                                placeholder="Search..."
-                                                liveChange=".onSearchHistory"
-                                            />
-                                        </HBox>
-                                        <ToolbarSpacer id="_IDGenToolbarSpacer2" />
-                                        <Button id="_IDGenButton10" 
-                                            icon="sap-icon://refresh"
-                                            tooltip="Refresh"
-                                            press=".onRefreshHistory"
-                                        />
-                                    </OverflowToolbar>
-                                </t:extension>
-
-                                <t:footer>
-                                    <OverflowToolbar id="_IDGenOverflowToolbar6"  >
-                                        <Label id="_IDGenLabel34"  
-                                            visible="{= ${/historyCount} > 0 }"
-                                            text="Number of Records: {/historyCount}"
-                                        />
-                                    </OverflowToolbar>
-                                </t:footer>
-                            </t:Table>
-                        </IconTabFilter>
-                    </items>
-                </IconTabBar>
-                </f:content>
+                            <t:footer>
+                                <OverflowToolbar id="_IDGenOverflowToolbar6">
+                                    <Label
+                                        id="_IDGenLabel34"
+                                        visible="{= ${/historyCount} > 0 }"
+                                        text="Number of Records: {/historyCount}"
+                                    />
+                                </OverflowToolbar>
+                            </t:footer>
+                        </t:Table>
+                    </IconTabFilter>
+                </items>
+            </IconTabBar>
+        </f:content>
     </f:DynamicPage>
 </mvc:View>

@@ -51,6 +51,7 @@
         "sap.m": {},
         "sap.ui.core": {},
         "sap.f": {},
+        "sap.ui.export": {},
         "sap.ui.layout": {}
       }
     },

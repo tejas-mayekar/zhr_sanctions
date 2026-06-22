@@ -1,12 +1,13 @@
 sap.ui.define([
     "zhrsanctions/controller/BaseController",
     "sap/ui/model/json/JSONModel",
-    
+
     "sap/ui/model/Filter",
     "sap/ui/model/FilterOperator",
     "zhrsanctions/utils/ODataUtils",
-    "zhrsanctions/utils/TableUtils"
-], (BaseController, JSONModel,Filter, FilterOperator,ODataUtils, TableUtils) => {
+    "zhrsanctions/utils/TableUtils",
+    "zhrsanctions/utils/ExportUtils"
+], (BaseController, JSONModel, Filter, FilterOperator, ODataUtils, TableUtils, ExportUtils) => {
     "use strict";
 
     const CURRENT_COLUMNS = [
@@ -78,9 +79,24 @@ sap.ui.define([
             // var sEmail = oUser.getEmail();   // email (if available)
             // // use/attach to model
             // console.log("/user", { id: sId, name: sName, email: sEmail });
-        }
-        ,
+        },
+        onExportCurrent() {
+            ExportUtils.exportTableToExcel(
+                this.byId("currentTable"),
+                CURRENT_COLUMNS,
+                "Current_Violations",
+                this.formatEdmTime.bind(this)
+            );
+        },
 
+        onExportHistory() {
+            ExportUtils.exportTableToExcel(
+                this.byId("historyTable"),
+                HISTORY_COLUMNS,
+                "Violation_History",
+                this.formatEdmTime.bind(this)
+            );
+        },
         async onSearch() {
             try {
                 const oUIModel = this.getView().getModel();

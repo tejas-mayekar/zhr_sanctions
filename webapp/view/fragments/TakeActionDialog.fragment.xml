@@ -56,6 +56,41 @@
                     valueHelpRequest="onValueHelpRequest"
                     placeholder="Enter incident type"
                 />
+                <HBox
+                    id="_IDGenHBox5"
+                    justifyContent="SpaceBetween"
+                    alignItems="Center"
+                    visible="false"
+                >
+                    <HBox
+                        id="_IDGenHBox9"
+                        alignItems="Center"
+                    >
+                        <Label
+                            id="_IDGenLabel87"
+                            text="First Incident Date"
+                            class="sapUiSmallMarginEnd"
+                        />
+                        <Text
+                            id="_IDGenText71"
+                            text="{regularize>/ZfirstIncDate}"
+                        />
+                    </HBox>
+                    <HBox
+                        id="_IDGenHBox10"
+                        alignItems="Center"
+                    >
+                        <Label
+                            id="_IDGenLabel88"
+                            text="Repeat Count"
+                            class="sapUiSmallMarginEnd"
+                        />
+                        <Input
+                            id="_IDGenInput4"
+                            value="{regularize>/Zrepeatcount}"
+                        />
+                    </HBox>
+                </HBox>
 
                 <Label
                     id="_IDGenLabel85"

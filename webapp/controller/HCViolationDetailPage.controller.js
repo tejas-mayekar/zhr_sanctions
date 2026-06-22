@@ -44,6 +44,8 @@ sap.ui.define([
             this.getView().getModel("regularize").setData({
                 ZactionRefNo: "",
                 ZincCategory: "",
+                ZfirstIncDate:"",
+                Zrepeatcount :"",
                 ZincType: "",
                 reason: "",
                 actionOptions: []

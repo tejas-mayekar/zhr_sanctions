@@ -1,12 +1,13 @@
 sap.ui.define([
     "zhrsanctions/controller/BaseController",
     "sap/ui/model/json/JSONModel",
-    
+
     "sap/ui/model/Filter",
     "sap/ui/model/FilterOperator",
     "zhrsanctions/utils/ODataUtils",
-    "zhrsanctions/utils/TableUtils"
-], (BaseController, JSONModel,Filter, FilterOperator, ODataUtils, TableUtils) => {
+    "zhrsanctions/utils/TableUtils",
+    "zhrsanctions/utils/ExportUtils"
+], (BaseController, JSONModel, Filter, FilterOperator, ODataUtils, TableUtils, ExportUtils) => {
     "use strict";
 
     /* eslint-disable camelcase */
@@ -37,7 +38,7 @@ sap.ui.define([
                 ITM_STRSet: []
             }));
 
-            TableUtils.buildTableColumns(this.byId("_IDGenTable"), HISTORY_COLUMNS, this.formatEdmTime.bind(this));
+            TableUtils.buildTableColumns(this.byId("HcTable"), HISTORY_COLUMNS, this.formatEdmTime.bind(this));
 
             this.getOwnerComponent()
                 .getRouter()
@@ -71,13 +72,20 @@ sap.ui.define([
         },
 
         onSearchHistory(oEvent) {
-            TableUtils.applyTableSearch(this.byId("_IDGenTable"), HISTORY_COLUMNS, oEvent.getParameter("newValue"));
+            TableUtils.applyTableSearch(this.byId("HcTable"), HISTORY_COLUMNS, oEvent.getParameter("newValue"));
         },
 
         onRefreshHistory() {
             this._loadHistory();
         },
-
+        onExportHCData() {
+            ExportUtils.exportTableToExcel(
+                this.byId("HcTable"),
+                HISTORY_COLUMNS,
+                "Current_Violations",
+                this.formatEdmTime.bind(this)
+            );
+        },
         onViewDetails(oEvent) {
             const oContext = oEvent.getSource().getBindingContext();
             if (!oContext) {
