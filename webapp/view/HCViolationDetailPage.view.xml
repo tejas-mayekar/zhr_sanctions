@@ -103,6 +103,8 @@
                                 text="Take Actions"
                                 type="Emphasized"
                                 width="10rem"
+                                visible="{= ${/isEditOn} }"
+                                enabled="{= ${/isEditOn} }"
                                 press=".onTakeActionPress"
                             />
                         </HBox>

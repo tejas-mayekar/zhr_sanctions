@@ -32,6 +32,15 @@ sap.ui.define([
             if (oDetailModel) {
                 this.getView().setModel(oDetailModel, "detailData");
             }
+            if(oDetailModel.getData().record.Zstatus !== "COMPLETED"){
+                  this.getView()
+                .getModel()
+                .setProperty("/isEditOn", true);
+            }else{
+                 this.getView()
+                .getModel()
+                .setProperty("/isEditOn", false);
+            }
             this.getView().getModel("regularize").setData({
                 ZactionRefNo: "",
                 ZincCategory: "",
@@ -102,9 +111,8 @@ sap.ui.define([
                 ZactionRefNo: oRecord.ZactionRefNo,
                 ZincCategory: oActionData.ZincCategory,
                 ZincType: oActionData.ZincType,
-                Zlinemanageraction: oActionData.Zlinemanageraction,
-                Zlinemanagerremarks: oActionData.reason,
-                Zlinemanageractiondate: new Date(),
+                Zhcopsremark: oActionData.reason,
+                Zhcevpactiondate: new Date(),
                 Zstatus: "COMPLETED",
                 ZlmIdName: ODataUtils.getuserId()   // ← stamp current user
             };
@@ -117,6 +125,9 @@ sap.ui.define([
                     oRegularizeModel.setData({
                         ZincCategory: "", ZincType: "", reason: "", actionOptions: []
                     });
+                     this.getView()
+                .getModel()
+                .setProperty("/isEditOn", false);
                 })
                 .catch((oError) => {
                     console.error("Failed to submit action:", oError);

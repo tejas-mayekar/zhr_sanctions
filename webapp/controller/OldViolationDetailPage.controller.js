@@ -35,22 +35,6 @@ sap.ui.define([
                 punchIn: "", punchOut: "", reason: ""
             });
         },
-        onEditViolationPress() {
-
-
-            // Now this works because the default model exists
-            this.getView()
-                .getModel()
-                .setProperty("/isEditOn", true);
-
-        },
-        onEditCancelPress() {
-
-            // Now this works because the default model exists
-            this.getView()
-                .getModel()
-                .setProperty("/isEditOn", false);
-        }
         // onNavBack inherited from BaseController
     });
 });

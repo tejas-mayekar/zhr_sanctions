@@ -95,38 +95,6 @@
                         </ObjectHeader>
                     </VBox>
 
-                    <VBox id="_IDGenVBox6">
-                        <HBox
-                            id="_IDGenHBox5"
-                            justifyContent="SpaceBetween"
-                            width="21rem"
-                        >
-                            <Button
-                                id="_IDGenButton12"
-                                text="Edit Violation"
-                                type="Emphasized"
-                                width="10rem"
-                                visible="{= !${/isEditOn} }"
-                                press=".onEditViolationPress"
-                            />
-                             <Button
-                                id="_IDGenButton14"
-                                text="Save Changes"
-                                type="Success"
-                                width="10rem"
-                                visible="{= ${/isEditOn} }"
-                                press=".onSaveViolationPress"
-                            />
-                            <Button
-                                id="_IDGenButton13"
-                                text="Cancel"
-                                type="Negative"
-                                width="10rem"
-                                visible="{= ${/isEditOn} }"
-                                press=".onEditCancelPress"
-                            />
-                        </HBox>
-                    </VBox>
                 </HBox>
             </f:DynamicPageHeader>
         </f:header>
@@ -162,33 +130,27 @@
                                 id="_IDGenLabel35"
                                 text="Employee ID"
                             />
-                            <Input
+                            <Text
                                 id="_IDGenText32"
-                                value="{detailData>/record/ZempId}"
-                                
-                                editable="{= ${/isEditOn} }"
+                                text="{detailData>/record/ZempId}"
                             />
 
                             <Label
                                 id="_IDGenLabel36"
                                 text="Employee Name"
                             />
-                            <Input
+                            <Text
                                 id="_IDGenText33"
-                                value="{detailData>/record/ZempName}"
-                                
-                                editable="{= ${/isEditOn} }"
+                                text="{detailData>/record/ZempName}"
                             />
 
                             <Label
                                 id="_IDGenLabel37"
                                 text="Employee Type"
                             />
-                            <Input
+                            <Text
                                 id="_IDGenText34"
-                                value="{detailData>/record/ZempTypeDesc}"
-                            
-                                editable="{= ${/isEditOn} }"
+                                text="{detailData>/record/ZempTypeDesc}"
                             />
 
                             <Label
