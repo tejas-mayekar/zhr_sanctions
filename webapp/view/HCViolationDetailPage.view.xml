@@ -81,7 +81,13 @@
                                 <ObjectAttribute id="_IDGenObjectStatus3"
                                      
                                     title="Incident Date"
-                                    text="{detailData>/record/ZincDate}"
+                                    text="{
+        path: 'detailData>/record/ZincDate',
+        type: 'sap.ui.model.type.Date',
+        formatOptions: {
+            pattern: 'dd-MM-yyyy'
+        }
+    }"
                                 />
                                 <ObjectAttribute id="_IDGenObjectStatus2"
                                      
@@ -324,7 +330,14 @@
                             />
                             <Text id="_IDGenText73" 
                                  
-                                text="{detailData>/record/ZincDate}"
+                                text="{
+        path: 'detailData>/record/ZincDate',
+        type: 'sap.ui.model.type.Date',
+        formatOptions: {
+            pattern: 'dd-MM-yyyy'
+        }
+    }"
+                                
                             />
                         </form:content>
                     </form:SimpleForm>

@@ -1,0 +1,59 @@
+[
+    {
+        "ZempId": "200040",
+        "ZfirstInciDate": "/Date(201101195000)/",
+        "ZincCategory": "A",
+        "Zrepeatcount": 1,
+        "ZincType": "001",
+        "Zsysyrepeatcount": 48
+    },
+     {
+        "ZempId": "200040",
+        "ZfirstInciDate": "/Date(201101195000)/",
+        "ZincCategory": "A",
+        "Zrepeatcount": 15,
+        "ZincType": "002",
+        "Zsysyrepeatcount": 48
+    },
+     {
+        "ZempId": "200040",
+        "ZfirstInciDate": "/Date(201101195000)/",
+        "ZincCategory": "A",
+        "Zrepeatcount": 18,
+        "ZincType": "003",
+        "Zsysyrepeatcount": 48
+    },
+     {
+        "ZempId": "200040",
+        "ZfirstInciDate": "/Date(201101195000)/",
+        "ZincCategory": "A",
+        "Zrepeatcount": 108,
+        "ZincType": "004",
+        "Zsysyrepeatcount": 48
+    },
+     {
+        "ZempId": "200040",
+        "ZfirstInciDate": "/Date(201101195000)/",
+        "ZincCategory": "A",
+        "Zrepeatcount": 58,
+        "ZincType": "005",
+        "Zsysyrepeatcount": 48
+    },
+     {
+        "ZempId": "200040",
+        "ZfirstInciDate": "/Date(201101195000)/",
+        "ZincCategory": "A",
+        "Zrepeatcount": 98,
+        "ZincType": "006",
+        "Zsysyrepeatcount": 48
+
+    },
+     {
+        "ZempId": "200040",
+        "ZfirstInciDate": "/Date(201101195000)/",
+        "ZincCategory": "A",
+        "Zrepeatcount": 1,
+        "ZincType": "007",
+        "Zsysyrepeatcount": 48
+    }
+]

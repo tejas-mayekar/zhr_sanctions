@@ -18,6 +18,7 @@ sap.ui.define([
                 ZincCategory: "",
                 ZincType: "",
                 reason: "",
+                ZincDate:"",
                 actionOptions: []
             }), "regularize");
 
@@ -46,6 +47,8 @@ sap.ui.define([
                 ZincCategory: "",
                 ZfirstIncDate:"",
                 Zrepeatcount :"",
+                isVisible:false,
+                ZincDate:"",
                 ZincType: "",
                 reason: "",
                 actionOptions: []
@@ -120,6 +123,7 @@ sap.ui.define([
             const oOverrides = {
                 ZactionRefNo: oRecord.ZactionRefNo,
                 Zhcopsremark: oActionData.reason,
+                Zrepeatcount:oActionData.Zrepeatcount,
                 Zhcevpactiondate: new Date(),
                 Zstatus: "COMPLETED",
                 ZlmIdName: ODataUtils.getuserId()   // ← stamp current user

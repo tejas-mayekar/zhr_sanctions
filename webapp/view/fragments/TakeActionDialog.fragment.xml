@@ -60,7 +60,7 @@
                     id="_IDGenHBox5"
                     justifyContent="SpaceBetween"
                     alignItems="Center"
-                    visible="false"
+                    visible="{regularize>/isVisible}"
                 >
                     <HBox
                         id="_IDGenHBox9"
@@ -73,7 +73,13 @@
                         />
                         <Text
                             id="_IDGenText71"
-                            text="{regularize>/ZfirstIncDate}"
+                            text="{
+        path: 'regularize>/ZfirstIncDate',
+        type: 'sap.ui.model.type.Date',
+        formatOptions: {
+            pattern: 'dd-MM-yyyy'
+        }
+    }"
                         />
                     </HBox>
                     <HBox

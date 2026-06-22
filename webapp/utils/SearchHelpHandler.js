@@ -59,7 +59,56 @@ sap.ui.define([
                 });
             });
         },
+        /**
+         * After a violation type is selected, look up how many prior ITM_STR
+         * records exist for this employee + category + type, and the earliest
+         * incident date among them. Used to populate Zrepeatcount / ZfirstIncDate.
+         */
+        _updateRepeatInfo: function (oController, sZempId, sCategory, sType, sIncDate) {
+            if (!sZempId || !sCategory || !sType || !sIncDate) {
+                return;
+            }
 
+            var oModel = oController.getView().getModel("mainService");
+
+            // Format the date for OData
+            var sFormattedDate = this._formatDateForOData(sIncDate);
+
+            // Construct the entity key path
+            var sPath = "/FIST_INC_DATESet(ZempId='" + sZempId + "',ZincCategory='" + sCategory +
+                "',ZincType='" + sType + "',ZincDate=datetime'" + sFormattedDate + "')";
+
+            oModel.read(sPath, {
+                success: function (oData) {
+                    var oRegModel = oController.getView().getModel("regularize");
+                    if (!oRegModel) {
+                        return;
+                    }
+
+                    oRegModel.setProperty("/Zrepeatcount", oData.Zrepeatcount);
+                    oRegModel.setProperty("/ZfirstIncDate", oData.ZfirstInciDate);
+                    oRegModel.setProperty("/isVisible", true);
+                },
+                error: function (oError) {
+                    console.error("SearchHelpHandler._updateRepeatInfo: failed", oError);
+                }
+            });
+        },
+
+        _formatDateForOData: function (vDate) {
+            var dDate = vDate;
+
+            if (typeof vDate === "string") {
+                dDate = new Date(vDate);
+            }
+
+            var iYear = dDate.getFullYear();
+            var iMonth = dDate.getMonth() + 1;
+            var iDay = dDate.getDate();
+
+            return iYear + "-" + iMonth + "-" + iDay + "T00:00:00";
+        }
+        ,
         /**
          * Create the Value Help Dialog programmatically (internal fragment)
          */
@@ -293,6 +342,20 @@ sap.ui.define([
             var oSHDataModel = oController.getView().getModel("SHData");
             if (oSHDataModel) {
                 oSHDataModel.setProperty("/selectedEmployeeData", oSelectedData);
+            }
+            // ── NEW: when a violation TYPE is picked, look up repeat history ──
+            // Only relevant for the HC "Take Action" flow on HCViolationDetailPage —
+            // FileViolation also reuses the "dIpZincType" input id but has no
+            // detailData/regularize context for this lookup.
+            if (sInputId === "dIpZincType" &&
+                oController.getMetadata().getName() === "zhrsanctions.controller.HCViolationDetailPage") {
+
+                var sCategory = oDialog._incidentDate; // holds Zviolationcategory for this field
+                var oDetailModel = oController.getView().getModel("detailData");
+                var sZempId = oDetailModel ? oDetailModel.getProperty("/record/ZempId") : null;
+                var sZincDate = oDetailModel ? oDetailModel.getProperty("/record/ZincDate") : null;
+
+                this._updateRepeatInfo(oController, sZempId, sCategory, sValue, sZincDate);
             }
 
             oDialog._input.fireChange({ value: sValue });
