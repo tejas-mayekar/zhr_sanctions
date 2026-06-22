@@ -186,15 +186,33 @@
             <EntityType Name="FIST_INC_DATE" sap:content-version="1">
                 <Key>
                     <PropertyRef Name="ZempId"/>
+                    <PropertyRef Name="ZincDate"/>
                     <PropertyRef Name="ZincCategory"/>
                     <PropertyRef Name="ZincType"/>
                 </Key>
                 <Property Name="ZempId" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Employee ID" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZfirstInciDate" Type="Edm.DateTime" Nullable="false" Precision="7" sap:unicode="false" sap:label="Date" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="ZincDate" Type="Edm.DateTime" Nullable="false" Precision="7" sap:unicode="false" sap:label="Incident date" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="ZfirstInciDate" Type="Edm.DateTime" Precision="7" sap:unicode="false" sap:label="Date" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="ZincCategory" Type="Edm.String" Nullable="false" MaxLength="60" sap:unicode="false" sap:label="Incident Category" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zrepeatcount" Type="Edm.Byte" Nullable="false" sap:unicode="false" sap:label="Repeat Count" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Zrepeatcount" Type="Edm.Byte" sap:unicode="false" sap:label="Repeat Count" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="ZincType" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Incident Type" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zsysyrepeatcount" Type="Edm.Byte" Nullable="false" sap:unicode="false" sap:label="Repeat Count" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Zsysyrepeatcount" Type="Edm.Byte" sap:unicode="false" sap:label="Repeat Count" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+            </EntityType>
+            <EntityType Name="punch_regularize" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="ZempId"/>
+                    <PropertyRef Name="ZincDate"/>
+                    <PropertyRef Name="ZactionRefNo"/>
+                    <PropertyRef Name="DelayFlag"/>
+                </Key>
+                <Property Name="ZempId" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Employee ID" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="ZincDate" Type="Edm.DateTime" Nullable="false" Precision="7" sap:unicode="false" sap:label="Incident date" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="ZschTimeIn" Type="Edm.Time" Precision="0" sap:unicode="false" sap:label="Start Time" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="ZschTimeOut" Type="Edm.Time" Precision="0" sap:unicode="false" sap:label="End Time" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Zpunchintime" Type="Edm.Time" Precision="0" sap:unicode="false" sap:label="Punch In Time" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Zpunchouttime" Type="Edm.Time" Precision="0" sap:unicode="false" sap:label="Punch Out Time" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="ZactionRefNo" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Action reference Num" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="DelayFlag" Type="Edm.String" Nullable="false" MaxLength="1" sap:unicode="false" sap:label="Char01" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
             </EntityType>
             <EntityContainer Name="ZHR_SACTIONS_APPLICATION_SRV_Entities" m:IsDefaultEntityContainer="true" sap:supported-formats="atom json xlsx">
                 <EntitySet Name="HDR_STRSet" EntityType="ZHR_SACTIONS_APPLICATION_SRV.HDR_STR" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:content-version="1"/>
@@ -202,6 +220,7 @@
                 <EntitySet Name="EMP_SEARCHHELPSet" EntityType="ZHR_SACTIONS_APPLICATION_SRV.EMP_SEARCHHELP" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:content-version="1"/>
                 <EntitySet Name="VIOALATION_SEARCHHELPSet" EntityType="ZHR_SACTIONS_APPLICATION_SRV.VIOALATION_SEARCHHELP" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:content-version="1"/>
                 <EntitySet Name="FIST_INC_DATESet" EntityType="ZHR_SACTIONS_APPLICATION_SRV.FIST_INC_DATE" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:content-version="1"/>
+                <EntitySet Name="punch_regularizeSet" EntityType="ZHR_SACTIONS_APPLICATION_SRV.punch_regularize" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:content-version="1"/>
             </EntityContainer>
             <atom:link rel="self" href="/sap/opu/odata/sap/ZHR_SACTIONS_APPLICATION_SRV/$metadata" xmlns:atom="http://www.w3.org/2005/Atom"/>
             <atom:link rel="latest-version" href="/sap/opu/odata/sap/ZHR_SACTIONS_APPLICATION_SRV/$metadata" xmlns:atom="http://www.w3.org/2005/Atom"/>

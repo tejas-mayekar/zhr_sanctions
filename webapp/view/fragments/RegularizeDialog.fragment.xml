@@ -5,16 +5,16 @@
 >
     <Dialog
         id="regularizeDialog"
-        title="Regularize Attendance"
+        title="{regularize>/dialogTitle}"
         icon="sap-icon://edit"
-        contentWidth="36rem"
+        contentWidth="70rem"
         resizable="true"
         draggable="true"
     >
         <content>
             <VBox id="_IDGenVBox9" class="sapUiSmallMargin">
 
-                <!-- Read-only context strip -->
+                <!-- ── Info Strip ── -->
                 <MessageStrip
                     id="regularizeInfoStrip"
                     text="Regularizing record {detailData>/record/ZACTION_REF_NO} for {detailData>/record/ZempName} on {detailData>/record/ZincDate}"
@@ -24,56 +24,141 @@
                     class="sapUiSmallMarginBottom"
                 />
 
-                <form:SimpleForm
-                    id="regularizeForm"
-                    editable="true"
-                    layout="ResponsiveGridLayout"
-                    labelSpanL="5"
-                    labelSpanM="5"
-                    labelSpanS="12"
-                    emptySpanL="0"
-                    emptySpanM="0"
-                    columnsL="1"
-                    columnsM="1"
-                >
-                    <form:content>
+                <!-- ── Context Summary ── -->
+                <Panel id="regularizeSummaryPanel" headerText="Attendance Summary" expandable="false" class="sapUiSmallMarginBottom">
+                    <form:SimpleForm
+                        id="regularizeSummaryForm"
+                        editable="false"
+                        layout="ResponsiveGridLayout"
+                        labelSpanL="6"
+                        labelSpanM="6"
+                        labelSpanS="12"
+                        columnsL="2"
+                        columnsM="2"
+                    >
+                        <form:content>
+                            <Label id="lblPlannedIn" text="Planned Clock-In" />
+                            <Text id="txtPlannedIn" text="{regularize>/scheduledIn}" />
 
-                        <!-- Punch In -->
-                        <Label id="_IDGenLabel64" text="Punch In Time" required="true" />
-                        <TimePicker
-                            id="regularizePunchIn"
-                            value="{regularize>/punchIn}"
-                            valueFormat="HH:mm:ss"
-                            displayFormat="HH:mm:ss"
-                            placeholder="HH:MM:SS"
-                            width="100%"
-                        />
+                            <Label id="lblPlannedOut" text="Planned Clock-Out" />
+                            <Text id="txtPlannedOut" text="{regularize>/scheduledOut}" />
 
-                        <!-- Punch Out -->
-                        <Label id="_IDGenLabel65" text="Punch Out Time" required="true" />
-                        <TimePicker
-                            id="regularizePunchOut"
-                            value="{regularize>/punchOut}"
-                            valueFormat="HH:mm:ss"
-                            displayFormat="HH:mm:ss"
-                            placeholder="HH:MM:SS"
-                            width="100%"
-                        />
+                            <Label id="lblActualIn" text="Actual Clock-In" />
+                            <Text id="txtActualIn" text="{regularize>/punchIn}" />
 
-                        <!-- Reason -->
-                        <Label id="_IDGenLabel66" text="Reason / Remarks" required="true" />
-                        <TextArea
-                            id="regularizeReason"
-                            value="{regularize>/reason}"
-                            rows="3"
-                            maxLength="255"
-                            growing="false"
-                            width="100%"
-                            placeholder="Enter reason for regularization..."
-                        />
+                            <Label id="lblActualOut" text="Actual Clock-Out" />
+                            <Text id="txtActualOut" text="{regularize>/punchOut}" />
 
-                    </form:content>
-                </form:SimpleForm>
+                            <Label id="lblDelayHrs" text="Delay Hours" visible="{regularize>/hasDelay}" />
+                            <Text id="txtDelayHrs" text="{regularize>/delayHrs}" visible="{regularize>/hasDelay}" />
+
+                            <Label id="lblShortHrs" text="Short Hours" visible="{regularize>/hasShort}" />
+                            <Text id="txtShortHrs" text="{regularize>/shortHrs}" visible="{regularize>/hasShort}" />
+                        </form:content>
+                    </form:SimpleForm>
+                </Panel>
+
+                <!-- ── Mode Selector (only when BOTH delay AND short apply) ── -->
+                <VBox id="regularizeModeBox" visible="{regularize>/showModeSelector}" class="sapUiSmallMarginBottom">
+                    <Label id="lblRegMode" text="Regularization Type" required="true" class="sapUiSmallMarginBottom" />
+                    <SegmentedButton
+                        id="regularizeModeBtn"
+                        selectedKey="{regularize>/mode}"
+                        selectionChange=".onRegularizeModeChange"
+                        width="100%"
+                    >
+                        <items>
+                            <SegmentedButtonItem id="modeDelay" key="delay" text="Update Delay Hours" />
+                            <SegmentedButtonItem id="modeShort" key="short" text="Update Short Hours" />
+                            <SegmentedButtonItem id="modeBoth"  key="both"  text="Update Both" />
+                        </items>
+                    </SegmentedButton>
+                </VBox>
+
+                <!-- ── Delay Section ── -->
+                <VBox id="regularizeDelayBox" visible="{regularize>/showDelay}" class="sapUiSmallMarginBottom">
+                    <Title id="titleDelaySection" text="Regularize Delay Hours" level="H5" class="sapUiSmallMarginBottom" />
+                    <form:SimpleForm
+                        id="formDelaySection"
+                        editable="true"
+                        layout="ResponsiveGridLayout"
+                        labelSpanL="4"
+                        labelSpanM="4"
+                        labelSpanS="12"
+                        columnsL="2"
+                        columnsM="2"
+                    >
+                        <form:content>
+                            <Label id="lblDelayFrom" text="From Time" required="true" />
+                            <TimePicker
+                                id="regularizeDelayFrom"
+                                value="{regularize>/delayFrom}"
+                                valueFormat="HH:mm:ss"
+                                displayFormat="hh:mm:ss a"
+                                placeholder="HH:MM:SS"
+                                width="100%"
+                            />
+                            <Label id="lblDelayTo" text="To Time" required="true" />
+                            <TimePicker
+                                id="regularizeDelayTo"
+                                value="{regularize>/delayTo}"
+                                valueFormat="HH:mm:ss"
+                                displayFormat="hh:mm:ss a"
+                                placeholder="HH:MM:SS"
+                                width="100%"
+                            />
+                        </form:content>
+                    </form:SimpleForm>
+                </VBox>
+
+                <!-- ── Short Section ── -->
+                <VBox id="regularizeShortBox" visible="{regularize>/showShort}" class="sapUiSmallMarginBottom">
+                    <Title id="titleShortSection" text="Regularize Short Hours" level="H5" class="sapUiSmallMarginBottom" />
+                    <form:SimpleForm
+                        id="formShortSection"
+                        editable="true"
+                        layout="ResponsiveGridLayout"
+                        labelSpanL="4"
+                        labelSpanM="4"
+                        labelSpanS="12"
+                        columnsL="2"
+                        columnsM="2"
+                    >
+                        <form:content>
+                            <Label id="lblShortFrom" text="From Time" required="true" />
+                            <TimePicker
+                                id="regularizeShortFrom"
+                                value="{regularize>/shortFrom}"
+                                valueFormat="HH:mm:ss"
+                                displayFormat="hh:mm:ss a"
+                                placeholder="HH:MM:SS"
+                                width="100%"
+                            />
+                            <Label id="lblShortTo" text="To Time" required="true" />
+                            <TimePicker
+                                id="regularizeShortTo"
+                                value="{regularize>/shortTo}"
+                                valueFormat="HH:mm:ss"
+                                displayFormat="hh:mm:ss a"
+                                placeholder="HH:MM:SS"
+                                width="100%"
+                            />
+                        </form:content>
+                    </form:SimpleForm>
+                </VBox>
+
+                <!-- ── Reason ── -->
+                <Label id="_IDGenLabel66" text="Reason / Remarks" required="true" class="sapUiSmallMarginTop" />
+                <TextArea
+                    id="regularizeReason"
+                    value="{regularize>/reason}"
+                    rows="3"
+                    maxLength="255"
+                    growing="false"
+                    width="100%"
+                    placeholder="Enter reason for regularization..."
+                />
+
             </VBox>
         </content>
 
