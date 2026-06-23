@@ -293,24 +293,30 @@ sap.ui.define([
             let sCorrectedSchOut = toTimeStr(oRecord.ZschTimeOut);
 
             if (oData.showDelay && !oData.showShort) {
-                // Delay only: from→punchin, to→punchout
-                sCorrectedPunchIn = oData.delayFrom;
-                sCorrectedPunchOut = oData.delayTo;
+                // flag=1: timestamp1=ZschTimeIn(from), timestamp2=Zpunchintime(to)
+                sCorrectedSchIn = oData.delayFrom;
+                sCorrectedPunchIn = oData.delayTo;
+
             } else if (oData.showShort && !oData.showDelay) {
-                // Short only: schIn→from, schOut→to
-                sCorrectedSchIn = oData.shortFrom;
+                // flag=2: timestamp1=Zpunchouttime(from), timestamp2=ZschTimeOut(to)
+                sCorrectedPunchOut = oData.shortFrom;
                 sCorrectedSchOut = oData.shortTo;
+
             } else if (oData.showDelay && oData.showShort) {
-                // Both: delay fields → punch times, short fields → schedule times
-                sCorrectedPunchIn = oData.delayFrom;
-                sCorrectedPunchOut = oData.delayTo;
-                sCorrectedSchIn = oData.shortFrom;
+                // flag=3: FM called twice
+                // call1: ZschTimeIn(from) / Zpunchintime(to)
+                // call2: Zpunchouttime(from) / ZschTimeOut(to)
+                sCorrectedSchIn = oData.delayFrom;
+                sCorrectedPunchIn = oData.delayTo;
+                sCorrectedPunchOut = oData.shortFrom;
                 sCorrectedSchOut = oData.shortTo;
             }
 
             // ── Determine DelayFlag ─────────────────────────────────────────
 
-            const sDelayFlag = oData.showDelay && oData.showShort ? "3" : oData.showDelay ? "1" : "2";
+            const sDelayFlag = oData.showDelay && oData.showShort ? "3"
+                : oData.showDelay ? "1"
+                    : "2";
 
             const oModel = this.getOwnerComponent().getModel() || this.getView().getModel("mainService");
             if (!oModel) {
@@ -324,8 +330,6 @@ sap.ui.define([
                 Zlinemanagerremarks: sReason,
                 Zpunchintime: ODataUtils.formatTimeForPayload(sCorrectedPunchIn),
                 Zpunchouttime: ODataUtils.formatTimeForPayload(sCorrectedPunchOut),
-                ZschTimeIn: ODataUtils.formatTimeForPayload(sCorrectedSchIn),
-                ZschTimeOut: ODataUtils.formatTimeForPayload(sCorrectedSchOut),
                 Zstatus: "COMPLETED"
             });
 
@@ -333,9 +337,9 @@ sap.ui.define([
 
             // Step 1: PUT punch_regularizeSet
             ODataUtils.submitPunchRegularize(oModel, oRecord, {
+                ZschTimeIn: sCorrectedSchIn,
                 Zpunchintime: sCorrectedPunchIn,
                 Zpunchouttime: sCorrectedPunchOut,
-                ZschTimeIn: sCorrectedSchIn,
                 ZschTimeOut: sCorrectedSchOut,
                 DelayFlag: sDelayFlag
             })

@@ -392,9 +392,9 @@ sap.ui.define([], () => {
                 ZactionRefNo: oRecord.ZACTION_REF_NO || oRecord.ZactionRefNo || "",
                 ZincDate: this.formatDateTimeForPayload(oRecord.ZincDate),
                 ZschTimeIn: this.formatTimeDurationForPayload(o.ZschTimeIn || oRecord.ZschTimeIn),
+                Zpunchintime: this.formatTimeDurationForPayload(o.Zpunchintime || oRecord.Zpunchintime),
+                Zpunchouttime: this.formatTimeDurationForPayload(o.Zpunchouttime || oRecord.Zpunchouttime),
                 ZschTimeOut: this.formatTimeDurationForPayload(o.ZschTimeOut || oRecord.ZschTimeOut),
-                Zpunchintime: this.formatTimeDurationForPayload(o.Zpunchintime),
-                Zpunchouttime: this.formatTimeDurationForPayload(o.Zpunchouttime),
                 DelayFlag: o.DelayFlag !== undefined && o.DelayFlag !== null ? String(o.DelayFlag) : "0"
             };
         },
