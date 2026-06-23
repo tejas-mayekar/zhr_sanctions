@@ -383,6 +383,7 @@ sap.ui.define([], () => {
         // oOverrides: { Zpunchintime, Zpunchouttime, DelayFlag } in UI form
         //             (Zpunchintime/out as "HH:mm:ss" strings; DelayFlag as "1"/"0")
 
+
         buildPunchRegularizePayload(oRecord, oOverrides) {
             const o = oOverrides || {};
 
@@ -390,13 +391,14 @@ sap.ui.define([], () => {
                 ZempId: oRecord.ZempId || "",
                 ZactionRefNo: oRecord.ZACTION_REF_NO || oRecord.ZactionRefNo || "",
                 ZincDate: this.formatDateTimeForPayload(oRecord.ZincDate),
-                ZschTimeIn: this.formatTimeDurationForPayload(oRecord.ZschTimeIn),
-                ZschTimeOut: this.formatTimeDurationForPayload(oRecord.ZschTimeOut),
+                ZschTimeIn: this.formatTimeDurationForPayload(o.ZschTimeIn || oRecord.ZschTimeIn),
+                ZschTimeOut: this.formatTimeDurationForPayload(o.ZschTimeOut || oRecord.ZschTimeOut),
                 Zpunchintime: this.formatTimeDurationForPayload(o.Zpunchintime),
                 Zpunchouttime: this.formatTimeDurationForPayload(o.Zpunchouttime),
                 DelayFlag: o.DelayFlag !== undefined && o.DelayFlag !== null ? String(o.DelayFlag) : "0"
             };
         },
+
         formatDateTimeForKey(vDate) {
             if (vDate === null || vDate === undefined || vDate === "") {
                 return null;

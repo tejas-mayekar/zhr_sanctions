@@ -284,20 +284,33 @@ sap.ui.define([
                 return;
             }
 
+            // Replace the "Derive corrected punch times" block in onRegularizeSubmit:
+
             // ── Derive corrected punch times ────────────────────────────────
             let sCorrectedPunchIn = toTimeStr(oRecord.Zpunchintime);
             let sCorrectedPunchOut = toTimeStr(oRecord.Zpunchouttime);
+            let sCorrectedSchIn = toTimeStr(oRecord.ZschTimeIn);
+            let sCorrectedSchOut = toTimeStr(oRecord.ZschTimeOut);
 
-            if (oData.showDelay) {
+            if (oData.showDelay && !oData.showShort) {
+                // Delay only: from→punchin, to→punchout
                 sCorrectedPunchIn = oData.delayFrom;
-            }
-            if (oData.showShort) {
-                sCorrectedPunchOut = oData.shortTo;
+                sCorrectedPunchOut = oData.delayTo;
+            } else if (oData.showShort && !oData.showDelay) {
+                // Short only: schIn→from, schOut→to
+                sCorrectedSchIn = oData.shortFrom;
+                sCorrectedSchOut = oData.shortTo;
+            } else if (oData.showDelay && oData.showShort) {
+                // Both: delay fields → punch times, short fields → schedule times
+                sCorrectedPunchIn = oData.delayFrom;
+                sCorrectedPunchOut = oData.delayTo;
+                sCorrectedSchIn = oData.shortFrom;
+                sCorrectedSchOut = oData.shortTo;
             }
 
             // ── Determine DelayFlag ─────────────────────────────────────────
-            // "1" when regularizing delay, "0" when short-only
-            const sDelayFlag = oData.showDelay ? "1" : "0";
+
+            const sDelayFlag = oData.showDelay && oData.showShort ? "3" : oData.showDelay ? "1" : "2";
 
             const oModel = this.getOwnerComponent().getModel() || this.getView().getModel("mainService");
             if (!oModel) {
@@ -311,39 +324,40 @@ sap.ui.define([
                 Zlinemanagerremarks: sReason,
                 Zpunchintime: ODataUtils.formatTimeForPayload(sCorrectedPunchIn),
                 Zpunchouttime: ODataUtils.formatTimeForPayload(sCorrectedPunchOut),
+                ZschTimeIn: ODataUtils.formatTimeForPayload(sCorrectedSchIn),
+                ZschTimeOut: ODataUtils.formatTimeForPayload(sCorrectedSchOut),
                 Zstatus: "COMPLETED"
             });
 
             sap.ui.core.BusyIndicator.show(0);
 
-            // Step 1: create ITM_STRSet. Step 2 (only on step 1 success): PUT to
-            // punch_regularizeSet with the corrected punch times / DelayFlag.
-            oModel.create("/ITM_STRSet", oITMPayload, {
-                success: () => {
-                    ODataUtils.submitPunchRegularize(oModel, oRecord, {
-                        Zpunchintime: sCorrectedPunchIn,
-                        Zpunchouttime: sCorrectedPunchOut,
-                        DelayFlag: sDelayFlag
-                    })
-                        .then(() => {
+            // Step 1: PUT punch_regularizeSet
+            ODataUtils.submitPunchRegularize(oModel, oRecord, {
+                Zpunchintime: sCorrectedPunchIn,
+                Zpunchouttime: sCorrectedPunchOut,
+                ZschTimeIn: sCorrectedSchIn,
+                ZschTimeOut: sCorrectedSchOut,
+                DelayFlag: sDelayFlag
+            })
+                .then(() => {
+                    // Step 2: CREATE ITM_STRSet
+                    oModel.create("/ITM_STRSet", oITMPayload, {
+                        success: () => {
                             sap.ui.core.BusyIndicator.hide();
                             MessageToast.show("Regularization submitted successfully.");
                             this._closeRegularizeDialog();
                             this.onNavBack();
-                        })
-                        .catch((oPunchError) => {
+                        },
+                        error: (oErr) => {
                             sap.ui.core.BusyIndicator.hide();
-                            // ITM_STRSet create already succeeded; submitPunchRegularize already
-                            // surfaced the error via handleODataError. Log for traceability —
-                            // the ITM_STRSet record exists even though the punch PUT failed.
-                            console.error("Punch regularize PUT failed after successful ITM_STRSet create:", oPunchError);
-                        });
-                },
-                error: (oErr) => {
+                            ODataUtils.handleODataError(oErr, "Error submitting Regularization");
+                        }
+                    });
+                })
+                .catch((oPunchError) => {
                     sap.ui.core.BusyIndicator.hide();
-                    ODataUtils.handleODataError(oErr, "Error submitting Regularization");
-                }
-            });
+                    console.error("Punch regularize PUT failed, ITM_STRSet create skipped:", oPunchError);
+                });
         },
 
         onRegularizeCancel() {
