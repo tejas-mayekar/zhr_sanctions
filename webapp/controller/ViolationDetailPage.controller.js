@@ -26,8 +26,8 @@ sap.ui.define([
         const parts = sTime.split(":");
         if (parts.length < 2) { return 0; }
         return (parseInt(parts[0], 10) || 0) * 3600
-             + (parseInt(parts[1], 10) || 0) * 60
-             + (parseInt(parts[2], 10) || 0);
+            + (parseInt(parts[1], 10) || 0) * 60
+            + (parseInt(parts[2], 10) || 0);
     }
 
     /**
@@ -77,17 +77,17 @@ sap.ui.define([
             return {
                 // display labels
                 dialogTitle: "Regularize Attendance",
-                scheduledIn:  "",
+                scheduledIn: "",
                 scheduledOut: "",
-                punchIn:      "",
-                punchOut:     "",
-                delayHrs:     "",
-                shortHrs:     "",
+                punchIn: "",
+                punchOut: "",
+                delayHrs: "",
+                shortHrs: "",
                 incidentDate: "",
 
                 // flags
-                hasDelay:        false,
-                hasShort:        false,
+                hasDelay: false,
+                hasShort: false,
                 showModeSelector: false,
 
                 // mode: "delay" | "short" | "both"
@@ -99,9 +99,9 @@ sap.ui.define([
 
                 // editable time fields
                 delayFrom: "",
-                delayTo:   "",
+                delayTo: "",
                 shortFrom: "",
-                shortTo:   "",
+                shortTo: "",
 
                 reason: ""
             };
@@ -128,9 +128,9 @@ sap.ui.define([
          * pre-fills the From/To time fields to close each gap.
          */
         _buildRegularizeModel(oRecord) {
-            const sSchIn    = toTimeStr(oRecord.ZschTimeIn);
-            const sSchOut   = toTimeStr(oRecord.ZschTimeOut);
-            const sPunchIn  = toTimeStr(oRecord.Zpunchintime);
+            const sSchIn = toTimeStr(oRecord.ZschTimeIn);
+            const sSchOut = toTimeStr(oRecord.ZschTimeOut);
+            const sPunchIn = toTimeStr(oRecord.Zpunchintime);
             const sPunchOut = toTimeStr(oRecord.Zpunchouttime);
 
             // Determine whether delay / short exist.
@@ -159,13 +159,13 @@ sap.ui.define([
             const sShortDisp = this._formatHrsDisplay(oRecord.ZshortHrs);
 
             const oModel = {
-                dialogTitle:  showBoth ? "Regularize Both" : hasDelay ? "Regularize Delay" : "Regularize Short Hours",
-                scheduledIn:  buildDisplayDateTime(sIncDate, sSchIn),
+                dialogTitle: showBoth ? "Regularize Both" : hasDelay ? "Regularize Delay" : "Regularize Short Hours",
+                scheduledIn: buildDisplayDateTime(sIncDate, sSchIn),
                 scheduledOut: buildDisplayDateTime(sIncDate, sSchOut),
-                punchIn:      buildDisplayDateTime(sIncDate, sPunchIn),
-                punchOut:     buildDisplayDateTime(sIncDate, sPunchOut),
-                delayHrs:     sDelayDisp,
-                shortHrs:     sShortDisp,
+                punchIn: buildDisplayDateTime(sIncDate, sPunchIn),
+                punchOut: buildDisplayDateTime(sIncDate, sPunchOut),
+                delayHrs: sDelayDisp,
+                shortHrs: sShortDisp,
                 incidentDate: sIncDate,
 
                 hasDelay,
@@ -176,11 +176,11 @@ sap.ui.define([
 
                 // Delay gap: scheduled-in → actual punch-in
                 delayFrom: sSchIn,
-                delayTo:   sPunchIn,
+                delayTo: sPunchIn,
 
                 // Short gap: actual punch-out → scheduled-out
                 shortFrom: sPunchOut,
-                shortTo:   sSchOut,
+                shortTo: sSchOut,
 
                 reason: ""
             };
@@ -202,10 +202,10 @@ sap.ui.define([
         },
 
         onRegularizeModeChange(oEvent) {
-            const oModel    = this.getView().getModel("regularize");
-            const sMode     = oEvent.getParameter("item").getKey();
-            const hasDelay  = oModel.getProperty("/hasDelay");
-            const hasShort  = oModel.getProperty("/hasShort");
+            const oModel = this.getView().getModel("regularize");
+            const sMode = oEvent.getParameter("item").getKey();
+            const hasDelay = oModel.getProperty("/hasDelay");
+            const hasShort = oModel.getProperty("/hasShort");
 
             oModel.setProperty("/mode", sMode);
             const vis = this._sectionVisibility(sMode, hasDelay, hasShort);
@@ -237,9 +237,8 @@ sap.ui.define([
 
         onRegularizeSubmit() {
             const oRegModel = this.getView().getModel("regularize");
-            const oData     = oRegModel.getData();
-            const sReason   = (oData.reason || "").trim();
-            const sMode     = oData.mode;
+            const oData = oRegModel.getData();
+            const sReason = (oData.reason || "").trim();
 
             // ── Validation ─────────────────────────────────────────────────
             if (!sReason) {
@@ -275,34 +274,44 @@ sap.ui.define([
                 return;
             }
 
-            // ── Build punch times for payload ───────────────────────────────
-            // The "corrected" punch-in = delayFrom (= scheduled-in) when regularizing delay.
-            // The "corrected" punch-out = shortTo (= scheduled-out) when regularizing short.
-            // When only one side is regularized, keep the original for the other side.
-            let sCorrectedPunchIn  = toTimeStr(oRecord.Zpunchintime);
+            // ── Derive corrected punch times ────────────────────────────────
+            let sCorrectedPunchIn = toTimeStr(oRecord.Zpunchintime);
             let sCorrectedPunchOut = toTimeStr(oRecord.Zpunchouttime);
 
             if (oData.showDelay) {
-                // Corrected punch-in = the delayFrom (user confirms start of the gap = scheduled in)
                 sCorrectedPunchIn = oData.delayFrom;
             }
             if (oData.showShort) {
-                // Corrected punch-out = the shortTo (user confirms end of gap = scheduled out)
                 sCorrectedPunchOut = oData.shortTo;
             }
 
-            const oPayload = ODataUtils.buildITMPayload(oRecord, {
-                Zaction:            "Regularized",
-                Zlinemanagerremarks: sReason,
-                Zpunchintime:       ODataUtils.formatTimeForPayload(sCorrectedPunchIn),
-                Zpunchouttime:      ODataUtils.formatTimeForPayload(sCorrectedPunchOut),
-                Zstatus:            "COMPLETED"
-            });
+            // ── Determine DelayFlag ─────────────────────────────────────────
+            // "1" when regularizing delay, "0" when short-only
+            const sDelayFlag = oData.showDelay ? "1" : "0";
 
-            this._submitITM(oPayload, "Regularization submitted successfully.", () => {
-                this._closeRegularizeDialog();
-                this.onNavBack();
-            }, "Error submitting Regularization");
+            const oModel = this.getOwnerComponent().getModel() || this.getView().getModel("mainService");
+            if (!oModel) {
+                MessageBox.warning("No active OData service connected.");
+                return;
+            }
+
+            sap.ui.core.BusyIndicator.show(0);
+
+            ODataUtils.submitPunchRegularize(oModel, oRecord, {
+                Zpunchintime: sCorrectedPunchIn,
+                Zpunchouttime: sCorrectedPunchOut,
+                DelayFlag: sDelayFlag
+            })
+                .then(() => {
+                    sap.ui.core.BusyIndicator.hide();
+                    MessageToast.show("Regularization submitted successfully.");
+                    this._closeRegularizeDialog();
+                    this.onNavBack();
+                })
+                .catch(() => {
+                    // ODataUtils.submitPunchRegularize already calls handleODataError internally
+                    sap.ui.core.BusyIndicator.hide();
+                });
         },
 
         onRegularizeCancel() {
@@ -425,8 +434,8 @@ sap.ui.define([
                 return String(vDate);
             }
             if (isNaN(d.getTime())) { return ""; }
-            const dd   = String(d.getDate()).padStart(2, "0");
-            const mm   = String(d.getMonth() + 1).padStart(2, "0");
+            const dd = String(d.getDate()).padStart(2, "0");
+            const mm = String(d.getMonth() + 1).padStart(2, "0");
             const yyyy = d.getFullYear();
             return `${dd}-${mm}-${yyyy}`;
         },

@@ -263,7 +263,7 @@ sap.ui.define([], () => {
             const oPayload = this.buildITMPayload(oRecord, oOverrides || {});
             var finalPayload = this._formatPayloadForOData(oPayload)
             // Construct the entity path with the key (typically ZactionRefNo)
-            const sEntityPath = "/ITM_STRSet(ZactionRefNo='"+ oRecord.ZactionRefNo +"',ZempId='200040',ZincDate=datetime'2026-05-17T00:00:00')";
+            const sEntityPath = "/ITM_STRSet(ZactionRefNo='" + oRecord.ZactionRefNo + "',ZempId='200040',ZincDate=datetime'2026-05-17T00:00:00')";
             // const sEntityPath = "/ITM_STRSet(ZactionRefNo='"+ oRecord.ZactionRefNo +"')";
             debugger
             return new Promise((resolve, reject) => {
@@ -284,7 +284,7 @@ sap.ui.define([], () => {
             const oFormatted = { ...oPayload };
 
             const aDateFields = [
-                "Zhiredate", "ZincDisDate", "ZinitDate", "ZfirstIncDate","ZincDate",
+                "Zhiredate", "ZincDisDate", "ZinitDate", "ZfirstIncDate", "ZincDate",
                 "Zawaitingactionfrom", "Zlastaction", "Zlinemanageractiondate",
                 "Zhcopsactiondate", "Zhcevpactiondate", "Zlegalmemberactiondate",
                 "Zceoactiondate"
@@ -376,6 +376,103 @@ sap.ui.define([], () => {
             const pad = n => String(n).padStart(2, "0");
             return `P${pad(iDays)}DT${pad(iHours)}H${pad(iMinutes)}M${pad(iSeconds)}S`;
         },
+        // ── Punch Regularize Payload Builder ────────────────────────────────────
+        //
+        // Builds the body for a PUT to /punch_regularizeSet(...).
+        // oRecord: the violation record (detailData>/record)
+        // oOverrides: { Zpunchintime, Zpunchouttime, DelayFlag } in UI form
+        //             (Zpunchintime/out as "HH:mm:ss" strings; DelayFlag as "1"/"0")
+
+        buildPunchRegularizePayload(oRecord, oOverrides) {
+            const o = oOverrides || {};
+
+            return {
+                ZempId: oRecord.ZempId || "",
+                ZactionRefNo: oRecord.ZACTION_REF_NO || oRecord.ZactionRefNo || "",
+                ZincDate: this.formatDateTimeForPayload(oRecord.ZincDate),
+                ZschTimeIn: this.formatTimeDurationForPayload(oRecord.ZschTimeIn),
+                ZschTimeOut: this.formatTimeDurationForPayload(oRecord.ZschTimeOut),
+                Zpunchintime: this.formatTimeDurationForPayload(o.Zpunchintime),
+                Zpunchouttime: this.formatTimeDurationForPayload(o.Zpunchouttime),
+                DelayFlag: o.DelayFlag !== undefined && o.DelayFlag !== null ? String(o.DelayFlag) : "0"
+            };
+        },
+  formatDateTimeForKey(vDate) {
+            if (vDate === null || vDate === undefined || vDate === "") {
+                return null;
+            }
+ 
+            let dDate;
+            if (vDate instanceof Date) {
+                dDate = vDate;
+            } else if (typeof vDate === "string" && vDate.startsWith("/Date(")) {
+                const iMs = parseInt(vDate.replace(/[^0-9]/g, ""), 10);
+                dDate = new Date(iMs);
+            } else if (typeof vDate === "string") {
+                dDate = new Date(vDate);
+            } else {
+                return null;
+            }
+ 
+            if (isNaN(dDate.getTime())) {
+                return null;
+            }
+ 
+            const yyyy = dDate.getFullYear();
+            const mm = String(dDate.getMonth() + 1).padStart(2, "0");
+            const dd = String(dDate.getDate()).padStart(2, "0");
+            const hh = String(dDate.getHours()).padStart(2, "0");
+            const mi = String(dDate.getMinutes()).padStart(2, "0");
+            const ss = String(dDate.getSeconds()).padStart(2, "0");
+ 
+            return `${yyyy}-${mm}-${dd}T${hh}:${mi}:${ss}`;
+        },
+        // ── Punch Regularize Submit ──────────────────────────────────────────────
+        //
+        // PUTs to /punch_regularizeSet(ZempId='..',ZactionRefNo='..',ZincDate=datetime'..',DelayFlag='..')
+        // oModel: OData model
+        // oRecord: detail page record (from detailData model)
+        // oOverrides: { Zpunchintime, Zpunchouttime, DelayFlag } in UI form
+
+        submitPunchRegularize(oModel, oRecord, oOverrides) {
+            if (!oModel) {
+                return Promise.reject(new Error("ODataUtils.submitPunchRegularize: oModel is null or undefined."));
+            }
+            if (!oRecord || !oRecord.ZempId) {
+                return Promise.reject(new Error("ODataUtils.submitPunchRegularize: oRecord or ZempId is missing."));
+            }
+
+            const sActionRefNo = oRecord.ZACTION_REF_NO || oRecord.ZactionRefNo;
+            if (!sActionRefNo) {
+                return Promise.reject(new Error("ODataUtils.submitPunchRegularize: ZactionRefNo is required."));
+            }
+
+            const oPayload = this.buildPunchRegularizePayload(oRecord, oOverrides || {});
+
+            const sIncDateKey = this.formatDateTimeForKey(oRecord.ZincDate);
+            const sDelayFlag = oPayload.DelayFlag;
+
+            const sEntityPath = "/punch_regularizeSet(ZempId='" + oRecord.ZempId +
+                "',ZactionRefNo='" + sActionRefNo +
+                "',ZincDate=datetime'" + sIncDateKey +
+                "',DelayFlag='" + sDelayFlag + "')";
+oModel.setUseBatch(false)
+            return new Promise((resolve, reject) => {
+                oModel.update(sEntityPath, oPayload, {
+                    bMerge: false,
+                    success: (oResponse) => {
+                        console.log("ODataUtils.submitPunchRegularize: Success", oResponse);
+                        resolve(oResponse);
+                    },
+                    error: (oError) => {
+                        console.error("ODataUtils.submitPunchRegularize: Error", oError);
+                        this.handleODataError(oError, "Failed to submit regularization");
+                        reject(oError);
+                    }
+                });
+            });
+        }
+
 
     };
 
