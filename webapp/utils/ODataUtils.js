@@ -397,11 +397,10 @@ sap.ui.define([], () => {
                 DelayFlag: o.DelayFlag !== undefined && o.DelayFlag !== null ? String(o.DelayFlag) : "0"
             };
         },
-  formatDateTimeForKey(vDate) {
+        formatDateTimeForKey(vDate) {
             if (vDate === null || vDate === undefined || vDate === "") {
                 return null;
             }
- 
             let dDate;
             if (vDate instanceof Date) {
                 dDate = vDate;
@@ -413,18 +412,15 @@ sap.ui.define([], () => {
             } else {
                 return null;
             }
- 
             if (isNaN(dDate.getTime())) {
                 return null;
             }
- 
             const yyyy = dDate.getFullYear();
             const mm = String(dDate.getMonth() + 1).padStart(2, "0");
             const dd = String(dDate.getDate()).padStart(2, "0");
             const hh = String(dDate.getHours()).padStart(2, "0");
             const mi = String(dDate.getMinutes()).padStart(2, "0");
             const ss = String(dDate.getSeconds()).padStart(2, "0");
- 
             return `${yyyy}-${mm}-${dd}T${hh}:${mi}:${ss}`;
         },
         // ── Punch Regularize Submit ──────────────────────────────────────────────
@@ -456,7 +452,7 @@ sap.ui.define([], () => {
                 "',ZactionRefNo='" + sActionRefNo +
                 "',ZincDate=datetime'" + sIncDateKey +
                 "',DelayFlag='" + sDelayFlag + "')";
-oModel.setUseBatch(false)
+            oModel.setUseBatch(false)
             return new Promise((resolve, reject) => {
                 oModel.update(sEntityPath, oPayload, {
                     bMerge: false,

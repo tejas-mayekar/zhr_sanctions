@@ -295,23 +295,45 @@ sap.ui.define([
                 return;
             }
 
+            // ── Build the ITM_STRSet create payload (step 1) ────────────────
+            const oITMPayload = ODataUtils.buildITMPayload(oRecord, {
+                Zaction: "Regularized",
+                Zlinemanagerremarks: sReason,
+                Zpunchintime: ODataUtils.formatTimeForPayload(sCorrectedPunchIn),
+                Zpunchouttime: ODataUtils.formatTimeForPayload(sCorrectedPunchOut),
+                Zstatus: "COMPLETED"
+            });
+
             sap.ui.core.BusyIndicator.show(0);
 
-            ODataUtils.submitPunchRegularize(oModel, oRecord, {
-                Zpunchintime: sCorrectedPunchIn,
-                Zpunchouttime: sCorrectedPunchOut,
-                DelayFlag: sDelayFlag
-            })
-                .then(() => {
+            // Step 1: create ITM_STRSet. Step 2 (only on step 1 success): PUT to
+            // punch_regularizeSet with the corrected punch times / DelayFlag.
+            oModel.create("/ITM_STRSet", oITMPayload, {
+                success: () => {
+                    ODataUtils.submitPunchRegularize(oModel, oRecord, {
+                        Zpunchintime: sCorrectedPunchIn,
+                        Zpunchouttime: sCorrectedPunchOut,
+                        DelayFlag: sDelayFlag
+                    })
+                        .then(() => {
+                            sap.ui.core.BusyIndicator.hide();
+                            MessageToast.show("Regularization submitted successfully.");
+                            this._closeRegularizeDialog();
+                            this.onNavBack();
+                        })
+                        .catch((oPunchError) => {
+                            sap.ui.core.BusyIndicator.hide();
+                            // ITM_STRSet create already succeeded; submitPunchRegularize already
+                            // surfaced the error via handleODataError. Log for traceability —
+                            // the ITM_STRSet record exists even though the punch PUT failed.
+                            console.error("Punch regularize PUT failed after successful ITM_STRSet create:", oPunchError);
+                        });
+                },
+                error: (oErr) => {
                     sap.ui.core.BusyIndicator.hide();
-                    MessageToast.show("Regularization submitted successfully.");
-                    this._closeRegularizeDialog();
-                    this.onNavBack();
-                })
-                .catch(() => {
-                    // ODataUtils.submitPunchRegularize already calls handleODataError internally
-                    sap.ui.core.BusyIndicator.hide();
-                });
+                    ODataUtils.handleODataError(oErr, "Error submitting Regularization");
+                }
+            });
         },
 
         onRegularizeCancel() {
@@ -393,7 +415,7 @@ sap.ui.define([
                 () => this.onNavBack(), "Error submitting Payroll Deduction");
         },
 
-        // ── Shared OData submit ───────────────────────────────────────────────
+        // ── Shared OData submit (used by Report To HC / Payroll Deduction) ────
 
         _submitITM(oPayload, sSuccessMsg, fnSuccess, sErrorTitle) {
             const oModel = this.getOwnerComponent().getModel() || this.getView().getModel("mainService");
