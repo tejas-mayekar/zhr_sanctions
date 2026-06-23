@@ -58,21 +58,20 @@
                     </form:SimpleForm>
                 </Panel>
 
-                <!-- ── Mode Selector (only when BOTH delay AND short apply) ── -->
+                <!-- ── Mode Selector: RadioButtonGroup — only when BOTH apply ── -->
                 <VBox id="regularizeModeBox" visible="{regularize>/showModeSelector}" class="sapUiSmallMarginBottom">
                     <Label id="lblRegMode" text="Regularization Type" required="true" class="sapUiSmallMarginBottom" />
-                    <SegmentedButton
-                        id="regularizeModeBtn"
-                        selectedKey="{regularize>/mode}"
-                        selectionChange=".onRegularizeModeChange"
-                        width="100%"
+                    <RadioButtonGroup
+                        id="regularizeModeRadio"
+                        columns="3"
+                        select=".onRegularizeModeChange"
                     >
-                        <items>
-                            <SegmentedButtonItem id="modeDelay" key="delay" text="Update Delay Hours" />
-                            <SegmentedButtonItem id="modeShort" key="short" text="Update Short Hours" />
-                            <SegmentedButtonItem id="modeBoth"  key="both"  text="Update Both" />
-                        </items>
-                    </SegmentedButton>
+                        <buttons>
+                            <RadioButton id="modeDelay" text="Delay Only"  groupName="regMode" />
+                            <RadioButton id="modeShort" text="Short Only"  groupName="regMode" />
+                            <RadioButton id="modeBoth"  text="Both"        groupName="regMode" selected="true" />
+                        </buttons>
+                    </RadioButtonGroup>
                 </VBox>
 
                 <!-- ── Delay Section ── -->

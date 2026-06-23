@@ -137,12 +137,13 @@ sap.ui.define([
             // The backend may supply ZdelayHrs / ZshortHrs as numeric strings ("00:15"),
             // numbers (minutes), or time objects — check them, but also fall back to
             // comparing scheduled vs actual times directly.
-            const hasDelay = hasNonZeroTime(oRecord.ZdelayHrs) || (
-                sPunchIn && sSchIn && toSeconds(sPunchIn) > toSeconds(sSchIn)
+            const hasDelay = hasNonZeroTime(oRecord.ZdelayHrs) && (
+                !sPunchIn || !sSchIn || toSeconds(sPunchIn) > toSeconds(sSchIn)
             );
-            const hasShort = hasNonZeroTime(oRecord.ZshortHrs) || (
-                sPunchOut && sSchOut && toSeconds(sPunchOut) < toSeconds(sSchOut)
+            const hasShort = hasNonZeroTime(oRecord.ZshortHrs) && (
+                !sPunchOut || !sSchOut || toSeconds(sPunchOut) < toSeconds(sSchOut)
             );
+
 
             const showBoth = hasDelay && hasShort;
 
@@ -174,13 +175,14 @@ sap.ui.define([
 
                 mode: sMode,
 
-                // Delay gap: scheduled-in → actual punch-in
+                // Delay gap: schIn → (punchIn - 1s)
                 delayFrom: sSchIn,
-                delayTo: sPunchIn,
+                delayTo: fromSeconds(toSeconds(sPunchIn) - 1),
 
-                // Short gap: actual punch-out → scheduled-out
-                shortFrom: sPunchOut,
+                // Short gap: (punchOut + 1s) → schOut
+                shortFrom: fromSeconds(toSeconds(sPunchOut) + 1),
                 shortTo: sSchOut,
+
 
                 reason: ""
             };
@@ -201,9 +203,14 @@ sap.ui.define([
             };
         },
 
+        // Replace onRegularizeModeChange in ViolationDetailPage.controller.js
+
         onRegularizeModeChange(oEvent) {
             const oModel = this.getView().getModel("regularize");
-            const sMode = oEvent.getParameter("item").getKey();
+            const iIdx = oEvent.getParameter("selectedIndex"); // 0=delay, 1=short, 2=both
+            const aModes = ["delay", "short", "both"];
+            const sMode = aModes[iIdx] || "both";
+
             const hasDelay = oModel.getProperty("/hasDelay");
             const hasShort = oModel.getProperty("/hasShort");
 
@@ -212,8 +219,11 @@ sap.ui.define([
             oModel.setProperty("/showDelay", vis.showDelay);
             oModel.setProperty("/showShort", vis.showShort);
 
-            // Update dialog title
-            const titles = { delay: "Regularize Delay", short: "Regularize Short Hours", both: "Regularize Both" };
+            const titles = {
+                delay: "Regularize Delay",
+                short: "Regularize Short Hours",
+                both: "Regularize Both"
+            };
             oModel.setProperty("/dialogTitle", titles[sMode] || "Regularize Attendance");
         },
 
