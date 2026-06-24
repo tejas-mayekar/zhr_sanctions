@@ -110,7 +110,7 @@ sap.ui.define([], () => {
             }
 
             const sId = sap.ushell.Container.getService("UserInfo").getUser().getId();
-            return sId === "DACO_EAMV04" ? "200129" : "200130";
+            return sId;
         },
 
         // ── Edm.Time Builder ──────────────────────────────────────────────────
