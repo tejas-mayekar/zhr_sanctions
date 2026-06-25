@@ -7,14 +7,21 @@ sap.ui.define([
 
     return Controller.extend("zhrsanctions.controller.BaseController", {
 
-        // Formatter proxy for XML view bindings: formatter: '.formatEdmTime'
-        formatEdmTime(oTime) {
-            return ODataUtils.formatEdmTime(oTime);
+        /**
+         * Proxy for ODataUtils.formatEdmTime — used as formatter in XML view bindings.
+         * Example: formatter: '.formatEdmTime'
+         */
+        formatEdmTime(edmTime) {
+            return ODataUtils.formatEdmTime(edmTime);
         },
 
+        /**
+         * Navigate back to the previous page, or fall back to the main list view.
+         */
         onNavBack() {
-            const sPrevHash = History.getInstance().getPreviousHash();
-            if (sPrevHash !== undefined) {
+            const previousHash = History.getInstance().getPreviousHash();
+
+            if (previousHash !== undefined) {
                 window.history.go(-1);
             } else {
                 this.getOwnerComponent().getRouter().navTo("RouteView1", {}, true);

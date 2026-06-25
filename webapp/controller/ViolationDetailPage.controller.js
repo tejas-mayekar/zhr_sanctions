@@ -8,64 +8,82 @@ sap.ui.define([
 ], (BaseController, Fragment, JSONModel, MessageToast, MessageBox, ODataUtils) => {
     "use strict";
 
-    // ── Helpers ────────────────────────────────────────────────────────────────
+    // ─── Time Helpers ─────────────────────────────────────────────────────────
 
     /**
      * Convert an OData Edm.Time value (or "HH:mm:ss" string) to "HH:mm:ss".
-     * Returns "" on null / undefined.
+     * Returns "" for null / undefined.
      */
-    function toTimeStr(oTime) {
-        return ODataUtils.formatEdmTime(oTime) || "";
+    function toTimeString(edmTime) {
+        return ODataUtils.formatEdmTime(edmTime) || "";
     }
 
     /**
      * Parse "HH:mm:ss" → total seconds. Returns 0 on bad input.
      */
-    function toSeconds(sTime) {
-        if (!sTime) { return 0; }
-        const parts = sTime.split(":");
-        if (parts.length < 2) { return 0; }
-        return (parseInt(parts[0], 10) || 0) * 3600
-            + (parseInt(parts[1], 10) || 0) * 60
-            + (parseInt(parts[2], 10) || 0);
+    function timeStringToSeconds(timeStr) {
+        if (!timeStr) { return 0; }
+        const [hh, mm, ss = "0"] = timeStr.split(":");
+        return (parseInt(hh, 10) || 0) * 3600
+             + (parseInt(mm, 10) || 0) * 60
+             + (parseInt(ss, 10) || 0);
     }
 
     /**
-     * Format total seconds → "HH:mm:ss".
+     * Convert total seconds → zero-padded "HH:mm:ss".
      */
-    function fromSeconds(iTotalSec) {
-        if (iTotalSec < 0) { iTotalSec = 0; }
-        const hh = String(Math.floor(iTotalSec / 3600)).padStart(2, "0");
-        const mm = String(Math.floor((iTotalSec % 3600) / 60)).padStart(2, "0");
-        const ss = String(iTotalSec % 60).padStart(2, "0");
+    function secondsToTimeString(totalSeconds) {
+        if (totalSeconds < 0) { totalSeconds = 0; }
+        const hh = String(Math.floor(totalSeconds / 3600)).padStart(2, "0");
+        const mm = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, "0");
+        const ss = String(totalSeconds % 60).padStart(2, "0");
         return `${hh}:${mm}:${ss}`;
     }
 
     /**
-     * Determine whether a time field carries a non-zero value.
-     * Handles Edm.Time objects, numeric ms, "HH:mm:ss" strings, or falsy.
+     * Return true when an OData time field contains a non-zero value.
      */
-    function hasNonZeroTime(oTime) {
-        if (!oTime) { return false; }
-        const s = toTimeStr(oTime);
+    function isNonZeroTime(edmTime) {
+        if (!edmTime) { return false; }
+        const s = toTimeString(edmTime);
         return s !== "" && s !== "00:00:00";
     }
 
     /**
-     * Format "HH:mm:ss" → "dd-MM-yyyy HH:mm:ss" display string
-     * using the incident date string already stored in the regularize model.
+     * Build a display string "dd-MM-yyyy HH:mm:ss" from separate date and time strings.
      */
-    function buildDisplayDateTime(sDate, sTime) {
-        if (!sDate || !sTime) { return sTime || ""; }
-        return `${sDate} ${sTime}`;
+    function buildDateTimeDisplayString(dateStr, timeStr) {
+        if (!dateStr || !timeStr) { return timeStr || ""; }
+        return `${dateStr} ${timeStr}`;
     }
 
-    // ── Controller ─────────────────────────────────────────────────────────────
+    // ─── Regularize Model Flags ───────────────────────────────────────────────
+
+    /**
+     * Map regularization mode + available flags to section visibility booleans.
+     */
+    function resolveSectionVisibility(mode, hasDelay, hasShort) {
+        return {
+            showDelay: mode === "both" ? hasDelay : mode === "delay",
+            showShort: mode === "both" ? hasShort : mode === "short"
+        };
+    }
+
+    /**
+     * Derive the dialog title from the mode.
+     */
+    const MODE_TITLE = {
+        delay: "Regularize Delay",
+        short: "Regularize Short Hours",
+        both:  "Regularize Both"
+    };
+
+    // ─── Controller ───────────────────────────────────────────────────────────
 
     return BaseController.extend("zhrsanctions.controller.ViolationDetailPage", {
 
         onInit() {
-            this.getView().setModel(new JSONModel(this._emptyRegularizeModel()), "regularize");
+            this.getView().setModel(new JSONModel(this._buildEmptyRegularizeState()), "regularize");
 
             this.getOwnerComponent()
                 .getRouter()
@@ -73,440 +91,418 @@ sap.ui.define([
                 .attachPatternMatched(this._onRouteMatched, this);
         },
 
-        _emptyRegularizeModel() {
-            return {
-                // display labels
-                dialogTitle: "Regularize Attendance",
-                scheduledIn: "",
-                scheduledOut: "",
-                punchIn: "",
-                punchOut: "",
-                delayHrs: "",
-                shortHrs: "",
-                incidentDate: "",
-
-                // flags
-                hasDelay: false,
-                hasShort: false,
-                showModeSelector: false,
-
-                // mode: "delay" | "short" | "both"
-                mode: "both",
-
-                // section visibility (derived from mode + flags)
-                showDelay: false,
-                showShort: false,
-
-                // editable time fields
-                delayFrom: "",
-                delayTo: "",
-                shortFrom: "",
-                shortTo: "",
-
-                reason: ""
-            };
-        },
+        // ── Route Handler ─────────────────────────────────────────────────────
 
         _onRouteMatched() {
-            const oDetailModel = this.getOwnerComponent().getModel("detailData");
-            if (oDetailModel) {
-                this.getView().setModel(oDetailModel, "detailData");
+            const detailModel = this.getOwnerComponent().getModel("detailData");
+            if (detailModel) {
+                this.getView().setModel(detailModel, "detailData");
             }
         },
 
-        // ── Regularize ────────────────────────────────────────────────────────
+        // ── Regularize Dialog ─────────────────────────────────────────────────
 
         onRegularizePress() {
-            const oRecord = this.getView().getModel("detailData").getProperty("/record");
-            this._buildRegularizeModel(oRecord);
-            this._openRegularizeDialog();
+            const record = this.getView().getModel("detailData").getProperty("/record");
+            this._populateRegularizeModel(record);
+            this._openDialog("regularize", "zhrsanctions.view.fragments.RegularizeDialog");
         },
 
         /**
-         * Build the regularize model from the current violation record.
+         * Build the regularize model from the violation record.
          * Determines which sections apply (delay / short / both) and
-         * pre-fills the From/To time fields to close each gap.
+         * pre-fills the From/To time pickers to close each attendance gap.
          */
-        _buildRegularizeModel(oRecord) {
-            const sSchIn = toTimeStr(oRecord.ZschTimeIn);
-            const sSchOut = toTimeStr(oRecord.ZschTimeOut);
-            const sPunchIn = toTimeStr(oRecord.Zpunchintime);
-            const sPunchOut = toTimeStr(oRecord.Zpunchouttime);
+        _populateRegularizeModel(record) {
+            const scheduledIn  = toTimeString(record.ZschTimeIn);
+            const scheduledOut = toTimeString(record.ZschTimeOut);
+            const punchIn      = toTimeString(record.Zpunchintime);
+            const punchOut     = toTimeString(record.Zpunchouttime);
 
-            // Determine whether delay / short exist.
-            // The backend may supply ZdelayHrs / ZshortHrs as numeric strings ("00:15"),
-            // numbers (minutes), or time objects — check them, but also fall back to
-            // comparing scheduled vs actual times directly.
-            const hasDelay = hasNonZeroTime(oRecord.ZdelayHrs) && (
-                !sPunchIn || !sSchIn || toSeconds(sPunchIn) > toSeconds(sSchIn)
-            );
-            const hasShort = hasNonZeroTime(oRecord.ZshortHrs) && (
-                !sPunchOut || !sSchOut || toSeconds(sPunchOut) < toSeconds(sSchOut)
+            // Detect delay: ZdelayHrs non-zero AND punch-in is later than scheduled-in
+            const hasDelay = isNonZeroTime(record.ZdelayHrs) && (
+                !punchIn || !scheduledIn ||
+                timeStringToSeconds(punchIn) > timeStringToSeconds(scheduledIn)
             );
 
+            // Detect short: ZshortHrs non-zero AND punch-out is earlier than scheduled-out
+            const hasShort = isNonZeroTime(record.ZshortHrs) && (
+                !punchOut || !scheduledOut ||
+                timeStringToSeconds(punchOut) < timeStringToSeconds(scheduledOut)
+            );
 
-            const showBoth = hasDelay && hasShort;
+            const hasBoth = hasDelay && hasShort;
+            const mode    = hasBoth ? "both" : hasDelay ? "delay" : "short";
 
-            // Default mode when both apply → "both"; otherwise whichever is relevant
-            let sMode = "both";
-            if (hasDelay && !hasShort) { sMode = "delay"; }
-            if (hasShort && !hasDelay) { sMode = "short"; }
+            const incidentDateDisplay = this._formatIncidentDateDisplay(record.ZincDate);
 
-            // Derive a display date string from ZincDate
-            const sIncDate = this._formatDisplayDate(oRecord.ZincDate);
-
-            // Format ZdelayHrs / ZshortHrs for display
-            const sDelayDisp = this._formatHrsDisplay(oRecord.ZdelayHrs);
-            const sShortDisp = this._formatHrsDisplay(oRecord.ZshortHrs);
-
-            const oModel = {
-                dialogTitle: showBoth ? "Regularize Both" : hasDelay ? "Regularize Delay" : "Regularize Short Hours",
-                scheduledIn: buildDisplayDateTime(sIncDate, sSchIn),
-                scheduledOut: buildDisplayDateTime(sIncDate, sSchOut),
-                punchIn: buildDisplayDateTime(sIncDate, sPunchIn),
-                punchOut: buildDisplayDateTime(sIncDate, sPunchOut),
-                delayHrs: sDelayDisp,
-                shortHrs: sShortDisp,
-                incidentDate: sIncDate,
-
+            const state = {
+                dialogTitle:       hasBoth ? "Regularize Both" : MODE_TITLE[mode],
+                scheduledIn:       buildDateTimeDisplayString(incidentDateDisplay, scheduledIn),
+                scheduledOut:      buildDateTimeDisplayString(incidentDateDisplay, scheduledOut),
+                punchIn:           buildDateTimeDisplayString(incidentDateDisplay, punchIn),
+                punchOut:          buildDateTimeDisplayString(incidentDateDisplay, punchOut),
+                delayHrs:          this._formatHoursDisplay(record.ZdelayHrs),
+                shortHrs:          this._formatHoursDisplay(record.ZshortHrs),
+                incidentDate:      incidentDateDisplay,
                 hasDelay,
                 hasShort,
-                showModeSelector: showBoth,
+                showModeSelector:  hasBoth,
+                mode,
 
-                mode: sMode,
+                // Delay gap: scheduled-in → (punch-in minus 1 sec)
+                delayFrom: scheduledIn,
+                delayTo:   secondsToTimeString(timeStringToSeconds(punchIn) - 1),
 
-                // Delay gap: schIn → (punchIn - 1s)
-                delayFrom: sSchIn,
-                delayTo: fromSeconds(toSeconds(sPunchIn) - 1),
-
-                // Short gap: (punchOut + 1s) → schOut
-                shortFrom: fromSeconds(toSeconds(sPunchOut) + 1),
-                shortTo: sSchOut,
-
+                // Short gap: (punch-out plus 1 sec) → scheduled-out
+                shortFrom: secondsToTimeString(timeStringToSeconds(punchOut) + 1),
+                shortTo:   scheduledOut,
 
                 reason: ""
             };
 
-            // Derive section visibility from mode
-            Object.assign(oModel, this._sectionVisibility(sMode, hasDelay, hasShort));
+            Object.assign(state, resolveSectionVisibility(mode, hasDelay, hasShort));
 
-            this.getView().getModel("regularize").setData(oModel);
+            this.getView().getModel("regularize").setData(state);
         },
-
-        /**
-         * Returns { showDelay, showShort } based on current mode and available flags.
-         */
-        _sectionVisibility(sMode, hasDelay, hasShort) {
-            return {
-                showDelay: sMode === "both" ? hasDelay : sMode === "delay",
-                showShort: sMode === "both" ? hasShort : sMode === "short"
-            };
-        },
-
-        // Replace onRegularizeModeChange in ViolationDetailPage.controller.js
 
         onRegularizeModeChange(oEvent) {
-            const oModel = this.getView().getModel("regularize");
-            const iIdx = oEvent.getParameter("selectedIndex"); // 0=delay, 1=short, 2=both
-            const aModes = ["delay", "short", "both"];
-            const sMode = aModes[iIdx] || "both";
+            const regularizeModel = this.getView().getModel("regularize");
+            const modeIndex       = oEvent.getParameter("selectedIndex");
+            const modes           = ["delay", "short", "both"];
+            const selectedMode    = modes[modeIndex] || "both";
 
-            const hasDelay = oModel.getProperty("/hasDelay");
-            const hasShort = oModel.getProperty("/hasShort");
+            const hasDelay = regularizeModel.getProperty("/hasDelay");
+            const hasShort = regularizeModel.getProperty("/hasShort");
 
-            oModel.setProperty("/mode", sMode);
-            const vis = this._sectionVisibility(sMode, hasDelay, hasShort);
-            oModel.setProperty("/showDelay", vis.showDelay);
-            oModel.setProperty("/showShort", vis.showShort);
+            regularizeModel.setProperty("/mode",        selectedMode);
+            regularizeModel.setProperty("/dialogTitle", MODE_TITLE[selectedMode] || "Regularize Attendance");
 
-            const titles = {
-                delay: "Regularize Delay",
-                short: "Regularize Short Hours",
-                both: "Regularize Both"
-            };
-            oModel.setProperty("/dialogTitle", titles[sMode] || "Regularize Attendance");
-        },
-
-        _openRegularizeDialog() {
-            if (!this._oRegularizeDialog) {
-                Fragment.load({
-                    id: this.getView().getId(),
-                    name: "zhrsanctions.view.fragments.RegularizeDialog",
-                    controller: this
-                }).then(oDialog => {
-                    this._oRegularizeDialog = oDialog;
-                    this.getView().addDependent(oDialog);
-                    oDialog.setModel(this.getView().getModel("detailData"), "detailData");
-                    oDialog.setModel(this.getView().getModel("regularize"), "regularize");
-                    oDialog.open();
-                });
-            } else {
-                this._oRegularizeDialog.open();
-            }
+            const visibility = resolveSectionVisibility(selectedMode, hasDelay, hasShort);
+            regularizeModel.setProperty("/showDelay", visibility.showDelay);
+            regularizeModel.setProperty("/showShort", visibility.showShort);
         },
 
         onRegularizeSubmit() {
-            const oRegModel = this.getView().getModel("regularize");
-            const oData = oRegModel.getData();
-            const sReason = (oData.reason || "").trim();
+            const regularizeModel = this.getView().getModel("regularize");
+            const state           = regularizeModel.getData();
+            const reason          = (state.reason || "").trim();
 
-            // ── Validation ─────────────────────────────────────────────────
-            if (!sReason) {
+            // ── Validate ──────────────────────────────────────────────────────
+            if (!reason) {
                 MessageBox.warning("Please enter a reason before submitting.");
                 return;
             }
 
-            if (oData.showDelay) {
-                if (!oData.delayFrom || !oData.delayTo) {
+            if (state.showDelay) {
+                if (!state.delayFrom || !state.delayTo) {
                     MessageBox.warning("Please fill in both Delay From and To times.");
                     return;
                 }
-                if (toSeconds(oData.delayTo) <= toSeconds(oData.delayFrom)) {
+                if (timeStringToSeconds(state.delayTo) <= timeStringToSeconds(state.delayFrom)) {
                     MessageBox.warning("Delay 'To Time' must be later than 'From Time'.");
                     return;
                 }
             }
 
-            if (oData.showShort) {
-                if (!oData.shortFrom || !oData.shortTo) {
+            if (state.showShort) {
+                if (!state.shortFrom || !state.shortTo) {
                     MessageBox.warning("Please fill in both Short Hours From and To times.");
                     return;
                 }
-                if (toSeconds(oData.shortTo) <= toSeconds(oData.shortFrom)) {
+                if (timeStringToSeconds(state.shortTo) <= timeStringToSeconds(state.shortFrom)) {
                     MessageBox.warning("Short Hours 'To Time' must be later than 'From Time'.");
                     return;
                 }
             }
 
-            const oRecord = this.getView().getModel("detailData").getProperty("/record");
-            if (!oRecord || !oRecord.ZACTION_REF_NO) {
+            const record = this.getView().getModel("detailData").getProperty("/record");
+            if (!record?.ZACTION_REF_NO) {
                 MessageBox.error("No violation record loaded. Cannot submit Regularization.");
                 return;
             }
 
-            // Replace the "Derive corrected punch times" block in onRegularizeSubmit:
+            // ── Derive corrected punch/schedule times by mode ─────────────────
+            let correctedSchIn   = toTimeString(record.ZschTimeIn);
+            let correctedPunchIn  = toTimeString(record.Zpunchintime);
+            let correctedPunchOut = toTimeString(record.Zpunchouttime);
+            let correctedSchOut  = toTimeString(record.ZschTimeOut);
 
-            // ── Derive corrected punch times ────────────────────────────────
-            let sCorrectedPunchIn = toTimeStr(oRecord.Zpunchintime);
-            let sCorrectedPunchOut = toTimeStr(oRecord.Zpunchouttime);
-            let sCorrectedSchIn = toTimeStr(oRecord.ZschTimeIn);
-            let sCorrectedSchOut = toTimeStr(oRecord.ZschTimeOut);
+            if (state.showDelay && !state.showShort) {
+                // DelayFlag = "1": from = ZschTimeIn, to = Zpunchintime
+                correctedSchIn   = state.delayFrom;
+                correctedPunchIn = state.delayTo;
 
-            if (oData.showDelay && !oData.showShort) {
-                // flag=1: timestamp1=ZschTimeIn(from), timestamp2=Zpunchintime(to)
-                sCorrectedSchIn = oData.delayFrom;
-                sCorrectedPunchIn = oData.delayTo;
+            } else if (state.showShort && !state.showDelay) {
+                // DelayFlag = "2": from = Zpunchouttime, to = ZschTimeOut
+                correctedPunchOut = state.shortFrom;
+                correctedSchOut   = state.shortTo;
 
-            } else if (oData.showShort && !oData.showDelay) {
-                // flag=2: timestamp1=Zpunchouttime(from), timestamp2=ZschTimeOut(to)
-                sCorrectedPunchOut = oData.shortFrom;
-                sCorrectedSchOut = oData.shortTo;
-
-            } else if (oData.showDelay && oData.showShort) {
-                // flag=3: FM called twice
-                // call1: ZschTimeIn(from) / Zpunchintime(to)
-                // call2: Zpunchouttime(from) / ZschTimeOut(to)
-                sCorrectedSchIn = oData.delayFrom;
-                sCorrectedPunchIn = oData.delayTo;
-                sCorrectedPunchOut = oData.shortFrom;
-                sCorrectedSchOut = oData.shortTo;
+            } else if (state.showDelay && state.showShort) {
+                // DelayFlag = "3": FM called twice (delay + short)
+                correctedSchIn    = state.delayFrom;
+                correctedPunchIn  = state.delayTo;
+                correctedPunchOut = state.shortFrom;
+                correctedSchOut   = state.shortTo;
             }
 
-            // ── Determine DelayFlag ─────────────────────────────────────────
+            const delayFlag = state.showDelay && state.showShort ? "3"
+                            : state.showDelay                    ? "1"
+                            :                                      "2";
 
-            const sDelayFlag = oData.showDelay && oData.showShort ? "3"
-                : oData.showDelay ? "1"
-                    : "2";
-
-            const oModel = this.getOwnerComponent().getModel() || this.getView().getModel("mainService");
-            if (!oModel) {
+            const oDataModel = this.getOwnerComponent().getModel()
+                            || this.getView().getModel("mainService");
+            if (!oDataModel) {
                 MessageBox.warning("No active OData service connected.");
                 return;
             }
 
-            // ── Build the ITM_STRSet create payload (step 1) ────────────────
-            const oITMPayload = ODataUtils.buildITMPayload(oRecord, {
-                Zaction: "Regularized",
-                Zlinemanagerremarks: sReason,
-                Zpunchintime: ODataUtils.formatTimeForPayload(sCorrectedPunchIn),
-                Zpunchouttime: ODataUtils.formatTimeForPayload(sCorrectedPunchOut),
-                Zstatus: "COMPLETED"
+            const itmPayload = ODataUtils.buildITMPayload(record, {
+                Zaction:             "Regularized",
+                Zlinemanagerremarks: reason,
+                Zpunchintime:        ODataUtils.formatTimeForPayload(correctedPunchIn),
+                Zpunchouttime:       ODataUtils.formatTimeForPayload(correctedPunchOut),
+                Zstatus:             "COMPLETED"
             });
 
             sap.ui.core.BusyIndicator.show(0);
 
             // Step 1: PUT punch_regularizeSet
-            ODataUtils.submitPunchRegularize(oModel, oRecord, {
-                ZschTimeIn: sCorrectedSchIn,
-                Zpunchintime: sCorrectedPunchIn,
-                Zpunchouttime: sCorrectedPunchOut,
-                ZschTimeOut: sCorrectedSchOut,
-                DelayFlag: sDelayFlag
+            ODataUtils.submitPunchRegularize(oDataModel, record, {
+                ZschTimeIn:   correctedSchIn,
+                Zpunchintime: correctedPunchIn,
+                Zpunchouttime:correctedPunchOut,
+                ZschTimeOut:  correctedSchOut,
+                DelayFlag:    delayFlag
             })
-                .then(() => {
-                    // Step 2: CREATE ITM_STRSet
-                    oModel.create("/ITM_STRSet", oITMPayload, {
-                        success: () => {
-                            sap.ui.core.BusyIndicator.hide();
-                            MessageToast.show("Regularization submitted successfully.");
-                            this._closeRegularizeDialog();
-                            this.onNavBack();
-                        },
-                        error: (oErr) => {
-                            sap.ui.core.BusyIndicator.hide();
-                            ODataUtils.handleODataError(oErr, "Error submitting Regularization");
-                        }
-                    });
-                })
-                .catch((oPunchError) => {
-                    sap.ui.core.BusyIndicator.hide();
-                    console.error("Punch regularize PUT failed, ITM_STRSet create skipped:", oPunchError);
+            .then(() => {
+                // Step 2: POST ITM_STRSet
+                oDataModel.create("/ITM_STRSet", itmPayload, {
+                    success: () => {
+                        sap.ui.core.BusyIndicator.hide();
+                        MessageToast.show("Regularization submitted successfully.");
+                        this._closeDialog("regularize");
+                        this.onNavBack();
+                    },
+                    error: (error) => {
+                        sap.ui.core.BusyIndicator.hide();
+                        ODataUtils.handleODataError(error, "Error submitting Regularization");
+                    }
                 });
+            })
+            .catch((punchError) => {
+                sap.ui.core.BusyIndicator.hide();
+                console.error("Punch regularize PUT failed; ITM_STRSet create skipped:", punchError);
+            });
         },
 
         onRegularizeCancel() {
-            this._closeRegularizeDialog();
+            this._closeDialog("regularize");
         },
 
-        _closeRegularizeDialog() {
-            if (this._oRegularizeDialog) {
-                this._oRegularizeDialog.close();
-            }
-        },
-
-        // ── Report To HC ──────────────────────────────────────────────────────
+        // ── Report To HC Dialog ───────────────────────────────────────────────
 
         onReportToHCPress() {
             this.getView().getModel("regularize").setData(
-                Object.assign(this._emptyRegularizeModel(), { reason: "" })
+                Object.assign(this._buildEmptyRegularizeState(), { reason: "" })
             );
-            this._openReportToHCDialog();
-        },
-
-        _openReportToHCDialog() {
-            if (!this._oReportToHCDialog) {
-                Fragment.load({
-                    id: this.getView().getId(),
-                    name: "zhrsanctions.view.fragments.ReportToHCDialog",
-                    controller: this
-                }).then(oDialog => {
-                    this._oReportToHCDialog = oDialog;
-                    this.getView().addDependent(oDialog);
-                    oDialog.setModel(this.getView().getModel("detailData"), "detailData");
-                    oDialog.setModel(this.getView().getModel("regularize"), "regularize");
-                    oDialog.open();
-                });
-            } else {
-                this._oReportToHCDialog.open();
-            }
+            this._openDialog("reportToHC", "zhrsanctions.view.fragments.ReportToHCDialog");
         },
 
         onReportToHCSubmit() {
-            const sReason = (this.getView().getModel("regularize").getProperty("/reason") || "").trim();
-            if (!sReason) {
+            const reason = (this.getView().getModel("regularize").getProperty("/reason") || "").trim();
+            if (!reason) {
                 MessageBox.warning("Please enter a reason before submitting.");
                 return;
             }
-            const oRecord = this.getView().getModel("detailData").getProperty("/record");
-            if (!oRecord || !oRecord.ZACTION_REF_NO) {
+
+            const record = this.getView().getModel("detailData").getProperty("/record");
+            if (!record?.ZACTION_REF_NO) {
                 MessageBox.error("No violation record loaded. Cannot submit Report To HC.");
                 return;
             }
-            const oPayload = ODataUtils.buildITMPayload(oRecord, {
-                Zaction: "Report To HC",
-                Zlinemanagerremarks: sReason
+
+            const payload = ODataUtils.buildITMPayload(record, {
+                Zaction:             "Report To HC",
+                Zlinemanagerremarks: reason
             });
-            this._submitITM(oPayload, "Report to HC submitted successfully.", () => {
-                this._closeReportToHCDialog();
+
+            this._submitToITMSet(payload, "Report to HC submitted successfully.", () => {
+                this._closeDialog("reportToHC");
                 this.onNavBack();
             }, "Error submitting Report to HC");
         },
 
         onReportToHCCancel() {
-            this._closeReportToHCDialog();
-        },
-
-        _closeReportToHCDialog() {
-            if (this._oReportToHCDialog) { this._oReportToHCDialog.close(); }
+            this._closeDialog("reportToHC");
         },
 
         // ── Payroll Deduction ─────────────────────────────────────────────────
 
         onPayrollDeductionPress() {
-            const oRecord = this.getView().getModel("detailData").getProperty("/record");
-            if (!oRecord || !oRecord.ZACTION_REF_NO) {
+            const record = this.getView().getModel("detailData").getProperty("/record");
+            if (!record?.ZACTION_REF_NO) {
                 MessageBox.error("No violation record loaded. Cannot submit Payroll Deduction.");
                 return;
             }
-            const oPayload = ODataUtils.buildITMPayload(oRecord, { Zaction: "Payroll Deduction" });
-            this._submitITM(oPayload, "Payroll Deduction submitted successfully.",
-                () => this.onNavBack(), "Error submitting Payroll Deduction");
+
+            const payload = ODataUtils.buildITMPayload(record, { Zaction: "Payroll Deduction" });
+            this._submitToITMSet(
+                payload,
+                "Payroll Deduction submitted successfully.",
+                () => this.onNavBack(),
+                "Error submitting Payroll Deduction"
+            );
         },
 
-        // ── Shared OData submit (used by Report To HC / Payroll Deduction) ────
+        // ── Generic Dialog Helpers ────────────────────────────────────────────
 
-        _submitITM(oPayload, sSuccessMsg, fnSuccess, sErrorTitle) {
-            const oModel = this.getOwnerComponent().getModel() || this.getView().getModel("mainService");
-            if (!oModel) {
+        /**
+         * Fragment cache keys → fragment names mapping.
+         */
+        _FRAGMENT_MAP: {
+            regularize: "zhrsanctions.view.fragments.RegularizeDialog",
+            reportToHC: "zhrsanctions.view.fragments.ReportToHCDialog"
+        },
+
+        /**
+         * Load (if needed) and open a fragment dialog.
+         * Dialogs are cached on the controller as `_dialog_<key>`.
+         */
+        _openDialog(dialogKey, fragmentName) {
+            const cacheKey = `_dialog_${dialogKey}`;
+
+            if (this[cacheKey]) {
+                this[cacheKey].open();
+                return;
+            }
+
+            Fragment.load({
+                id:         this.getView().getId(),
+                name:       fragmentName,
+                controller: this
+            }).then(dialog => {
+                this[cacheKey] = dialog;
+                this.getView().addDependent(dialog);
+                dialog.setModel(this.getView().getModel("detailData"),   "detailData");
+                dialog.setModel(this.getView().getModel("regularize"),   "regularize");
+                dialog.open();
+            });
+        },
+
+        _closeDialog(dialogKey) {
+            const dialog = this[`_dialog_${dialogKey}`];
+            if (dialog) { dialog.close(); }
+        },
+
+        // ── Shared OData Create ───────────────────────────────────────────────
+
+        /**
+         * POST to ITM_STRSet with a given payload.
+         *
+         * @param {object}   payload       - full ITM_STR entity payload
+         * @param {string}   successMsg    - toast shown on success
+         * @param {Function} onSuccess     - callback invoked after success toast
+         * @param {string}   errorTitle    - MessageBox title on error
+         */
+        _submitToITMSet(payload, successMsg, onSuccess, errorTitle) {
+            const oDataModel = this.getOwnerComponent().getModel()
+                            || this.getView().getModel("mainService");
+
+            if (!oDataModel) {
                 MessageBox.warning(
-                    "No active OData service connected. Payload logged to console:\n" +
-                    JSON.stringify(oPayload, null, 2)
+                    "No active OData service connected. Payload logged to console:\n"
+                    + JSON.stringify(payload, null, 2)
                 );
                 return;
             }
+
             sap.ui.core.BusyIndicator.show(0);
-            oModel.create("/ITM_STRSet", oPayload, {
+            oDataModel.create("/ITM_STRSet", payload, {
                 success: () => {
                     sap.ui.core.BusyIndicator.hide();
-                    MessageToast.show(sSuccessMsg);
-                    fnSuccess();
+                    MessageToast.show(successMsg);
+                    onSuccess();
                 },
-                error: (oErr) => {
+                error: (error) => {
                     sap.ui.core.BusyIndicator.hide();
-                    ODataUtils.handleODataError(oErr, sErrorTitle);
+                    ODataUtils.handleODataError(error, errorTitle);
                 }
             });
         },
 
-        // ── Private formatting helpers ────────────────────────────────────────
+        // ── Private Formatters ────────────────────────────────────────────────
 
         /**
-         * Format an OData DateTime value (e.g. "/Date(...)/" or Date object) to "dd-MM-yyyy".
+         * Format an OData DateTime value → "dd-MM-yyyy" display string.
          */
-        _formatDisplayDate(vDate) {
-            if (!vDate) { return ""; }
-            let d;
-            if (typeof vDate === "string" && vDate.startsWith("/Date(")) {
-                d = new Date(parseInt(vDate.replace(/[^0-9]/g, ""), 10));
-            } else if (vDate instanceof Date) {
-                d = vDate;
+        _formatIncidentDateDisplay(dateValue) {
+            if (!dateValue) { return ""; }
+
+            let date;
+            if (typeof dateValue === "string" && dateValue.startsWith("/Date(")) {
+                date = new Date(parseInt(dateValue.replace(/[^0-9]/g, ""), 10));
+            } else if (dateValue instanceof Date) {
+                date = dateValue;
             } else {
-                return String(vDate);
+                return String(dateValue);
             }
-            if (isNaN(d.getTime())) { return ""; }
-            const dd = String(d.getDate()).padStart(2, "0");
-            const mm = String(d.getMonth() + 1).padStart(2, "0");
-            const yyyy = d.getFullYear();
+
+            if (isNaN(date.getTime())) { return ""; }
+
+            const dd   = String(date.getDate()).padStart(2, "0");
+            const mm   = String(date.getMonth() + 1).padStart(2, "0");
+            const yyyy = date.getFullYear();
             return `${dd}-${mm}-${yyyy}`;
         },
 
         /**
-         * Convert ZdelayHrs / ZshortHrs to a human-readable string.
+         * Convert ZdelayHrs / ZshortHrs to a "H:mm" display string.
          * Backend may send "00:15", a number (minutes), or an Edm.Time object.
          */
-        _formatHrsDisplay(oVal) {
-            if (!oVal && oVal !== 0) { return "0:00"; }
-            // Already a "HH:mm" or "HH:mm:ss" string
-            if (typeof oVal === "string" && oVal.includes(":")) { return oVal.substring(0, 5); }
-            // Numeric minutes
-            if (typeof oVal === "number") {
-                const h = Math.floor(oVal / 60);
-                const m = oVal % 60;
+        _formatHoursDisplay(hoursValue) {
+            if (!hoursValue && hoursValue !== 0) { return "0:00"; }
+
+            if (typeof hoursValue === "string" && hoursValue.includes(":")) {
+                return hoursValue.substring(0, 5);
+            }
+
+            if (typeof hoursValue === "number") {
+                const h = Math.floor(hoursValue / 60);
+                const m = hoursValue % 60;
                 return `${h}:${String(m).padStart(2, "0")}`;
             }
+
             // Edm.Time object
-            const s = toTimeStr(oVal);
-            return s ? s.substring(0, 5) : "0:00";
+            const timeStr = toTimeString(hoursValue);
+            return timeStr ? timeStr.substring(0, 5) : "0:00";
+        },
+
+        /**
+         * Build an empty regularize model state object.
+         */
+        _buildEmptyRegularizeState() {
+            return {
+                dialogTitle:     "Regularize Attendance",
+                scheduledIn:     "",
+                scheduledOut:    "",
+                punchIn:         "",
+                punchOut:        "",
+                delayHrs:        "",
+                shortHrs:        "",
+                incidentDate:    "",
+                hasDelay:        false,
+                hasShort:        false,
+                showModeSelector:false,
+                mode:            "both",
+                showDelay:       false,
+                showShort:       false,
+                delayFrom:       "",
+                delayTo:         "",
+                shortFrom:       "",
+                shortTo:         "",
+                reason:          ""
+            };
         }
     });
 });

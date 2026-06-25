@@ -4,362 +4,332 @@ sap.ui.define([
     "sap/ui/model/json/JSONModel",
     "sap/m/SelectDialog",
     "sap/m/StandardListItem",
-    "zhrsanctions/utils/ODataUtils",
-], function (Filter, FilterOperator, JSONModel, SelectDialog, StandardListItem, ODataUtils) {
+    "zhrsanctions/utils/ODataUtils"
+], (Filter, FilterOperator, JSONModel, SelectDialog, StandardListItem, ODataUtils) => {
     "use strict";
 
-    return {
-        _config: {
-            "inputZempId": {
-                modelName: "mainService",
-                entitySetPath: "EMP_SEARCHHELPSet",
-                fieldName: "ZempId",
-                descriptionName: "ZempName",
-                title: "Employee Search Help",
-                filters: [
-                    new Filter("ZlmIdName", FilterOperator.EQ, ODataUtils.getuserId())
-                ]
-            },
-            "dIpZincType": {
-                modelName: "mainService",
-                entitySetPath: "VIOALATION_SEARCHHELPSet",
-                fieldName: "Zviolationtype",
-                descriptionName: "Zviolationdesc",
-                title: "Violation Search Help",
-                filters: [
-                ]
-            },
+    // ─── Field Configurations ─────────────────────────────────────────────────
+
+    /**
+     * Maps input field IDs to their OData search-help configuration.
+     * Extend here to add more value-help fields.
+     */
+    const FIELD_CONFIG = {
+        inputZempId: {
+            modelName:      "mainService",
+            entitySetPath:  "EMP_SEARCHHELPSet",
+            keyField:       "ZempId",
+            descField:      "ZempName",
+            title:          "Employee Search Help",
+            defaultFilters: [
+                new Filter("ZlmIdName", FilterOperator.EQ, ODataUtils.getCurrentUserId())
+            ]
         },
+        dIpZincType: {
+            modelName:      "mainService",
+            entitySetPath:  "VIOALATION_SEARCHHELPSet",
+            keyField:       "Zviolationtype",
+            descField:      "Zviolationdesc",
+            title:          "Violation Search Help",
+            defaultFilters: []
+        }
+    };
 
-        fetchGLData: function (oController, modelname, entitySetPath, filters) {
-            var oModel = modelname
-                ? oController.getView().getModel(modelname)
-                : oController.getView().getModel();
+    // ─── Internal Helpers ─────────────────────────────────────────────────────
 
-            return new Promise(function (resolve, reject) {
-                // Validate
-                if (!entitySetPath) {
-                    reject("entitySetPath is undefined");
-                    return;
-                }
+    /**
+     * Format a Date or "/Date(ms)/" string → "yyyy-M-dTHH:mm:ss" for OData keys.
+     */
+    function formatDateForODataKey(dateValue) {
+        const date = typeof dateValue === "string" ? new Date(dateValue) : dateValue;
+        const year  = date.getFullYear();
+        const month = date.getMonth() + 1;
+        const day   = date.getDate();
+        return `${year}-${month}-${day}T00:00:00`;
+    }
 
-                // Normalize – MUST begin with '/'
-                if (!entitySetPath.startsWith("/")) {
-                    entitySetPath = "/" + entitySetPath;
-                }
+    /**
+     * Build the dialog cache key used to store it on the controller.
+     */
+    function dialogCacheKey(inputId) {
+        return `_valueHelpDialog_${inputId}`;
+    }
 
-                oModel.read(entitySetPath, {
+    // ─── Module ───────────────────────────────────────────────────────────────
+
+    const SearchHelpHandler = {
+
+        // ── Data Fetching ─────────────────────────────────────────────────────
+
+        /**
+         * Read an OData entity set and return the results as a Promise.
+         *
+         * @param {sap.ui.core.mvc.Controller} controller
+         * @param {string} modelName   - named model on the view (or "" for default)
+         * @param {string} entitySetPath
+         * @param {Array}  filters
+         */
+        fetchEntitySet(controller, modelName, entitySetPath, filters) {
+            const model = modelName
+                ? controller.getView().getModel(modelName)
+                : controller.getView().getModel();
+
+            if (!entitySetPath) {
+                return Promise.reject("entitySetPath is undefined");
+            }
+
+            const normalizedPath = entitySetPath.startsWith("/")
+                ? entitySetPath
+                : `/${entitySetPath}`;
+
+            return new Promise((resolve, reject) => {
+                model.read(normalizedPath, {
                     filters: filters || [],
-                    success: function (oData) {
-                        resolve(oData.results);
-                    },
-                    error: function (oError) {
-                        reject(oError);
-                    }
+                    success: data => resolve(data.results),
+                    error:   err  => reject(err)
                 });
             });
         },
+
+        // ── Repeat-Count Lookup ───────────────────────────────────────────────
+
         /**
-         * After a violation type is selected, look up how many prior ITM_STR
-         * records exist for this employee + category + type, and the earliest
-         * incident date among them. Used to populate Zrepeatcount / ZfirstIncDate.
+         * After a violation type is selected (HC flow), look up prior repeat count
+         * and earliest incident date for this employee + category + type.
+         * Populates regularize>/Zrepeatcount and regularize>/ZfirstIncDate.
          */
-        _updateRepeatInfo: function (oController, sZempId, sCategory, sType, sIncDate) {
-            if (!sZempId || !sCategory || !sType || !sIncDate) {
-                return;
-            }
+        loadRepeatInfo(controller, employeeId, category, incidentType, incidentDate) {
+            if (!employeeId || !category || !incidentType || !incidentDate) { return; }
 
-            var oModel = oController.getView().getModel("mainService");
+            const model          = controller.getView().getModel("mainService");
+            const formattedDate  = formatDateForODataKey(incidentDate);
+            const entityPath     = `/FIST_INC_DATESet(ZempId='${employeeId}',ZincCategory='${category}',ZincType='${incidentType}',ZincDate=datetime'${formattedDate}')`;
 
-            // Format the date for OData
-            var sFormattedDate = this._formatDateForOData(sIncDate);
-
-            // Construct the entity key path
-            var sPath = "/FIST_INC_DATESet(ZempId='" + sZempId + "',ZincCategory='" + sCategory +
-                "',ZincType='" + sType + "',ZincDate=datetime'" + sFormattedDate + "')";
-
-            oModel.read(sPath, {
-                success: function (oData) {
-                    var oRegModel = oController.getView().getModel("regularize");
-                    if (!oRegModel) {
-                        return;
-                    }
-
-                    oRegModel.setProperty("/Zrepeatcount", oData.Zrepeatcount);
-                    oRegModel.setProperty("/ZfirstIncDate", oData.ZfirstInciDate);
-                    oRegModel.setProperty("/isVisible", true);
+            model.read(entityPath, {
+                success: (data) => {
+                    const regularizeModel = controller.getView().getModel("regularize");
+                    if (!regularizeModel) { return; }
+                    regularizeModel.setProperty("/Zrepeatcount",  data.Zrepeatcount);
+                    regularizeModel.setProperty("/ZfirstIncDate", data.ZfirstInciDate);
+                    regularizeModel.setProperty("/isVisible",     true);
                 },
-                error: function (oError) {
-                    console.error("SearchHelpHandler._updateRepeatInfo: failed", oError);
+                error: (error) => {
+                    console.error("SearchHelpHandler.loadRepeatInfo: failed", error);
                 }
             });
         },
 
-        _formatDateForOData: function (vDate) {
-            var dDate = vDate;
+        // ── Dialog Lifecycle ──────────────────────────────────────────────────
 
-            if (typeof vDate === "string") {
-                dDate = new Date(vDate);
-            }
-
-            var iYear = dDate.getFullYear();
-            var iMonth = dDate.getMonth() + 1;
-            var iDay = dDate.getDate();
-
-            return iYear + "-" + iMonth + "-" + iDay + "T00:00:00";
-        }
-        ,
         /**
-         * Create the Value Help Dialog programmatically (internal fragment)
+         * Build and register a SelectDialog for the given input field.
+         * Stored on the controller as `_valueHelpDialog_<inputId>`.
          */
-        _createValueHelpDialog: function (oController, oView, sInputId, oFieldConfig, oInput) {
-            var that = this;
+        _createDialog(controller, view, inputId, fieldConfig, targetInput) {
+            const handler = this;
 
-            // Create SelectDialog programmatically
-            var oDialog = new SelectDialog(oView.getId() + "--" + sInputId + "Dialog", {
-                title: oFieldConfig.title || "Select",
+            const dialog = new SelectDialog(`${view.getId()}--${inputId}Dialog`, {
+                title:              fieldConfig.title || "Select",
                 rememberSelections: false,
-                contentWidth: "50%",
-                contentHeight: "60%",
-                liveChange: function (oEvent) {
-                    that.liveSearchValueHelpDialog(oEvent);
-                },
-                search: function (oEvent) {
-                    that.searchValueHelpDialog(oEvent);
-                },
-                confirm: function (oEvent) {
-                    that.closeValueHelpDialog(oController, oEvent);
-                },
-                cancel: function () {
-                    // Dialog closes automatically on cancel
-                }
+                contentWidth:       "50%",
+                contentHeight:      "60%",
+                liveChange: oEvent => handler.onLiveSearch(oEvent),
+                search:     oEvent => handler.onLiveSearch(oEvent),   // Enter key delegates to live
+                confirm:    oEvent => handler.onConfirm(controller, oEvent),
+                cancel:     ()     => {}                              // dialog closes automatically
             });
 
-            // Add to view
-            oView.addDependent(oDialog);
+            view.addDependent(dialog);
 
-            // Store references
-            oDialog._input = oInput;
-            oDialog._inputId = sInputId;
+            // Private state on the dialog instance
+            dialog._targetInput = targetInput;
+            dialog._inputId     = inputId;
+            dialog._allData     = [];
+            dialog._extraParam  = null;   // holds incidentDate / category depending on field
 
-            // Create a local JSON model for dialog items
-            var oDialogModel = new JSONModel([]);
-            oDialog.setModel(oDialogModel, "valueHelpItems");
+            // Local JSON model to back the dialog list items
+            const dialogModel = new JSONModel([]);
+            dialog.setModel(dialogModel, "valueHelpItems");
 
-            // Bind items to local JSON model
-            oDialog.bindAggregation("items", {
-                path: "valueHelpItems>/",
+            dialog.bindAggregation("items", {
+                path:     "valueHelpItems>/",
                 template: new StandardListItem({
-                    title: `{valueHelpItems>${oFieldConfig.fieldName}}`,
-                    description: `{valueHelpItems>${oFieldConfig.descriptionName}}`
+                    title:       `{valueHelpItems>${fieldConfig.keyField}}`,
+                    description: `{valueHelpItems>${fieldConfig.descField}}`
                 })
             });
 
-            // Add ESC key support
-            oDialog.addEventDelegate({
-                onkeydown: function (oEvent) {
+            // ESC key closes dialog
+            dialog.addEventDelegate({
+                onkeydown: (oEvent) => {
                     if (oEvent.key === "Escape" || oEvent.keyCode === 27) {
-                        oDialog.close();
+                        dialog.close();
                         oEvent.preventDefault();
                     }
                 }
             });
 
-            return oDialog;
+            return dialog;
         },
 
+        // ── Open ──────────────────────────────────────────────────────────────
+
         /**
-         * Open the Value Help Dialog
+         * Open (or create then open) the value-help dialog for the triggering input.
+         *
+         * @param {sap.ui.core.mvc.Controller} controller
+         * @param {sap.ui.base.Event}          triggerEvent   - valueHelpRequest event
+         * @param {Date|string}                extraParam     - incident date (emp search) or
+         *                                                      violation category (type search)
          */
-        /**
- * Open the Value Help Dialog
- */
-        openValueHelpDialog: function (oController, oEvent, oIncidentDate) {
-            var oInput = oEvent.getSource();
-            var sInputId = oInput.getId().split("--").pop();
-            var sInputValue = oInput.getValue();
-            var oView = oController.getView();
-            var oFieldConfig = this._config[sInputId];
+        openValueHelpDialog(controller, triggerEvent, extraParam) {
+            const sourceInput  = triggerEvent.getSource();
+            const inputId      = sourceInput.getId().split("--").pop();
+            const currentValue = sourceInput.getValue();
+            const view         = controller.getView();
+            const fieldConfig  = FIELD_CONFIG[inputId];
 
-            if (!oFieldConfig) {
-                return;
-            }
+            if (!fieldConfig) { return; }
 
-            var that = this;
-
-            // Create dialog if it doesn't exist
-            if (!oController["_valueHelpDialog_" + sInputId]) {
-                oController["_valueHelpDialog_" + sInputId] = this._createValueHelpDialog(
-                    oController,
-                    oView,
-                    sInputId,
-                    oFieldConfig,
-                    oInput
+            const cacheKey = dialogCacheKey(inputId);
+            if (!controller[cacheKey]) {
+                controller[cacheKey] = this._createDialog(
+                    controller, view, inputId, fieldConfig, sourceInput
                 );
             }
 
-            var oDialog = oController["_valueHelpDialog_" + sInputId];
+            const dialog = controller[cacheKey];
 
-            // Clear previous selections
-            if (oDialog.getSelectedItems) {
-                oDialog.getSelectedItems().forEach(function (item) {
-                    oDialog.removeSelectedItem(item);
-                });
+            // Reset state
+            dialog._targetInput = sourceInput;
+            dialog._inputId     = inputId;
+            dialog._extraParam  = extraParam;
+            dialog.getModel("valueHelpItems").setData([]);
+
+            dialog.setBusy(true);
+            dialog.open(currentValue);
+
+            // Build filters: default + context-specific
+            const filters = [...(fieldConfig.defaultFilters || [])];
+
+            if (extraParam && inputId === "inputZempId") {
+                filters.push(new Filter("ZincDate", FilterOperator.EQ, extraParam));
             }
-
-            // Store references
-            oDialog._input = oInput;
-            oDialog._inputId = sInputId;
-            oDialog._incidentDate = oIncidentDate; // Store the incident date
-
-            // Clear previous data
-            var oDialogModel = oDialog.getModel("valueHelpItems");
-            oDialogModel.setData([]);
-
-            // Open dialog with loading state
-            oDialog.setBusy(true);
-            oDialog.open(sInputValue);
-
-            // Prepare filters
-            var aFilters = oFieldConfig.filters ? [...oFieldConfig.filters] : [];
-
-            // **Add incident date filter if provided**
-            if (oIncidentDate && sInputId === "inputZempId") {
-                aFilters.push(new Filter("ZincDate", FilterOperator.EQ, oIncidentDate));
+            if (extraParam && inputId === "dIpZincType") {
+                filters.push(new Filter("Zviolationcategory", FilterOperator.EQ, extraParam));
             }
-            if (oIncidentDate && sInputId === "dIpZincType") {
-                aFilters.push(new Filter("Zviolationcategory", FilterOperator.EQ, oIncidentDate));
-            }
-
-            // Add search text filter
-            if (sInputValue) {
-                aFilters.push(new Filter({
+            if (currentValue) {
+                filters.push(new Filter({
                     filters: [
-                        new Filter(oFieldConfig.fieldName, FilterOperator.Contains, sInputValue),
-                        new Filter(oFieldConfig.descriptionName, FilterOperator.Contains, sInputValue)
+                        new Filter(fieldConfig.keyField,  FilterOperator.Contains, currentValue),
+                        new Filter(fieldConfig.descField, FilterOperator.Contains, currentValue)
                     ],
                     and: false
                 }));
             }
 
-            // Fetch data from API
-            that.fetchGLData(
-                oController,
-                oFieldConfig.modelName,
-                oFieldConfig.entitySetPath,
-                aFilters
-            ).then(function (aData) {
-                // Store all data for client-side filtering
-                oDialog._allData = aData;
-
-                // Set data to dialog model
-                oDialogModel.setData(aData);
-
-                // Remove loading indicator
-                oDialog.setBusy(false);
-            }).catch(function (oError) {
-                oDialog.setBusy(false);
-
-                var sErrorMsg = "Failed to load employee data. Please try again.";
-                if (oError && oError.message) {
-                    sErrorMsg += "\n\nDetails: " + oError.message;
-                }
-                if (oError && oError.statusCode) {
-                    sErrorMsg += "\nStatus: " + oError.statusCode;
-                }
-
-                sap.m.MessageBox.error(sErrorMsg);
-            });
-        },
-
-
-        /**
-         * Handle live search inside the Value Help Dialog (client-side filtering)
-         */
-        liveSearchValueHelpDialog: function (oEvent) {
-            var oDialog = oEvent.getSource();
-            var sValue = oEvent.getParameter("value");
-            var sInputId = oDialog._inputId;
-            var oFieldConfig = this._config[sInputId];
-
-            if (!oFieldConfig || !oDialog._allData) return;
-
-            var aFilteredData = oDialog._allData;
-
-            // Apply client-side filtering
-            if (sValue) {
-                var sValueLower = sValue.toLowerCase();
-                aFilteredData = oDialog._allData.filter(function (item) {
-                    var sName = (item[oFieldConfig.fieldName] || "").toString().toLowerCase();
-                    var sDesc = (item[oFieldConfig.descriptionName] || "").toString().toLowerCase();
-
-                    // Also check SupplierFullName if it exists (for vendor_input)
-                    var sFullName = item.SupplierFullName ? item.SupplierFullName.toString().toLowerCase() : "";
-
-                    return sName.includes(sValueLower) ||
-                        sDesc.includes(sValueLower) ||
-                        sFullName.includes(sValueLower);
+            this.fetchEntitySet(controller, fieldConfig.modelName, fieldConfig.entitySetPath, filters)
+                .then(data => {
+                    dialog._allData = data;
+                    dialog.getModel("valueHelpItems").setData(data);
+                    dialog.setBusy(false);
+                })
+                .catch(error => {
+                    dialog.setBusy(false);
+                    const msg = "Failed to load data. Please try again."
+                        + (error?.message   ? `\n\nDetails: ${error.message}` : "")
+                        + (error?.statusCode ? `\nStatus: ${error.statusCode}` : "");
+                    sap.m.MessageBox.error(msg);
                 });
-            }
-
-            // Update dialog model with filtered data
-            var oDialogModel = oDialog.getModel("valueHelpItems");
-            oDialogModel.setData(aFilteredData);
         },
 
+        // ── Live Search ───────────────────────────────────────────────────────
+
         /**
-         * Handle search inside the Value Help Dialog (triggers on Enter key)
+         * Client-side filter on already-loaded data as the user types.
+         * Handles both liveChange and search (Enter) events.
          */
-        searchValueHelpDialog: function (oEvent) {
-            // Delegate to liveSearch for consistency
-            this.liveSearchValueHelpDialog(oEvent);
+        onLiveSearch(oEvent) {
+            const dialog     = oEvent.getSource();
+            const query      = oEvent.getParameter("value") || "";
+            const inputId    = dialog._inputId;
+            const fieldConfig = FIELD_CONFIG[inputId];
+
+            if (!fieldConfig || !dialog._allData) { return; }
+
+            const queryLower    = query.toLowerCase();
+            const filteredData  = query
+                ? dialog._allData.filter(item => {
+                    const key      = String(item[fieldConfig.keyField]  || "").toLowerCase();
+                    const desc     = String(item[fieldConfig.descField] || "").toLowerCase();
+                    const fullName = String(item.SupplierFullName        || "").toLowerCase();
+                    return key.includes(queryLower) || desc.includes(queryLower) || fullName.includes(queryLower);
+                })
+                : dialog._allData;
+
+            dialog.getModel("valueHelpItems").setData(filteredData);
         },
 
+        // ── Confirm (selection) ───────────────────────────────────────────────
+
         /**
-         * Close the dialog and set the selected value in the input
+         * Handle item selection: set value on source input, update models.
          */
-        closeValueHelpDialog: function (oController, oEvent) {
-            var oSelectedItem = oEvent.getParameter("selectedItem");
-            var oDialog = oEvent.getSource();
+        onConfirm(controller, oEvent) {
+            const selectedItem = oEvent.getParameter("selectedItem");
+            const dialog       = oEvent.getSource();
 
-            if (!oSelectedItem) {
-                return;
+            if (!selectedItem) { return; }
+
+            const inputId     = dialog._inputId;
+            const fieldConfig = FIELD_CONFIG[inputId];
+            if (!dialog._targetInput || !fieldConfig) { return; }
+
+            const context      = selectedItem.getBindingContext("valueHelpItems");
+            const selectedData = context ? context.getObject() : {};
+            const selectedKey  = context
+                ? context.getProperty(fieldConfig.keyField)
+                : selectedItem.getTitle();
+
+            // Write selected key back to the input field
+            dialog._targetInput.setValue(selectedKey);
+            selectedData.initiatedDay = new Date();
+
+            // Persist selected employee/violation data in SHData model
+            const shDataModel = controller.getView().getModel("SHData");
+            if (shDataModel) {
+                shDataModel.setProperty("/selectedEmployeeData", selectedData);
             }
 
-            var sInputId = oDialog._inputId;
-            var oFieldConfig = this._config[sInputId];
+            // HC flow only: load repeat-count history when a violation TYPE is picked
+            const isHCController = controller.getMetadata().getName() ===
+                "zhrsanctions.controller.HCViolationDetailPage";
 
-            if (!oDialog._input || !oFieldConfig) return;
+            if (inputId === "dIpZincType" && isHCController) {
+                const category      = dialog._extraParam; // Zviolationcategory passed as extraParam
+                const detailModel   = controller.getView().getModel("detailData");
+                const employeeId    = detailModel?.getProperty("/record/ZempId");
+                const incidentDate  = detailModel?.getProperty("/record/ZincDate");
 
-            var oContext = oSelectedItem.getBindingContext("valueHelpItems");
-            var sValue = oContext ? oContext.getProperty(oFieldConfig.fieldName) : oSelectedItem.getTitle();
-            var oSelectedData = oContext ? oContext.getObject() : {};
-
-            oDialog._input.setValue(sValue);
-            oSelectedData.initiatedDay = new Date();
-
-            // **Set to SHData model**
-            var oSHDataModel = oController.getView().getModel("SHData");
-            if (oSHDataModel) {
-                oSHDataModel.setProperty("/selectedEmployeeData", oSelectedData);
-            }
-            // ── NEW: when a violation TYPE is picked, look up repeat history ──
-            // Only relevant for the HC "Take Action" flow on HCViolationDetailPage —
-            // FileViolation also reuses the "dIpZincType" input id but has no
-            // detailData/regularize context for this lookup.
-            if (sInputId === "dIpZincType" &&
-                oController.getMetadata().getName() === "zhrsanctions.controller.HCViolationDetailPage") {
-
-                var sCategory = oDialog._incidentDate; // holds Zviolationcategory for this field
-                var oDetailModel = oController.getView().getModel("detailData");
-                var sZempId = oDetailModel ? oDetailModel.getProperty("/record/ZempId") : null;
-                var sZincDate = oDetailModel ? oDetailModel.getProperty("/record/ZincDate") : null;
-
-                this._updateRepeatInfo(oController, sZempId, sCategory, sValue, sZincDate);
+                this.loadRepeatInfo(controller, employeeId, category, selectedKey, incidentDate);
             }
 
-            oDialog._input.fireChange({ value: sValue });
+            dialog._targetInput.fireChange({ value: selectedKey });
+        },
+
+        // ── Legacy API aliases ────────────────────────────────────────────────
+
+        /** @deprecated Use onLiveSearch */
+        liveSearchValueHelpDialog(oEvent) { return this.onLiveSearch(oEvent); },
+        /** @deprecated Use onLiveSearch */
+        searchValueHelpDialog(oEvent)     { return this.onLiveSearch(oEvent); },
+        /** @deprecated Use onConfirm */
+        closeValueHelpDialog(controller, oEvent) { return this.onConfirm(controller, oEvent); },
+        /** @deprecated Use fetchEntitySet */
+        fetchGLData(controller, modelName, entitySetPath, filters) {
+            return this.fetchEntitySet(controller, modelName, entitySetPath, filters);
         }
-
     };
+
+    return SearchHelpHandler;
 });

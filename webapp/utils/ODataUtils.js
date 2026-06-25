@@ -1,477 +1,531 @@
 sap.ui.define([], () => {
     "use strict";
 
+    // ─── Constants ────────────────────────────────────────────────────────────
+
+    const LOCAL_HOSTNAMES   = ["localhost", "127.0.0.1"];
+    const DEV_USER_ID       = "200129";
+    const ALT_USER_FALLBACK = "200130";
+    const DEV_SAP_USER      = "DACO_EAMV04";
+
+    const DATE_FIELDS_IN_PAYLOAD = [
+        "Zhiredate", "ZincDisDate", "ZinitDate", "ZfirstIncDate", "ZincDate",
+        "Zawaitingactionfrom", "Zlastaction", "Zlinemanageractiondate",
+        "Zhcopsactiondate", "Zhcevpactiondate", "Zlegalmemberactiondate",
+        "Zceoactiondate"
+    ];
+
+    const TIME_FIELDS_IN_PAYLOAD = [
+        "ZschTimeIn", "ZschTimeOut", "Zpunchintime", "Zpunchouttime"
+    ];
+
+    // ─── Internal Helpers ─────────────────────────────────────────────────────
+
+    /**
+     * Parse integer; return 0 on NaN. Used for Edm.Byte fields.
+     */
+    function parseByteField(value) {
+        const parsed = parseInt(value, 10);
+        return isNaN(parsed) ? 0 : parsed;
+    }
+
+    /**
+     * Convert total seconds to zero-padded "HH:mm:ss".
+     */
+    function secondsToTimeString(totalSeconds) {
+        if (totalSeconds < 0) { totalSeconds = 0; }
+        const hours   = String(Math.floor(totalSeconds / 3600)).padStart(2, "0");
+        const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, "0");
+        const seconds = String(totalSeconds % 60).padStart(2, "0");
+        return `${hours}:${minutes}:${seconds}`;
+    }
+
+    /**
+     * Zero-pad a number to 2 digits.
+     */
+    function pad2(n) {
+        return String(n).padStart(2, "0");
+    }
+
+    // ─── Public API ───────────────────────────────────────────────────────────
+
     const ODataUtils = {
 
-        // ── Error Handler ─────────────────────────────────────────────────────
+        // ── Error Handling ────────────────────────────────────────────────────
 
-        handleODataError(oErr, sTitle) {
-            let sErrorMessage = sTitle || "An error occurred.";
+        /**
+         * Extract a human-readable error message from an OData error response
+         * and show it in a MessageBox.
+         */
+        handleODataError(error, title) {
+            let message = title || "An error occurred.";
 
             try {
-                if (oErr.responseText) {
-                    const oErrorResponse = JSON.parse(oErr.responseText);
-                    const oError = oErrorResponse.error || oErrorResponse;
+                if (error.responseText) {
+                    const parsed      = JSON.parse(error.responseText);
+                    const errorBody   = parsed.error || parsed;
+                    const innerErrors = errorBody.innererror?.errordetails;
 
-                    if (oError.message && typeof oError.message === "object") {
-                        sErrorMessage = oError.message.value || sErrorMessage;
-                    } else if (oError.message) {
-                        sErrorMessage = oError.message;
+                    if (innerErrors?.[0]?.message) {
+                        message = innerErrors[0].message;
+                    } else if (typeof errorBody.message === "object") {
+                        message = errorBody.message.value || message;
+                    } else if (errorBody.message) {
+                        message = errorBody.message;
                     }
-
-                    if (oError.innererror && oError.innererror.errordetails) {
-                        const oDetail = oError.innererror.errordetails[0];
-                        if (oDetail && oDetail.message) {
-                            sErrorMessage = oDetail.message;
-                        }
-                    }
-                } else if (oErr.message) {
-                    sErrorMessage = oErr.message;
-                } else if (oErr.statusText) {
-                    sErrorMessage = oErr.statusText;
+                } else {
+                    message = error.message || error.statusText || message;
                 }
-            } catch (e) {
-                console.error("ODataUtils: error parsing OData error response:", e);
-                sErrorMessage = oErr.statusText || "An unexpected error occurred.";
+            } catch (parseError) {
+                console.error("ODataUtils: failed to parse error response:", parseError);
+                message = error.statusText || "An unexpected error occurred.";
             }
 
-            console.error("ODataUtils.handleODataError:", oErr);
-            sap.m.MessageBox.error(sErrorMessage, { title: sTitle || "Error" });
+            console.error("ODataUtils.handleODataError:", error);
+            sap.m.MessageBox.error(message, { title: title || "Error" });
         },
 
         // ── OData Read ────────────────────────────────────────────────────────
 
-        fetchOData(oModel, sEntityPath, aFilters) {
-            if (!oModel) {
-                return Promise.reject(new Error("ODataUtils.fetchOData: oModel is null or undefined."));
+        /**
+         * Promise-based wrapper around ODataModel.read().
+         * Resolves with results array; rejects with error object.
+         */
+        fetchOData(oDataModel, entitySetPath, filters) {
+            if (!oDataModel) {
+                return Promise.reject(new Error("ODataUtils.fetchOData: oDataModel is null or undefined."));
             }
-            if (typeof oModel.read !== "function") {
-                return Promise.reject(new Error("ODataUtils.fetchOData: oModel does not have a read() method."));
+            if (typeof oDataModel.read !== "function") {
+                return Promise.reject(new Error("ODataUtils.fetchOData: oDataModel has no read() method."));
             }
 
             return new Promise((resolve, reject) => {
-                oModel.read(sEntityPath, {
-                    filters: aFilters || [],
-                    success: (oData) => {
-                        if (!oData || !oData.results) {
-                            reject(new Error("ODataUtils.fetchOData: No results returned from " + sEntityPath));
+                oDataModel.read(entitySetPath, {
+                    filters: filters || [],
+                    success: (data) => {
+                        if (!data?.results) {
+                            reject(new Error(`ODataUtils.fetchOData: no results from ${entitySetPath}`));
                         } else {
-                            resolve(oData.results);
+                            resolve(data.results);
                         }
                     },
-                    error: (oError) => {
+                    error: (error) => {
                         console.error("ODataUtils.fetchOData error:", {
-                            entityPath: sEntityPath,
-                            statusCode: oError.statusCode,
-                            statusText: oError.statusText,
-                            message: oError.message
+                            entitySetPath,
+                            statusCode: error.statusCode,
+                            statusText: error.statusText,
+                            message:    error.message
                         });
-                        reject(oError);
+                        reject(error);
                     }
                 });
             });
         },
 
-        // ── Edm.Time Formatter ────────────────────────────────────────────────
-        //
-        // Accepts: { ms: 28800000 } | 28800000 | "08:00:00" | null | undefined
-        // Returns: "HH:mm:ss" string
+        // ── Edm.Time Formatting ───────────────────────────────────────────────
 
-        formatEdmTime(oTime) {
-            if (oTime === null || oTime === undefined) {
-                return "";
-            }
-            if (typeof oTime === "string") {
-                return oTime;
-            }
+        /**
+         * Convert OData Edm.Time to "HH:mm:ss" display string.
+         * Accepts: { ms: number } | number (ms) | "HH:mm:ss" string | null | undefined
+         */
+        formatEdmTime(edmTime) {
+            if (edmTime === null || edmTime === undefined) { return ""; }
+            if (typeof edmTime === "string")              { return edmTime; }
 
-            let iMs;
-            if (typeof oTime === "object" && oTime.ms !== undefined) {
-                iMs = oTime.ms;
-            } else if (typeof oTime === "number") {
-                iMs = oTime;
+            let milliseconds;
+            if (typeof edmTime === "object" && edmTime.ms !== undefined) {
+                milliseconds = edmTime.ms;
+            } else if (typeof edmTime === "number") {
+                milliseconds = edmTime;
             } else {
                 return "";
             }
 
-            const iSeconds = Math.floor(iMs / 1000);
-            const hh = String(Math.floor(iSeconds / 3600)).padStart(2, "0");
-            const mm = String(Math.floor((iSeconds % 3600) / 60)).padStart(2, "0");
-            const ss = String(iSeconds % 60).padStart(2, "0");
-
-            return `${hh}:${mm}:${ss}`;
+            const totalSeconds = Math.floor(milliseconds / 1000);
+            return secondsToTimeString(totalSeconds);
         },
 
-        // ── Get User Id ──────────────────────────────────────────────────
+        // ── User Identity ─────────────────────────────────────────────────────
 
-        getuserId() {
-            if (["localhost", "127.0.0.1"].includes(window.location.hostname)) {
-                return "200129";
+        /**
+         * Return the current SAP user ID.
+         * Falls back to a dev ID when running locally.
+         */
+        getCurrentUserId() {
+            if (LOCAL_HOSTNAMES.includes(window.location.hostname)) {
+                return DEV_USER_ID;
             }
-
-            const sId = sap.ushell.Container.getService("UserInfo").getUser().getId();
-            return sId;
+            const sapUserId = sap.ushell.Container.getService("UserInfo").getUser().getId();
+            return sapUserId;
         },
 
-        // ── Edm.Time Builder ──────────────────────────────────────────────────
-        //
-        // Converts "HH:mm:ss" or "HH:mm" string → { ms, __edmType } for OData payload.
+        /**
+         * @deprecated Use getCurrentUserId() instead.
+         */
+        getuserId() {
+            return this.getCurrentUserId();
+        },
 
-        formatTimeForPayload(sTimeVal) {
-            if (!sTimeVal) {
+        // ── Payload Formatters ────────────────────────────────────────────────
+
+        /**
+         * Convert "HH:mm:ss" or "HH:mm" → { ms, __edmType } for OData Edm.Time fields.
+         * Returns null for empty input.
+         */
+        formatTimeForPayload(timeString) {
+            if (!timeString) { return null; }
+
+            const parts = timeString.split(":");
+            if (parts.length < 2) { return null; }
+
+            const hours   = parseInt(parts[0], 10);
+            const minutes = parseInt(parts[1], 10);
+            const seconds = parts[2] ? parseInt(parts[2], 10) : 0;
+            const ms      = ((hours * 60 + minutes) * 60 + seconds) * 1000;
+
+            return { ms, __edmType: "Edm.Time" };
+        },
+
+        /**
+         * Convert Date | ISO string | "/Date(ms)/" → "/Date(ms)/" string for OData payload.
+         * Returns null for empty / invalid input.
+         */
+        formatDateTimeForPayload(dateValue) {
+            if (!dateValue && dateValue !== 0) { return null; }
+            if (typeof dateValue === "string" && dateValue.startsWith("/Date(")) { return dateValue; }
+
+            let date;
+            if (dateValue instanceof Date) {
+                date = dateValue;
+            } else if (typeof dateValue === "string") {
+                date = new Date(dateValue);
+            } else {
                 return null;
             }
-            const aParts = sTimeVal.split(":");
-            if (aParts.length >= 2) {
-                const iHours = parseInt(aParts[0], 10);
-                const iMinutes = parseInt(aParts[1], 10);
-                const iSeconds = aParts[2] ? parseInt(aParts[2], 10) : 0;
-                const iMs = ((iHours * 60 + iMinutes) * 60 + iSeconds) * 1000;
-                return { ms: iMs, __edmType: "Edm.Time" };
+
+            return isNaN(date.getTime()) ? null : `/Date(${date.getTime()})/`;
+        },
+
+        /**
+         * Convert Edm.Time value → ISO 8601 duration "P00DT08H30M00S" for PUT payloads.
+         * Accepts: { ms } | number (ms) | "HH:mm:ss" string | ISO duration string | null
+         */
+        formatTimeDurationForPayload(timeValue) {
+            if (timeValue === null || timeValue === undefined || timeValue === "") { return null; }
+
+            let milliseconds;
+
+            if (typeof timeValue === "object" && timeValue.ms !== undefined) {
+                milliseconds = timeValue.ms;
+            } else if (typeof timeValue === "number") {
+                milliseconds = timeValue;
+            } else if (typeof timeValue === "string") {
+                // Already a duration string like "P00DT08H30M00S"
+                if (/^P\d+DT\d+H\d+M\d+S$/.test(timeValue)) { return timeValue; }
+
+                const parts = timeValue.split(":");
+                if (parts.length < 2) { return null; }
+
+                const hours   = parseInt(parts[0], 10) || 0;
+                const minutes = parseInt(parts[1], 10) || 0;
+                const seconds = parts[2] ? (parseInt(parts[2], 10) || 0) : 0;
+                milliseconds  = ((hours * 60 + minutes) * 60 + seconds) * 1000;
+            } else {
+                return null;
             }
-            return null;
+
+            const totalSeconds = Math.floor(milliseconds / 1000);
+            const days    = Math.floor(totalSeconds / 86400);
+            const hours   = Math.floor((totalSeconds % 86400) / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = totalSeconds % 60;
+
+            return `P${pad2(days)}DT${pad2(hours)}H${pad2(minutes)}M${pad2(seconds)}S`;
         },
 
-        // ── Byte/Int Parser ───────────────────────────────────────────────────
-        //
-        // Safe parseInt for Edm.Byte fields — returns 0 on NaN.
+        /**
+         * Format DateTime for use inside an OData entity key string.
+         * Returns "yyyy-MM-ddTHH:mm:ss" or null.
+         */
+        formatDateTimeForEntityKey(dateValue) {
+            if (!dateValue && dateValue !== 0) { return null; }
 
-        parseByte(val) {
-            const iVal = parseInt(val, 10);
-            return isNaN(iVal) ? 0 : iVal;
+            let date;
+            if (dateValue instanceof Date) {
+                date = dateValue;
+            } else if (typeof dateValue === "string" && dateValue.startsWith("/Date(")) {
+                date = new Date(parseInt(dateValue.replace(/[^0-9]/g, ""), 10));
+            } else if (typeof dateValue === "string") {
+                date = new Date(dateValue);
+            } else {
+                return null;
+            }
+
+            if (isNaN(date.getTime())) { return null; }
+
+            return [
+                date.getFullYear(),
+                pad2(date.getMonth() + 1),
+                pad2(date.getDate())
+            ].join("-") + "T" + [
+                pad2(date.getHours()),
+                pad2(date.getMinutes()),
+                pad2(date.getSeconds())
+            ].join(":");
         },
 
-        // ── ITM_STR Payload Builder ───────────────────────────────────────────
-        //
-        // Builds full ITM_STRSet payload from a detailData record.
-        // oOverrides: any fields to override (e.g. Zaction, Zremark, Zpunchintime).
+        /**
+         * @deprecated Use formatDateTimeForEntityKey() instead.
+         */
+        formatDateTimeForKey(dateValue) {
+            return this.formatDateTimeForEntityKey(dateValue);
+        },
 
-        buildITMPayload(oRecord, oOverrides) {
-            const p = this.parseByte.bind(this);
+        // ── Byte Field Parser ─────────────────────────────────────────────────
 
-            const oBase = {
-                // Employee
-                ZempId: oRecord.ZempId || "",
-                ZempName: oRecord.ZempName || "",
-                ZempType: oRecord.ZempType || "",
-                ZempTypeDesc: oRecord.ZempTypeDesc || "",
-                ZempClass: oRecord.ZempClass || "",
-                ZempClassDesc: oRecord.ZempClassDesc || "",
-                Zcompany: oRecord.Zcompany || "",
-                Znationality: oRecord.Znationality || "",
-                Zhiredate: oRecord.ZhireDate || null,
-                Zpaygrade: oRecord.ZpayGrade || null,
-                Zposition: oRecord.Zposition || "",
-                Zjobtitle: oRecord.ZjobTitle || "",
-                Zjobclassification: oRecord.Zjobclassification || "",
-                Zlocation: oRecord.Zlocation || "",
-                Zlocationgroup: oRecord.ZlocGroup || "",
-                Zworkschedule: oRecord.Zworkschedule || "",
-                ZlatestNode: oRecord.ZlatestNode || "",
-                ZstdWeekHrs: p(oRecord.ZstdWeekHrs),
-                ZwrkDyWeek: p(oRecord.ZwrkDyWeek),
+        /**
+         * Safe parseInt for Edm.Byte fields — returns 0 on NaN.
+         */
+        parseByte: parseByteField,
 
-                // Indicators
-                Zn0: p(oRecord.Zn0),
-                Zn1: p(oRecord.Zn1),
-                Zn2: p(oRecord.Zn2),
-                Zn3: p(oRecord.Zn3),
-                Zn4: p(oRecord.Zn4),
-                Zn5: p(oRecord.Zn5),
-                Zn6: p(oRecord.Zn6),
-                Zn7: p(oRecord.Zn7),
+        // ── Payload Builders ──────────────────────────────────────────────────
 
-                // Violation
-                ZactionRefNo: oRecord.ZACTION_REF_NO || "",
-                ZincDate: oRecord.ZincDate || null,
-                ZincCategory: oRecord.ZincCategory || "",
-                ZincType: oRecord.ZincType || "",
-                Zaction: oRecord.Zaction || "",
-                Zstatus: oRecord.Status || "",
-                Zsanction: oRecord.Zsanction || "",
-                Zremark: oRecord.Zremark || "",
+        /**
+         * Build a full ITM_STRSet POST/PUT payload from a violation record.
+         * @param {object} violationRecord - record from detailData model
+         * @param {object} overrides       - fields to override (e.g. Zaction, Zremark)
+         */
+        buildITMPayload(violationRecord, overrides) {
+            const p = parseByteField;
+            const r = violationRecord;
 
-                // Timeline
-                ZincDisDate: oRecord.ZincDisDate || null,
-                ZinitatedBy: oRecord.ZinitatedBy || "",
-                ZinitDate: oRecord.ZinitDate || null,
-                ZfirstIncDate: oRecord.ZfirstIncDate || null,
-                Zawaitingactionfrom: oRecord.Zawaitingactionfrom || null,
-                Zlastaction: oRecord.Zlastaction || null,
+            const basePayload = {
+                // ── Employee ──────────────────────────────────────────────
+                ZempId:          r.ZempId          || "",
+                ZempName:        r.ZempName        || "",
+                ZempType:        r.ZempType        || "",
+                ZempTypeDesc:    r.ZempTypeDesc    || "",
+                ZempClass:       r.ZempClass       || "",
+                ZempClassDesc:   r.ZempClassDesc   || "",
+                Zcompany:        r.Zcompany        || "",
+                Znationality:    r.Znationality    || "",
+                Zhiredate:       r.ZhireDate       || null,
+                Zpaygrade:       r.ZpayGrade       || null,
+                Zposition:       r.Zposition       || "",
+                Zjobtitle:       r.ZjobTitle       || "",
+                Zjobclassification: r.Zjobclassification || "",
+                Zlocation:       r.Zlocation       || "",
+                Zlocationgroup:  r.ZlocGroup       || "",
+                Zworkschedule:   r.Zworkschedule   || "",
+                ZlatestNode:     r.ZlatestNode     || "",
+                ZstdWeekHrs:     p(r.ZstdWeekHrs),
+                ZwrkDyWeek:      p(r.ZwrkDyWeek),
 
-                // Times
-                ZschTimeIn: oRecord.ZschTimeIn || null,
-                ZschTimeOut: oRecord.ZschTimeOut || null,
-                Zpunchintime: oRecord.Zpunchintime || null,
-                Zpunchouttime: oRecord.Zpunchouttime || null,
-                ZdelayHrs: p(oRecord.ZdelayHrs),
-                ZshortHrs: p(oRecord.ZshortHrs),
-                Zrepeatcount: p(oRecord.Zrepeatcount),
-                Zsysyrepeatcount: p(oRecord.Zsysyrepeatcount),
+                // ── Org Indicators ────────────────────────────────────────
+                Zn0: p(r.Zn0),
+                Zn1: p(r.Zn1),
+                Zn2: p(r.Zn2),
+                Zn3: p(r.Zn3),
+                Zn4: p(r.Zn4),
+                Zn5: p(r.Zn5),
+                Zn6: p(r.Zn6),
+                Zn7: p(r.Zn7),
 
-                // Workflow
-                ZlmIdName: oRecord.ZlmIdName || "",
-                Zlinemanageraction: oRecord.Zlinemanageraction || "",
-                Zlinemanageractiondate: oRecord.ZlmIdActionDate || null,
-                Zlinemanagerremarks: oRecord.Zlinemanagerremarks || "",
+                // ── Violation ─────────────────────────────────────────────
+                ZactionRefNo: r.ZACTION_REF_NO || "",
+                ZincDate:     r.ZincDate       || null,
+                ZincCategory: r.ZincCategory   || "",
+                ZincType:     r.ZincType       || "",
+                Zaction:      r.Zaction        || "",
+                Zstatus:      r.Status         || "",
+                Zsanction:    r.Zsanction      || "",
+                Zremark:      r.Zremark        || "",
 
-                Zhcopsname: oRecord.Zhcopsname || "",
-                Zhcopsaction: oRecord.Zhcopsaction || "",
-                Zhcopsactiondate: oRecord.Zhcopsactiondate || null,
-                Zhcopsremark: oRecord.Zhcopsremark || "",
+                // ── Timeline ──────────────────────────────────────────────
+                ZincDisDate:       r.ZincDisDate       || null,
+                ZinitatedBy:       r.ZinitatedBy       || "",
+                ZinitDate:         r.ZinitDate         || null,
+                ZfirstIncDate:     r.ZfirstIncDate     || null,
+                Zawaitingactionfrom: r.Zawaitingactionfrom || null,
+                Zlastaction:       r.Zlastaction       || null,
 
-                Zhcevpname: oRecord.Zhcevpname || "",
-                Zhcevpaction: oRecord.Zhcevpaction || "",
-                Zhcevpactiondate: oRecord.Zhcevpactiondate || null,
-                Zhcevpremark: oRecord.Zhcevpremark || "",
+                // ── Shift Times ───────────────────────────────────────────
+                ZschTimeIn:   r.ZschTimeIn   || null,
+                ZschTimeOut:  r.ZschTimeOut  || null,
+                Zpunchintime: r.Zpunchintime || null,
+                Zpunchouttime:r.Zpunchouttime|| null,
+                ZdelayHrs:    p(r.ZdelayHrs),
+                ZshortHrs:    p(r.ZshortHrs),
+                Zrepeatcount: p(r.Zrepeatcount),
+                Zsysyrepeatcount: p(r.Zsysyrepeatcount),
 
-                Zlegalmembername: oRecord.Zlegalmembername || "",
-                Zlegalmemberaction: oRecord.Zlegalmemberaction || "",
-                Zlegalmemberactiondate: oRecord.Zlegalmemberactiondate || null,
-                Zlegalremark: oRecord.Zlegalremark || "",
+                // ── Workflow: Line Manager ─────────────────────────────────
+                ZlmIdName:            r.ZlmIdName            || "",
+                Zlinemanageraction:   r.Zlinemanageraction   || "",
+                Zlinemanageractiondate: r.ZlmIdActionDate    || null,
+                Zlinemanagerremarks:  r.Zlinemanagerremarks  || "",
 
-                Zceoname: oRecord.Zceoname || "",
-                Zceoaction: oRecord.Zceoaction || "",
-                Zceoactiondate: oRecord.Zceoactiondate || null,
-                Zceoactionremark: oRecord.Zceoactionremark || ""
+                // ── Workflow: HC Ops ──────────────────────────────────────
+                Zhcopsname:     r.Zhcopsname     || "",
+                Zhcopsaction:   r.Zhcopsaction   || "",
+                Zhcopsactiondate: r.Zhcopsactiondate || null,
+                Zhcopsremark:   r.Zhcopsremark   || "",
+
+                // ── Workflow: HC EVP ──────────────────────────────────────
+                Zhcevpname:     r.Zhcevpname     || "",
+                Zhcevpaction:   r.Zhcevpaction   || "",
+                Zhcevpactiondate: r.Zhcevpactiondate || null,
+                Zhcevpremark:   r.Zhcevpremark   || "",
+
+                // ── Workflow: Legal ───────────────────────────────────────
+                Zlegalmembername:   r.Zlegalmembername   || "",
+                Zlegalmemberaction: r.Zlegalmemberaction || "",
+                Zlegalmemberactiondate: r.Zlegalmemberactiondate || null,
+                Zlegalremark:       r.Zlegalremark       || "",
+
+                // ── Workflow: CEO ─────────────────────────────────────────
+                Zceoname:       r.Zceoname       || "",
+                Zceoaction:     r.Zceoaction     || "",
+                Zceoactiondate: r.Zceoactiondate || null,
+                Zceoactionremark: r.Zceoactionremark || ""
             };
 
-            return Object.assign(oBase, oOverrides || {});
+            return Object.assign(basePayload, overrides || {});
         },
 
-        // ── Submit Take Action ────────────────────────────────────────────────
-        //
-        // Creates a new ITM_STRSet entry with action details.
-        // oModel: OData model
-        // oRecord: detail page record (from detailData model)
-        // oOverrides: action input fields { ZincCategory, ZincType, reason, etc }
-
-        submitTakeAction(oModel, oRecord, oOverrides) {
-            if (!oModel) {
-                return Promise.reject(new Error("ODataUtils.submitTakeAction: oModel is null or undefined."));
-            }
-
-            if (!oRecord || !oRecord.ZempId) {
-                return Promise.reject(new Error("ODataUtils.submitTakeAction: oRecord or ZempId is missing."));
-            }
-
-            if (!oRecord.ZactionRefNo) {
-                return Promise.reject(new Error("ODataUtils.submitTakeAction: ZactionRefNo is required for update."));
-            }
-
-            // Build the payload with action details
-            const oPayload = this.buildITMPayload(oRecord, oOverrides || {});
-            var finalPayload = this._formatPayloadForOData(oPayload)
-            // Construct the entity path with the key (typically ZactionRefNo)
-            const sEntityPath = "/ITM_STRSet(ZactionRefNo='" + oRecord.ZactionRefNo + "',ZempId='200040',ZincDate=datetime'2026-05-17T00:00:00')";
-            // const sEntityPath = "/ITM_STRSet(ZactionRefNo='"+ oRecord.ZactionRefNo +"')";
-            debugger
-            return new Promise((resolve, reject) => {
-                oModel.update(sEntityPath, finalPayload, {
-                    success: (oResponse) => {
-                        console.log("ODataUtils.submitTakeAction: Success", oResponse);
-                        resolve(oResponse);
-                    },
-                    error: (oError) => {
-                        console.error("ODataUtils.submitTakeAction: Error", oError);
-                        this.handleODataError(oError, "Failed to submit action");
-                        reject(oError);
-                    }
-                });
-            });
-        },
-        _formatPayloadForOData(oPayload) {
-            const oFormatted = { ...oPayload };
-
-            const aDateFields = [
-                "Zhiredate", "ZincDisDate", "ZinitDate", "ZfirstIncDate", "ZincDate",
-                "Zawaitingactionfrom", "Zlastaction", "Zlinemanageractiondate",
-                "Zhcopsactiondate", "Zhcevpactiondate", "Zlegalmemberactiondate",
-                "Zceoactiondate"
-            ];
-            aDateFields.forEach(sField => {
-                oFormatted[sField] = this.formatDateTimeForPayload(oFormatted[sField]);
-            });
-
-            const aTimeFields = [
-                "ZschTimeIn", "ZschTimeOut", "Zpunchintime", "Zpunchouttime"
-            ];
-            aTimeFields.forEach(sField => {
-                oFormatted[sField] = this.formatTimeDurationForPayload(oFormatted[sField]);
-            });
-
-            return oFormatted;
-        },
-        // ── Edm.DateTime → "/Date(ms)/" ─────────────────────────────────────────
-        //
-        // Accepts: Date | ISO string ("2026-06-16T00:00:00.000Z") | "/Date(ms)/" | null
-        // Returns: "/Date(ms)/" string, or null
-
-        formatDateTimeForPayload(vDate) {
-            if (vDate === null || vDate === undefined || vDate === "") {
-                return null;
-            }
-
-            // Already in /Date(ms)/ form
-            if (typeof vDate === "string" && vDate.startsWith("/Date(")) {
-                return vDate;
-            }
-
-            let dDate;
-            if (vDate instanceof Date) {
-                dDate = vDate;
-            } else if (typeof vDate === "string") {
-                dDate = new Date(vDate);
-            } else {
-                return null;
-            }
-
-            if (isNaN(dDate.getTime())) {
-                return null;
-            }
-
-            return `/Date(${dDate.getTime()})/`;
-        },
-
-        // ── Edm.Time → "PnDTnHnMnS" ──────────────────────────────────────────────
-        //
-        // Accepts: { ms, __edmType } | number (ms) | "HH:mm:ss" string | null
-        // Returns: ISO 8601 duration string e.g. "P00DT08H30M00S", or null
-
-        formatTimeDurationForPayload(vTime) {
-            if (vTime === null || vTime === undefined || vTime === "") {
-                return null;
-            }
-
-            let iMs;
-
-            if (typeof vTime === "object" && vTime.ms !== undefined) {
-                iMs = vTime.ms;
-            } else if (typeof vTime === "number") {
-                iMs = vTime;
-            } else if (typeof vTime === "string") {
-                // Already a duration string
-                if (/^P\d+DT\d+H\d+M\d+S$/.test(vTime)) {
-                    return vTime;
-                }
-                // "HH:mm:ss" or "HH:mm"
-                const aParts = vTime.split(":");
-                if (aParts.length < 2) {
-                    return null;
-                }
-                const iHours = parseInt(aParts[0], 10) || 0;
-                const iMinutes = parseInt(aParts[1], 10) || 0;
-                const iSeconds = aParts[2] ? (parseInt(aParts[2], 10) || 0) : 0;
-                iMs = ((iHours * 60 + iMinutes) * 60 + iSeconds) * 1000;
-            } else {
-                return null;
-            }
-
-            const iTotalSeconds = Math.floor(iMs / 1000);
-            const iDays = Math.floor(iTotalSeconds / 86400);
-            const iHours = Math.floor((iTotalSeconds % 86400) / 3600);
-            const iMinutes = Math.floor((iTotalSeconds % 3600) / 60);
-            const iSeconds = iTotalSeconds % 60;
-
-            const pad = n => String(n).padStart(2, "0");
-            return `P${pad(iDays)}DT${pad(iHours)}H${pad(iMinutes)}M${pad(iSeconds)}S`;
-        },
-        // ── Punch Regularize Payload Builder ────────────────────────────────────
-        //
-        // Builds the body for a PUT to /punch_regularizeSet(...).
-        // oRecord: the violation record (detailData>/record)
-        // oOverrides: { Zpunchintime, Zpunchouttime, DelayFlag } in UI form
-        //             (Zpunchintime/out as "HH:mm:ss" strings; DelayFlag as "1"/"0")
-
-
-        buildPunchRegularizePayload(oRecord, oOverrides) {
-            const o = oOverrides || {};
+        /**
+         * Build payload for PUT to /punch_regularizeSet(...).
+         * All time fields converted to ISO 8601 duration strings.
+         */
+        buildPunchRegularizePayload(violationRecord, overrides) {
+            const o = overrides || {};
+            const r = violationRecord;
 
             return {
-                ZempId: oRecord.ZempId || "",
-                ZactionRefNo: oRecord.ZACTION_REF_NO || oRecord.ZactionRefNo || "",
-                ZincDate: this.formatDateTimeForPayload(oRecord.ZincDate),
-                ZschTimeIn: this.formatTimeDurationForPayload(o.ZschTimeIn || oRecord.ZschTimeIn),
-                Zpunchintime: this.formatTimeDurationForPayload(o.Zpunchintime || oRecord.Zpunchintime),
-                Zpunchouttime: this.formatTimeDurationForPayload(o.Zpunchouttime || oRecord.Zpunchouttime),
-                ZschTimeOut: this.formatTimeDurationForPayload(o.ZschTimeOut || oRecord.ZschTimeOut),
-                DelayFlag: o.DelayFlag !== undefined && o.DelayFlag !== null ? String(o.DelayFlag) : "0"
+                ZempId:       r.ZempId || "",
+                ZactionRefNo: r.ZACTION_REF_NO || r.ZactionRefNo || "",
+                ZincDate:     this.formatDateTimeForPayload(r.ZincDate),
+                ZschTimeIn:   this.formatTimeDurationForPayload(o.ZschTimeIn   || r.ZschTimeIn),
+                Zpunchintime: this.formatTimeDurationForPayload(o.Zpunchintime  || r.Zpunchintime),
+                Zpunchouttime:this.formatTimeDurationForPayload(o.Zpunchouttime || r.Zpunchouttime),
+                ZschTimeOut:  this.formatTimeDurationForPayload(o.ZschTimeOut   || r.ZschTimeOut),
+                DelayFlag:    o.DelayFlag !== undefined && o.DelayFlag !== null
+                                  ? String(o.DelayFlag)
+                                  : "0"
             };
         },
 
-        formatDateTimeForKey(vDate) {
-            if (vDate === null || vDate === undefined || vDate === "") {
-                return null;
-            }
-            let dDate;
-            if (vDate instanceof Date) {
-                dDate = vDate;
-            } else if (typeof vDate === "string" && vDate.startsWith("/Date(")) {
-                const iMs = parseInt(vDate.replace(/[^0-9]/g, ""), 10);
-                dDate = new Date(iMs);
-            } else if (typeof vDate === "string") {
-                dDate = new Date(vDate);
-            } else {
-                return null;
-            }
-            if (isNaN(dDate.getTime())) {
-                return null;
-            }
-            const yyyy = dDate.getFullYear();
-            const mm = String(dDate.getMonth() + 1).padStart(2, "0");
-            const dd = String(dDate.getDate()).padStart(2, "0");
-            const hh = String(dDate.getHours()).padStart(2, "0");
-            const mi = String(dDate.getMinutes()).padStart(2, "0");
-            const ss = String(dDate.getSeconds()).padStart(2, "0");
-            return `${yyyy}-${mm}-${dd}T${hh}:${mi}:${ss}`;
+        /**
+         * Convert all date and time fields in a payload to OData-safe formats.
+         * Used before PUT operations.
+         */
+        normalizePayloadForOData(payload) {
+            const normalized = { ...payload };
+
+            DATE_FIELDS_IN_PAYLOAD.forEach(field => {
+                normalized[field] = this.formatDateTimeForPayload(normalized[field]);
+            });
+
+            TIME_FIELDS_IN_PAYLOAD.forEach(field => {
+                normalized[field] = this.formatTimeDurationForPayload(normalized[field]);
+            });
+
+            return normalized;
         },
-        // ── Punch Regularize Submit ──────────────────────────────────────────────
-        //
-        // PUTs to /punch_regularizeSet(ZempId='..',ZactionRefNo='..',ZincDate=datetime'..',DelayFlag='..')
-        // oModel: OData model
-        // oRecord: detail page record (from detailData model)
-        // oOverrides: { Zpunchintime, Zpunchouttime, DelayFlag } in UI form
 
-        submitPunchRegularize(oModel, oRecord, oOverrides) {
-            if (!oModel) {
-                return Promise.reject(new Error("ODataUtils.submitPunchRegularize: oModel is null or undefined."));
+        /**
+         * @deprecated Use normalizePayloadForOData() instead.
+         */
+        _formatPayloadForOData(payload) {
+            return this.normalizePayloadForOData(payload);
+        },
+
+        // ── OData Write Operations ────────────────────────────────────────────
+
+        /**
+         * PUT to ITM_STRSet to record an HC action (Take Action / Take No Action).
+         * Constructs the entity key from ZactionRefNo, ZempId, and ZincDate.
+         */
+        submitHCAction(oDataModel, violationRecord, overrides) {
+            if (!oDataModel) {
+                return Promise.reject(new Error("ODataUtils.submitHCAction: oDataModel is null."));
             }
-            if (!oRecord || !oRecord.ZempId) {
-                return Promise.reject(new Error("ODataUtils.submitPunchRegularize: oRecord or ZempId is missing."));
+            if (!violationRecord?.ZempId) {
+                return Promise.reject(new Error("ODataUtils.submitHCAction: violationRecord or ZempId missing."));
+            }
+            if (!violationRecord.ZactionRefNo) {
+                return Promise.reject(new Error("ODataUtils.submitHCAction: ZactionRefNo required."));
             }
 
-            const sActionRefNo = oRecord.ZACTION_REF_NO || oRecord.ZactionRefNo;
-            if (!sActionRefNo) {
-                return Promise.reject(new Error("ODataUtils.submitPunchRegularize: ZactionRefNo is required."));
-            }
+            const payload       = this.buildITMPayload(violationRecord, overrides || {});
+            const normalPayload = this.normalizePayloadForOData(payload);
 
-            const oPayload = this.buildPunchRegularizePayload(oRecord, oOverrides || {});
+            const incDateKey  = this.formatDateTimeForEntityKey(violationRecord.ZincDate);
+            const entityPath  = `/ITM_STRSet(ZactionRefNo='${violationRecord.ZactionRefNo}',ZempId='${violationRecord.ZempId}',ZincDate=datetime'${incDateKey}')`;
 
-            const sIncDateKey = this.formatDateTimeForKey(oRecord.ZincDate);
-            const sDelayFlag = oPayload.DelayFlag;
+            oDataModel.setUseBatch(false);
 
-            const sEntityPath = "/punch_regularizeSet(ZempId='" + oRecord.ZempId +
-                "',ZactionRefNo='" + sActionRefNo +
-                "',ZincDate=datetime'" + sIncDateKey +
-                "',DelayFlag='" + sDelayFlag + "')";
-            oModel.setUseBatch(false)
             return new Promise((resolve, reject) => {
-                oModel.update(sEntityPath, oPayload, {
-                    bMerge: false,
-                    success: (oResponse) => {
-                        console.log("ODataUtils.submitPunchRegularize: Success", oResponse);
-                        resolve(oResponse);
+                oDataModel.update(entityPath, normalPayload, {
+                    success: (response) => {
+                        console.log("ODataUtils.submitHCAction: success", response);
+                        resolve(response);
                     },
-                    error: (oError) => {
-                        console.error("ODataUtils.submitPunchRegularize: Error", oError);
-                        this.handleODataError(oError, "Failed to submit regularization");
-                        reject(oError);
+                    error: (error) => {
+                        console.error("ODataUtils.submitHCAction: error", error);
+                        this.handleODataError(error, "Failed to submit action");
+                        reject(error);
+                    }
+                });
+            });
+        },
+
+        /**
+         * @deprecated Use submitHCAction() instead.
+         */
+        submitTakeAction(oDataModel, violationRecord, overrides) {
+            return this.submitHCAction(oDataModel, violationRecord, overrides);
+        },
+
+        /**
+         * PUT to punch_regularizeSet to record corrected punch times.
+         */
+        submitPunchRegularize(oDataModel, violationRecord, overrides) {
+            if (!oDataModel) {
+                return Promise.reject(new Error("ODataUtils.submitPunchRegularize: oDataModel is null."));
+            }
+            if (!violationRecord?.ZempId) {
+                return Promise.reject(new Error("ODataUtils.submitPunchRegularize: ZempId missing."));
+            }
+
+            const actionRefNo = violationRecord.ZACTION_REF_NO || violationRecord.ZactionRefNo;
+            if (!actionRefNo) {
+                return Promise.reject(new Error("ODataUtils.submitPunchRegularize: ZactionRefNo required."));
+            }
+
+            const payload     = this.buildPunchRegularizePayload(violationRecord, overrides || {});
+            const incDateKey  = this.formatDateTimeForEntityKey(violationRecord.ZincDate);
+            const delayFlag   = payload.DelayFlag;
+
+            const entityPath = `/punch_regularizeSet(ZempId='${violationRecord.ZempId}',ZactionRefNo='${actionRefNo}',ZincDate=datetime'${incDateKey}',DelayFlag='${delayFlag}')`;
+
+            oDataModel.setUseBatch(false);
+
+            return new Promise((resolve, reject) => {
+                oDataModel.update(entityPath, payload, {
+                    bMerge: false,
+                    success: (response) => {
+                        console.log("ODataUtils.submitPunchRegularize: success", response);
+                        resolve(response);
+                    },
+                    error: (error) => {
+                        console.error("ODataUtils.submitPunchRegularize: error", error);
+                        this.handleODataError(error, "Failed to submit regularization");
+                        reject(error);
                     }
                 });
             });
         }
-
-
     };
 
     return ODataUtils;
