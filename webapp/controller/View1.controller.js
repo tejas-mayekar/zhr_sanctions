@@ -113,7 +113,8 @@ sap.ui.define([
                 sap.ui.core.BusyIndicator.show(0);
 
                 const filters = [
-                    new Filter("ZlmIdName", FilterOperator.EQ, ODataUtils.getCurrentUserId())
+                    new Filter("ZlmIdName", FilterOperator.EQ, ODataUtils.getCurrentUserId()),
+                    new Filter("Zishc", FilterOperator.EQ, false)
                 ];
 
                 const records = await ODataUtils.fetchOData(
@@ -125,7 +126,13 @@ sap.ui.define([
                 const uiModel = this.getView().getModel();
                 uiModel.setProperty("/HDR_STRSet",    records || []);
                 uiModel.setProperty("/currentCount",  (records || []).length);
-                uiModel.setProperty("/isHC",          records[0]?.Zishc || false);
+                if((records || []).length > 0 ){
+
+                    uiModel.setProperty("/isHC",          true);
+                }else{
+                    
+                    uiModel.setProperty("/isHC",          false);
+                }
 
             } catch (error) {
                 ODataUtils.handleODataError(error, "Failed to load violations.");

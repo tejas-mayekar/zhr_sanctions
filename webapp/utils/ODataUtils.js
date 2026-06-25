@@ -4,8 +4,8 @@ sap.ui.define([], () => {
     // ─── Constants ────────────────────────────────────────────────────────────
 
     const LOCAL_HOSTNAMES   = ["localhost", "127.0.0.1"];
-    const DEV_USER_ID       = "200129";
-    const ALT_USER_FALLBACK = "200130";
+    const DEV_USER_ID       = "DACO_EAMV04";
+    const ALT_USER_FALLBACK = "DACO_EAMV04";
     const DEV_SAP_USER      = "DACO_EAMV04";
 
     const DATE_FIELDS_IN_PAYLOAD = [
