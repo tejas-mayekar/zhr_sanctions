@@ -126,7 +126,7 @@ sap.ui.define([
                 const uiModel = this.getView().getModel();
                 uiModel.setProperty("/HDR_STRSet",    records || []);
                 uiModel.setProperty("/currentCount",  (records || []).length);
-                if((records || []).length > 0 ){
+                if((records || []).length > 0 && records[0].Zishc == true){
 
                     uiModel.setProperty("/isHC",          true);
                 }else{
