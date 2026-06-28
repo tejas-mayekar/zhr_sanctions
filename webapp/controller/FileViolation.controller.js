@@ -17,40 +17,27 @@ sap.ui.define([
                 .attachPatternMatched(this._onRouteMatched, this);
         },
 
-        // ── Route Handler ─────────────────────────────────────────────────────
-
         _onRouteMatched() {
-            // Carry forward any existing "create" model
             const createModel = this.getOwnerComponent().getModel("create");
             if (createModel) {
                 this.getView().setModel(createModel, "detailData");
             }
-
-            // Fresh employee search-help model
             this.getView().setModel(new JSONModel({}), "SHData");
-
-            // Employee ID field disabled until incident date is set
             this.byId("inputZempId").setEditable(false);
         },
-
-        // ── Incident Date ─────────────────────────────────────────────────────
 
         onIncidentDateChange(oEvent) {
             const hasDate = !!oEvent.getSource().getDateValue();
             this.byId("inputZempId").setEditable(hasDate);
         },
 
-        // ── Employee Value Help ───────────────────────────────────────────────
-
         onValueHelpRequest(oEvent) {
             const incidentDate = this.byId("dpZincDate").getDateValue();
-
             if (!incidentDate) {
                 MessageBox.warning("Please select Incident Date before choosing Employee ID.");
                 this.byId("dpZincDate").focus();
                 return;
             }
-
             SearchHelpHandler.openValueHelpDialog(this, oEvent, incidentDate);
         },
 
@@ -62,18 +49,17 @@ sap.ui.define([
             SearchHelpHandler.onConfirm(this, oEvent);
         },
 
-        // ── Form Actions ──────────────────────────────────────────────────────
-
         onCancel() {
             this.onNavBack();
         },
 
         onSave() {
-            const p                  = ODataUtils.parseByte.bind(ODataUtils);
-            const selectedEmployee   = this._getSelectedEmployeeData();
-            const emp                = selectedEmployee || {};
+            // Edm.Byte only: ZdelayHrs, ZshortHrs, Zrepeatcount, Zsysyrepeatcount
+            // Zn0-Zn7, ZstdWeekHrs, ZwrkDyWeek = Edm.String in updated metadata
+            const p = ODataUtils.parseByte.bind(ODataUtils);
+            const selectedEmployee = this._getSelectedEmployeeData();
+            const emp = selectedEmployee || {};
 
-            // ── Build payload ──────────────────────────────────────────────
             const payload = {
                 // Employee
                 ZempId:             emp.ZempId             || this.byId("inputZempId").getValue(),
@@ -87,24 +73,26 @@ sap.ui.define([
                 Zhiredate:          emp.Zhiredate          || this.byId("dpZhiredate").getDateValue(),
                 Zpaygrade:          emp.Zpaygrade          || this.byId("inputZpaygrade").getValue(),
                 Zposition:          emp.Zposition          || this.byId("inputZposition").getValue(),
-                Zjobtitle:          emp.Zjobtitle          || this.byId("inputZjobtitle").getValue(),
-                Zjobclassification: emp.Zjobclassification || this.byId("inputZjobclassification").getValue(),
+                Zjobtitle:          emp.ZjobTitle          || this.byId("inputZjobtitle").getValue(),
+                Zjobclassification: emp.ZjobClass          || this.byId("inputZjobclassification").getValue(),
                 Zlocation:          emp.Zlocation          || this.byId("inputZlocation").getValue(),
-                Zlocationgroup:     emp.Zlocationgroup     || this.byId("inputZlocationgroup").getValue(),
+                Zlocationgroup:     emp.ZlocGroup          || this.byId("inputZlocationgroup").getValue(),
                 Zworkschedule:      emp.Zworkschedule      || this.byId("inputZworkschedule").getValue(),
                 ZlatestNode:        emp.ZlatestNode        || this.byId("inputZlatestNode").getValue(),
-                ZstdWeekHrs:        p(emp.ZstdWeekHrs      || this.byId("inputZstdWeekHrs").getValue()),
-                ZwrkDyWeek:         p(emp.ZwrkDyWeek       || this.byId("inputZwrkDyWeek").getValue()),
 
-                // Org indicators
-                Zn0: p(this.byId("inputZn0").getValue()),
-                Zn1: p(this.byId("inputZn1").getValue()),
-                Zn2: p(this.byId("inputZn2").getValue()),
-                Zn3: p(this.byId("inputZn3").getValue()),
-                Zn4: p(this.byId("inputZn4").getValue()),
-                Zn5: p(this.byId("inputZn5").getValue()),
-                Zn6: p(this.byId("inputZn6").getValue()),
-                Zn7: p(this.byId("inputZn7").getValue()),
+                // Edm.String — pass as-is (no parseByte)
+                ZstdWeekHrs: emp.ZstdWeekHrs || this.byId("inputZstdWeekHrs").getValue(),
+                ZwrkDyWeek:  emp.ZwrkDyWeek  || this.byId("inputZwrkDyWeek").getValue(),
+
+                // Org indicators — Edm.String in updated metadata
+                Zn0: emp.Zn0 || this.byId("inputZn0").getValue(),
+                Zn1: emp.Zn1 || this.byId("inputZn1").getValue(),
+                Zn2: emp.Zn2 || this.byId("inputZn2").getValue(),
+                Zn3: emp.Zn3 || this.byId("inputZn3").getValue(),
+                Zn4: emp.Zn4 || this.byId("inputZn4").getValue(),
+                Zn5: emp.Zn5 || this.byId("inputZn5").getValue(),
+                Zn6: emp.Zn6 || this.byId("inputZn6").getValue(),
+                Zn7: emp.Zn7 || this.byId("inputZn7").getValue(),
 
                 // Violation
                 ZincDate:     this.byId("dpZincDate").getDateValue(),
@@ -124,16 +112,18 @@ sap.ui.define([
                 Zlastaction:         this.byId("dpZlastaction").getDateValue(),
 
                 // Shift times
-                ZschTimeIn:   ODataUtils.formatTimeForPayload(this.byId("tpZschTimeIn").getValue()),
-                ZschTimeOut:  ODataUtils.formatTimeForPayload(this.byId("tpZschTimeOut").getValue()),
-                Zpunchintime: ODataUtils.formatTimeForPayload(this.byId("tpZpunchintime").getValue()),
-                Zpunchouttime:ODataUtils.formatTimeForPayload(this.byId("tpZpunchouttime").getValue()),
-                ZdelayHrs:    p(this.byId("inputZdelayHrs").getValue()),
-                ZshortHrs:    p(this.byId("inputZshortHrs").getValue()),
-                Zrepeatcount: p(this.byId("inputZrepeatcount").getValue()),
+                ZschTimeIn:    ODataUtils.formatTimeForPayload(this.byId("tpZschTimeIn").getValue()),
+                ZschTimeOut:   ODataUtils.formatTimeForPayload(this.byId("tpZschTimeOut").getValue()),
+                Zpunchintime:  ODataUtils.formatTimeForPayload(this.byId("tpZpunchintime").getValue()),
+                Zpunchouttime: ODataUtils.formatTimeForPayload(this.byId("tpZpunchouttime").getValue()),
+
+                // Edm.Byte — only these
+                ZdelayHrs:        p(this.byId("inputZdelayHrs").getValue()),
+                ZshortHrs:        p(this.byId("inputZshortHrs").getValue()),
+                Zrepeatcount:     p(this.byId("inputZrepeatcount").getValue()),
                 Zsysyrepeatcount: p(this.byId("inputZsysyrepeatcount").getValue()),
 
-                // Workflow: Line Manager (stamped automatically)
+                // Workflow: Line Manager
                 Zlinemanagername:       this.byId("inputZlinemanagername").getValue(),
                 ZlmIdName:              ODataUtils.getCurrentUserId(),
                 Zlinemanageraction:     this.byId("inputZlinemanageraction").getValue(),
@@ -165,15 +155,11 @@ sap.ui.define([
                 Zceoactionremark: this.byId("inputZceoactionremark").getValue()
             };
 
-            // ── Validate mandatory fields ──────────────────────────────────
             if (!payload.ZempId || !payload.ZincDate) {
-                MessageBox.error(
-                    "Please fill in all mandatory key fields:\n- Employee ID\n- Incident Date"
-                );
+                MessageBox.error("Please fill in all mandatory key fields:\n- Employee ID\n- Incident Date");
                 return;
             }
 
-            // ── Submit ────────────────────────────────────────────────────
             const oDataModel = this.getOwnerComponent().getModel()
                             || this.getView().getModel("mainService");
 
@@ -199,11 +185,6 @@ sap.ui.define([
             });
         },
 
-        // ── Private Helpers ───────────────────────────────────────────────────
-
-        /**
-         * Return selected employee data from the SHData model, or null.
-         */
         _getSelectedEmployeeData() {
             const shDataModel = this.getView().getModel("SHData");
             return shDataModel?.getProperty("/selectedEmployeeData") || null;
