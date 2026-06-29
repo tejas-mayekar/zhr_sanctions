@@ -137,11 +137,25 @@
                 <!-- ── Section 1: Employee Details ── -->
                 <Panel
                     id="_IDGenPanel3"
-                    headerText="Employee Information"
                     expandable="true"
                     expanded="true"
                     class="sapUiSmallMarginBottom"
                 >
+                    <headerToolbar>
+                        <OverflowToolbar id="_IDGenOverflowToolbar5">
+                            <Title
+                                id="_IDGenTitle6"
+                                text="Employee Information"
+                            />
+                            <ToolbarSpacer id="_IDGenToolbarSpacer3" />
+                            <Button
+                                id="_IDGenButton19"
+                                icon="sap-icon://comment"
+                                text="View Remarks"
+                                press=".onViewRemarkPress"
+                            />
+                        </OverflowToolbar>
+                    </headerToolbar>
                     <form:SimpleForm
                         id="_IDGenSimpleForm3"
                         editable="false"

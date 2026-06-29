@@ -4,21 +4,23 @@ sap.ui.define([
     "sap/m/MessageToast",
     "sap/m/MessageBox",
     "zhrsanctions/utils/ODataUtils",
-    "zhrsanctions/utils/SearchHelpHandler"
-], (BaseController, JSONModel, MessageToast, MessageBox, ODataUtils, SearchHelpHandler) => {
+    "zhrsanctions/utils/SearchHelpHandler",
+    "sap/ui/model/Filter",
+    "sap/ui/model/FilterOperator"
+], (BaseController, JSONModel, MessageToast, MessageBox, ODataUtils, SearchHelpHandler, Filter, FilterOperator) => {
     "use strict";
 
     // ─── Default State ────────────────────────────────────────────────────────
 
     const EMPTY_ACTION_STATE = {
-        ZactionRefNo:  "",
-        ZincCategory:  "",
-        ZincType:      "",
+        ZactionRefNo: "",
+        ZincCategory: "",
+        ZincType: "",
         ZfirstIncDate: "",
-        Zrepeatcount:  "",
-        ZincDate:      "",
-        isVisible:     false,
-        reason:        "",
+        Zrepeatcount: "",
+        ZincDate: "",
+        isVisible: false,
+        reason: "",
         actionOptions: []
     };
 
@@ -90,7 +92,7 @@ sap.ui.define([
         },
 
         onSubmitTakeAction() {
-            const actionData   = this.getView().getModel("regularize").getData();
+            const actionData = this.getView().getModel("regularize").getData();
             const violationRec = this.getView().getModel("detailData").getData().record;
 
             if (!actionData.ZincCategory || !actionData.ZincType) {
@@ -99,13 +101,13 @@ sap.ui.define([
             }
 
             this._submitHCAction(violationRec, {
-                ZactionRefNo:   violationRec.ZactionRefNo,
-                ZincCategory:   actionData.ZincCategory,
-                ZincType:       actionData.ZincType,
-                Zhcopsremark:   actionData.reason,
+                ZactionRefNo: violationRec.ZactionRefNo,
+                ZincCategory: actionData.ZincCategory,
+                ZincType: actionData.ZincType,
+                Zhcopsremark: actionData.reason,
                 Zhcevpactiondate: new Date(),
-                Zstatus:        "COMPLETED",
-                ZlmIdName:      ODataUtils.getCurrentUserId()
+                Zstatus: "COMPLETED",
+                ZlmIdName: ODataUtils.getCurrentUserId()
             }, () => this._takeActionDialog.close());
         },
 
@@ -126,18 +128,58 @@ sap.ui.define([
         onCloseTakeNoActionDialog() {
             this._takeNoActionDialog.close();
         },
+        onViewRemarkPress() {
+            if (!this._addRemark) {
+                this._addRemark = sap.ui.xmlfragment(
+                    this.getView().getId(),
+                    "zhrsanctions.view.fragments.AddRemarkDialog",
+                    this
+                );
+                this.getView().addDependent(this._addRemark);
+            }
 
+            const oDataModel = this.getOwnerComponent().getModel();
+
+            const violationRec = this.getView().getModel("detailData").getData().record;
+            oDataModel.setUseBatch(false)
+            oDataModel.read("/GET_REMARKSSet", {
+                filters: [
+                    new Filter("ZactionRefNo", FilterOperator.EQ, violationRec.ZactionRefNo)
+                ],
+                success: (data) => {
+                    // Extract the results array from the OData response
+                    const remarks = {
+                        results: data.results || []
+                    };
+
+                    if (!this.getView().getModel("remarks")) {
+                        this.getView().setModel(new JSONModel(remarks), "remarks");
+                    } else {
+                        this.getView().getModel("remarks").setData(remarks);
+                    }
+                    this._addRemark.open();
+                },
+                error: (err) => {
+                    console.error("RemarksSet fetch failed:", err);
+                    MessageBox.error("Failed to load remarks.");
+                }
+            });
+        },
+
+        onViewRemarkCancel() {
+            this._addRemark.close();
+        },
         onSubmitTakeNoAction() {
-            const actionData   = this.getView().getModel("regularize").getData();
+            const actionData = this.getView().getModel("regularize").getData();
             const violationRec = this.getView().getModel("detailData").getData().record;
 
             this._submitHCAction(violationRec, {
-                ZactionRefNo:     violationRec.ZactionRefNo,
-                Zhcopsremark:     actionData.reason,
-                Zrepeatcount:     actionData.Zrepeatcount,
+                ZactionRefNo: violationRec.ZactionRefNo,
+                Zhcopsremark: actionData.reason,
+                Zrepeatcount: actionData.Zrepeatcount,
                 Zhcevpactiondate: new Date(),
-                Zstatus:          "COMPLETED",
-                ZlmIdName:        ODataUtils.getCurrentUserId()
+                Zstatus: "COMPLETED",
+                ZlmIdName: ODataUtils.getCurrentUserId()
             }, () => this._takeNoActionDialog.close());
         },
 
