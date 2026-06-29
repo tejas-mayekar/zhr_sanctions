@@ -126,7 +126,20 @@ sap.ui.define([
         onCloseTakeNoActionDialog() {
             this._takeNoActionDialog.close();
         },
-
+        onAddRemarkPress(){
+            if (!this._addRemark) {
+                this._addRemark = sap.ui.xmlfragment(
+                    this.getView().getId(),
+                    "zhrsanctions.view.fragments.AddRemarkDialog",
+                    this
+                );
+                this.getView().addDependent(this._addRemark);
+            }
+            this._addRemark.open();
+        },
+        onAddRemarkCancel() {
+            this._addRemark.close();
+        },
         onSubmitTakeNoAction() {
             const actionData   = this.getView().getModel("regularize").getData();
             const violationRec = this.getView().getModel("detailData").getData().record;
