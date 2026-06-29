@@ -150,9 +150,9 @@
                             <ToolbarSpacer id="_IDGenToolbarSpacer3" />
                             <Button
                                 id="_IDGenButton19"
-                                icon="sap-icon://write-new-document"
-                                text="Add Remark"
-                                press=".onAddRemarkPress"
+                                icon="sap-icon://comment"
+                                text="View Remarks"
+                                press=".onViewRemarkPress"
                             />
                         </OverflowToolbar>
                     </headerToolbar>

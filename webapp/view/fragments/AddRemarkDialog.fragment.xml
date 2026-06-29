@@ -6,19 +6,30 @@
     <Dialog
         id="AddRemarkDialog"
         title="Remarks"
-        icon="sap-icon://edit"
+        icon="sap-icon://comment"
         contentWidth="56rem"
         resizable="true"
         draggable="true"
     >
         <content>
-            
+            <List
+                id="remarksList"
+                items="{remarks>/results}"
+                noDataText="No remarks found"
+                showSeparators="Inner"
+            >
+                <StandardListItem
+                    id="_IDGenStandardListItem"
+                    title="{remarks>Tdline}"
+                />
+            </List>
         </content>
 
         <endButton>
-            <Button id="_IDGenButton20"
+            <Button
+                id="_IDGenButton20"
                 text="Cancel"
-                press=".onAddRemarkCancel"
+                press=".onViewRemarkCancel"
             />
         </endButton>
     </Dialog>
