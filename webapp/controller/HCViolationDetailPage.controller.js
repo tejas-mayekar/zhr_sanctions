@@ -17,6 +17,7 @@ sap.ui.define([
         ZincCategory: "",
         ZincType: "",
         ZfirstIncDate: "",
+        ZincTypeDesc: "",
         Zrepeatcount: "",
         ZincDate: "",
         isVisible: false,

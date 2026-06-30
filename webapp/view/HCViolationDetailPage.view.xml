@@ -343,6 +343,29 @@
                                 id="_IDGenText77"
                                 text="{detailData>/record/ZincDate}"
                             />
+                            <Label
+                                id="_IDGenLabel96"
+                                text="Scheduled In"
+                            />
+                            <Text
+                                id="_IDGenText80"
+                                text="{
+                                    path: 'detailData>/record/ZschTimeIn',
+                                    formatter: '.formatEdmTime'
+                                }"
+                            />
+
+                            <Label
+                                id="_IDGenLabel97"
+                                text="Scheduled Out"
+                            />
+                            <Text
+                                id="_IDGenText81"
+                                text="{
+                                    path: 'detailData>/record/ZschTimeOut',
+                                    formatter: '.formatEdmTime'
+                                }"
+                            />
 
                             <Label
                                 id="_IDGenLabel92"
@@ -368,29 +391,6 @@
                                 }"
                             />
 
-                            <Label
-                                id="_IDGenLabel96"
-                                text="Scheduled In"
-                            />
-                            <Text
-                                id="_IDGenText80"
-                                text="{
-                                    path: 'detailData>/record/ZschTimeIn',
-                                    formatter: '.formatEdmTime'
-                                }"
-                            />
-
-                            <Label
-                                id="_IDGenLabel97"
-                                text="Scheduled Out"
-                            />
-                            <Text
-                                id="_IDGenText81"
-                                text="{
-                                    path: 'detailData>/record/ZschTimeOut',
-                                    formatter: '.formatEdmTime'
-                                }"
-                            />
 
                             <Label
                                 id="_IDGenLabel98"

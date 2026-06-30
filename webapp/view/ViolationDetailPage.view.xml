@@ -222,6 +222,22 @@
 
                             <Label id="_IDGenLabel20" text="Incident Date" />
                             <Text id="_IDGenText18" text="{detailData>/record/ZincDate}" />
+                        
+                            <Label id="_IDGenLabel23" text="Scheduled In" />
+                            <Text id="_IDGenText21"
+                                text="{
+                                    path: 'detailData>/record/ZschTimeIn',
+                                    formatter: '.formatEdmTime'
+                                }"
+                            />
+
+                            <Label id="_IDGenLabel24" text="Scheduled Out" />
+                            <Text id="_IDGenText22"
+                                text="{
+                                    path: 'detailData>/record/ZschTimeOut',
+                                    formatter: '.formatEdmTime'
+                                }"
+                            />
 
                             <Label id="_IDGenLabel21" text="Punch In Time" />
                             <Text id="_IDGenText19"
@@ -239,21 +255,6 @@
                                 }"
                             />
 
-                            <Label id="_IDGenLabel23" text="Scheduled In" />
-                            <Text id="_IDGenText21"
-                                text="{
-                                    path: 'detailData>/record/ZschTimeIn',
-                                    formatter: '.formatEdmTime'
-                                }"
-                            />
-
-                            <Label id="_IDGenLabel24" text="Scheduled Out" />
-                            <Text id="_IDGenText22"
-                                text="{
-                                    path: 'detailData>/record/ZschTimeOut',
-                                    formatter: '.formatEdmTime'
-                                }"
-                            />
 
                             <Label id="_IDGenLabel25" text="Delay Hours" />
                             <Text id="_IDGenText23" text="{detailData>/record/ZdelayHrs}" />
