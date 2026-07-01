@@ -13,19 +13,26 @@ sap.ui.define([
         /**
          * Dynamically add columns to a sap.ui.table.Table from a column config array.
          *
-         * @param {sap.ui.table.Table} table         - target table
-         * @param {Array}              columnConfigs  - array of column descriptor objects
+         * @param {sap.ui.table.Table} table          - target table
+         * @param {Array}              columnConfigs   - array of column descriptor objects
          * @param {Function}           [timeFormatter] - optional formatter for isTime columns
+         * @param {Function}           [statusFormatter] - optional formatter for isStatus columns
          */
-        buildTableColumns(table, columnConfigs, timeFormatter) {
+        buildTableColumns(table, columnConfigs, timeFormatter, statusFormatter) {
             const formatTime = timeFormatter || ODataUtils.formatEdmTime.bind(ODataUtils);
 
             columnConfigs
                 .filter(col => col.visible)
                 .forEach(col => {
-                    const cellBindingInfo = col.isTime
-                        ? { path: col.binding, formatter: formatTime }
-                        : `{${col.binding}}`;
+                    let cellBindingInfo;
+
+                    if (col.isTime) {
+                        cellBindingInfo = { path: col.binding, formatter: formatTime };
+                    } else if (col.isStatus && statusFormatter) {
+                        cellBindingInfo = { path: col.binding, formatter: statusFormatter };
+                    } else {
+                        cellBindingInfo = `{${col.binding}}`;
+                    }
 
                     table.addColumn(new Column({
                         label:          new Label({ text: col.label }),
@@ -38,14 +45,6 @@ sap.ui.define([
                 });
         },
 
-        /**
-         * Apply an OR-filter across all visible filterable columns.
-         * Clears filters when query is empty.
-         *
-         * @param {sap.ui.table.Table} table         - target table
-         * @param {Array}              columnConfigs  - column descriptor array
-         * @param {string}             searchQuery    - text to search
-         */
         applyTableSearch(table, columnConfigs, searchQuery) {
             const binding = table.getBinding("rows");
             if (!binding) { return; }

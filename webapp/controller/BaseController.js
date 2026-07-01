@@ -5,21 +5,32 @@ sap.ui.define([
 ], (Controller, History, ODataUtils) => {
     "use strict";
 
+    const ZSTATUS_MAP = {
+        "1": "In Progress",
+        "2": "Sent Back to HR",
+        "3": "Sent Back to LM",
+        "4": "Completed"
+    };
+
     return Controller.extend("zhrsanctions.controller.BaseController", {
 
-        /**
-         * Proxy for ODataUtils.formatEdmTime — used as formatter in XML view bindings.
-         * Example: formatter: '.formatEdmTime'
-         */
         formatEdmTime(edmTime) {
             return ODataUtils.formatEdmTime(edmTime);
         },
         formatVisibility: function (value) {
-            return !!value; // ensures true/false
+            return !!value;
         },
+
         /**
-         * Navigate back to the previous page, or fall back to the main list view.
+         * Map Zstatus code (1-4) to a display label.
+         * Falls back to the raw value if it's not a recognized code.
          */
+        formatZstatus(status) {
+            if (status === null || status === undefined || status === "") { return ""; }
+            const key = String(status).trim();
+            return ZSTATUS_MAP[key] || status;
+        },
+
         onNavBack() {
             const previousHash = History.getInstance().getPreviousHash();
 

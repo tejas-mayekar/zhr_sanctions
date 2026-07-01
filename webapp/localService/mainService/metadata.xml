@@ -112,7 +112,7 @@
                 <Property Name="Zlinemanagername" Type="Edm.String" MaxLength="60" sap:unicode="false" sap:label="Logical System" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="Zlinemanageraction" Type="Edm.String" MaxLength="60" sap:unicode="false" sap:label="Logical System" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="Zlinemanageractiondate" Type="Edm.DateTime" Precision="7" sap:unicode="false" sap:label="Date" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zlinemanagerremarks" Type="Edm.String" MaxLength="60" sap:unicode="false" sap:label="Logical System" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Zlinemanagerremarks" Type="Edm.String" MaxLength="255" sap:unicode="false" sap:label="Logical System" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="Zhcopsname" Type="Edm.String" MaxLength="60" sap:unicode="false" sap:label="Logical System" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="Zhcopsaction" Type="Edm.String" MaxLength="60" sap:unicode="false" sap:label="Logical System" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="Zhcopsactiondate" Type="Edm.DateTime" Precision="7" sap:unicode="false" sap:label="Date" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>

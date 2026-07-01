@@ -262,7 +262,7 @@ sap.ui.define([
                 Zlinemanagerremarks: reason,
                 Zpunchintime:        ODataUtils.formatTimeForPayload(correctedPunchIn),
                 Zpunchouttime:       ODataUtils.formatTimeForPayload(correctedPunchOut),
-                Zstatus:             "COMPLETED"
+                Zstatus:             "4"
             });
 
             sap.ui.core.BusyIndicator.show(0);

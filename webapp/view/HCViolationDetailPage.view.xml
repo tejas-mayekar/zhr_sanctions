@@ -332,7 +332,10 @@
                             />
                             <Text
                                 id="_IDGenText76"
-                                text="{detailData>/record/Status}"
+                                text="{
+                                    path: 'detailData>/record/Zstatus',
+                                    formatter: '.formatZstatus'
+                                }"
                             />
 
                             <Label
@@ -390,7 +393,6 @@
                                     formatter: '.formatEdmTime'
                                 }"
                             />
-
 
                             <Label
                                 id="_IDGenLabel98"

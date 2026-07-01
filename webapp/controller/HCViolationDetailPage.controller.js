@@ -51,7 +51,7 @@ sap.ui.define([
             }
 
             // Show action buttons only when the record is still open
-            const isOpen = detailModel?.getData().record?.Zstatus !== "COMPLETED";
+            const isOpen = detailModel?.getData().record?.Zstatus !== "4";
             this.getView().getModel().setProperty("/isEditOn", isOpen);
 
             // Reset action form
@@ -107,7 +107,7 @@ sap.ui.define([
                 ZincType: actionData.ZincType,
                 Zhcopsremark: actionData.reason,
                 Zhcevpactiondate: new Date(),
-                Zstatus: "COMPLETED",
+                Zstatus: "4",
                 ZlmIdName: ODataUtils.getCurrentUserId()
             }, () => this._takeActionDialog.close());
         },
@@ -182,7 +182,7 @@ sap.ui.define([
                 Zhcopsremark: actionData.reason,
                 Zrepeatcount: parseByteField(actionData.Zrepeatcount),
                 Zhcevpactiondate: new Date(),
-                Zstatus: "COMPLETED",
+                Zstatus: "4",
                 ZlmIdName: ODataUtils.getCurrentUserId()
             }, () => this._takeNoActionDialog.close());
         },

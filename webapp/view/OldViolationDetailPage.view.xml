@@ -94,7 +94,6 @@
                             </statuses>
                         </ObjectHeader>
                     </VBox>
-
                 </HBox>
             </f:DynamicPageHeader>
         </f:header>
@@ -291,7 +290,10 @@
                             />
                             <Text
                                 id="_IDGenText47"
-                                text="{detailData>/record/Status}"
+                                text="{
+                                    path: 'detailData>/record/Zstatus',
+                                    formatter: '.formatZstatus'
+                                }"
                             />
 
                             <Label
