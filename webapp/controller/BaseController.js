@@ -14,7 +14,9 @@ sap.ui.define([
         formatEdmTime(edmTime) {
             return ODataUtils.formatEdmTime(edmTime);
         },
-
+        formatVisibility: function (value) {
+            return !!value; // ensures true/false
+        },
         /**
          * Navigate back to the previous page, or fall back to the main list view.
          */

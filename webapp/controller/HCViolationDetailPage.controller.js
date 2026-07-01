@@ -17,6 +17,7 @@ sap.ui.define([
         ZincCategory: "",
         ZincType: "",
         ZfirstIncDate: "",
+        ZincTypeDesc: "",
         Zrepeatcount: "",
         ZincDate: "",
         isVisible: false,
@@ -172,11 +173,14 @@ sap.ui.define([
         onSubmitTakeNoAction() {
             const actionData = this.getView().getModel("regularize").getData();
             const violationRec = this.getView().getModel("detailData").getData().record;
-
+            function parseByteField(value) {
+                const parsed = parseInt(value, 10);
+                return isNaN(parsed) ? 0 : parsed;
+            }
             this._submitHCAction(violationRec, {
                 ZactionRefNo: violationRec.ZactionRefNo,
                 Zhcopsremark: actionData.reason,
-                Zrepeatcount: actionData.Zrepeatcount,
+                Zrepeatcount: parseByteField(actionData.Zrepeatcount),
                 Zhcevpactiondate: new Date(),
                 Zstatus: "COMPLETED",
                 ZlmIdName: ODataUtils.getCurrentUserId()

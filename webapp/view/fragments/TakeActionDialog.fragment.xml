@@ -56,6 +56,17 @@
                     valueHelpRequest="onValueHelpRequest"
                     placeholder="Enter incident type"
                 />
+                <TextArea
+                    id="_IDGenText90"
+                    rows="3"
+                    enabled="false"
+                    width="100%"
+                    visible="{
+                        path: 'regularize>/ZincTypeDesc',
+                        formatter: '.formatVisibility'
+                    }"
+                    value="{regularize>/ZincTypeDesc}"
+                />
                 <HBox
                     id="_IDGenHBox5"
                     justifyContent="SpaceBetween"
@@ -74,12 +85,12 @@
                         <Text
                             id="_IDGenText71"
                             text="{
-        path: 'regularize>/ZfirstIncDate',
-        type: 'sap.ui.model.type.Date',
-        formatOptions: {
-            pattern: 'dd-MM-yyyy'
-        }
-    }"
+                                    path: 'regularize>/ZfirstIncDate',
+                                    type: 'sap.ui.model.type.Date',
+                                    formatOptions: {
+                                        pattern: 'dd-MM-yyyy'
+                                    }
+                            }"
                         />
                     </HBox>
                     <HBox
