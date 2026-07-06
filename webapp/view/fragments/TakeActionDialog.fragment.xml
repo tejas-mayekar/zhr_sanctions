@@ -53,6 +53,7 @@
                     value="{regularize>/ZincType}"
                     width="100%"
                     showValueHelp="true"
+                    liveChange=".onValueHelpLiveSearch"
                     valueHelpRequest="onValueHelpRequest"
                     placeholder="Enter incident type"
                 />

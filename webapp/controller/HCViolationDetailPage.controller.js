@@ -73,9 +73,9 @@ sap.ui.define([
             this.getView().getModel("regularize").setProperty("/ZincCategory", selectedKey);
             return selectedKey || null;
         },
-
+        
         // ── Take Action Dialog ────────────────────────────────────────────────
-
+        
         onTakeActionPress() {
             if (!this._takeActionDialog) {
                 this._takeActionDialog = sap.ui.xmlfragment(
@@ -85,6 +85,12 @@ sap.ui.define([
                 );
                 this.getView().addDependent(this._takeActionDialog);
             }
+            const regularizeModel = this.getView().getModel("regularize");
+                    regularizeModel.setProperty("/Zrepeatcount", 0);
+                    regularizeModel.setProperty("/ZfirstIncDate", 0);
+                    regularizeModel.setProperty("/isVisible", false);
+                    regularizeModel.setProperty("/ZincTypeDesc", "");
+                    regularizeModel.setProperty("/ZincType", "");
             this._takeActionDialog.open();
         },
 

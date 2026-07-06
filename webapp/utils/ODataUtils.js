@@ -259,8 +259,8 @@ sap.ui.define([], () => {
                 Zpunchouttime: r.Zpunchouttime || null,
 
                 // ── Edm.Byte — only these four remain as integers ─────────
-                ZdelayHrs:        p(r.ZdelayHrs),
-                ZshortHrs:        p(r.ZshortHrs),
+                ZdelayHrs:        s(r.ZdelayHrs),
+                ZshortHrs:        s(r.ZshortHrs),
                 Zrepeatcount:     p(r.Zrepeatcount),
                 Zsysyrepeatcount: p(r.Zsysyrepeatcount),
 

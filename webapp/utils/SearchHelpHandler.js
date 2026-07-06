@@ -114,6 +114,10 @@ sap.ui.define([
                     regularizeModel.setProperty("/isVisible", true);
                 },
                 error: (error) => {
+                    const regularizeModel = controller.getView().getModel("regularize");
+                    regularizeModel.setProperty("/Zrepeatcount", 0);
+                    regularizeModel.setProperty("/ZfirstIncDate", 0);
+                    regularizeModel.setProperty("/isVisible", false);
                     console.error("SearchHelpHandler.loadRepeatInfo: failed", error);
                 }
             });
@@ -185,7 +189,7 @@ sap.ui.define([
         openValueHelpDialog(controller, triggerEvent, extraParam) {
             const sourceInput = triggerEvent.getSource();
             const inputId = sourceInput.getId().split("--").pop();
-            const currentValue = sourceInput.getValue();
+            const currentValue = ""//sourceInput.getValue();
             const view = controller.getView();
             const fieldConfig = FIELD_CONFIG[inputId];
 
