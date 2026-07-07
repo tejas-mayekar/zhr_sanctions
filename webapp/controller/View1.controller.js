@@ -5,8 +5,9 @@ sap.ui.define([
     "sap/ui/model/FilterOperator",
     "zhrsanctions/utils/ODataUtils",
     "zhrsanctions/utils/TableUtils",
-    "zhrsanctions/utils/ExportUtils"
-], (BaseController, JSONModel, Filter, FilterOperator, ODataUtils, TableUtils, ExportUtils) => {
+    "zhrsanctions/utils/ExportUtils",
+    "sap/ui/core/format/DateFormat"
+], (BaseController, JSONModel, Filter, FilterOperator, ODataUtils, TableUtils, ExportUtils, DateFormat) => {
     "use strict";
 
     // ─── Column Configs ───────────────────────────────────────────────────────
@@ -16,17 +17,17 @@ sap.ui.define([
         { label: "Employee ID", binding: "ZempId", width: "9rem", sortProperty: "ZempId", filterProperty: "ZempId", visible: true },
         { label: "Employee Name", binding: "ZempName", width: "14rem", sortProperty: "ZempName", filterProperty: "ZempName", visible: true },
         { label: "Status", binding: "Status", width: "8rem", sortProperty: "Status", filterProperty: "Status", visible: false, isStatus: true },
-        { label: "Incident Date", binding: "ZincDate", width: "10rem", sortProperty: "ZincDate", filterProperty: "ZincDate", visible: true },
+        { label: "Incident Date", binding: "ZincDate", width: "10rem", sortProperty: "ZincDate", filterProperty: "ZincDate", visible: true, isDate: true },
         { label: "Employee Type", binding: "ZempTypeDesc", width: "12rem", sortProperty: "ZempTypeDesc", filterProperty: "ZempTypeDesc", visible: true },
         { label: "Employment Class", binding: "ZempClass", width: "14rem", sortProperty: "ZempClass", filterProperty: "ZempClass", visible: true },
         { label: "Company", binding: "Zcompany", width: "14rem", sortProperty: "Zcompany", filterProperty: "Zcompany", visible: true },
         { label: "Department", binding: "Zn3", width: "14rem", sortProperty: "Zn3", filterProperty: "Zn3", visible: true },
         { label: "Position", binding: "Zposition", width: "16rem", sortProperty: "Zposition", filterProperty: "Zposition", visible: true },
         { label: "Job Title", binding: "ZjobTitle", width: "14rem", sortProperty: "ZjobTitle", filterProperty: "ZjobTitle", visible: true },
-        { label: "Punch In Time", binding: "Zpunchintime", width: "12rem", sortProperty: "Zpunchintime", filterProperty: "Zpunchintime", visible: true, isTime: true },
-        { label: "Punch Out Time", binding: "Zpunchouttime", width: "12rem", sortProperty: "Zpunchouttime", filterProperty: "Zpunchouttime", visible: true, isTime: true },
         { label: "Scheduled In", binding: "ZschTimeIn", width: "12rem", sortProperty: "ZschTimeIn", filterProperty: "ZschTimeIn", visible: false, isTime: true },
         { label: "Scheduled Out", binding: "ZschTimeOut", width: "12rem", sortProperty: "ZschTimeOut", filterProperty: "ZschTimeOut", visible: false, isTime: true },
+        { label: "Punch In Time", binding: "Zpunchintime", width: "12rem", sortProperty: "Zpunchintime", filterProperty: "Zpunchintime", visible: true, isTime: true },
+        { label: "Punch Out Time", binding: "Zpunchouttime", width: "12rem", sortProperty: "Zpunchouttime", filterProperty: "Zpunchouttime", visible: true, isTime: true },
         { label: "Delay Hours", binding: "ZdelayHrs", width: "10rem", sortProperty: "ZdelayHrs", filterProperty: "ZdelayHrs", visible: true },
         { label: "Short Hours", binding: "ZshortHrs", width: "10rem", sortProperty: "ZshortHrs", filterProperty: "ZshortHrs", visible: true },
         { label: "Unauthorized Days", binding: "ZunautDays", width: "12rem", sortProperty: "ZunautDays", filterProperty: "ZunautDays", visible: false },
@@ -71,17 +72,23 @@ sap.ui.define([
                 ITM_STRSet: [],
                 isHC: false
             }));
-
+            const dateFormatter = (value) => {
+                if (!value) return "";
+                const oDateFormat = DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" });
+                return oDateFormat.format(new Date(value));
+            };
             TableUtils.buildTableColumns(
                 this.byId("currentTable"),
                 CURRENT_VIOLATIONS_COLUMNS,
                 this.formatEdmTime.bind(this),
+                dateFormatter,
                 this.formatZstatus.bind(this)
             );
             TableUtils.buildTableColumns(
                 this.byId("historyTable"),
                 HISTORY_VIOLATIONS_COLUMNS,
                 this.formatEdmTime.bind(this),
+                dateFormatter,
                 this.formatZstatus.bind(this)
             );
 

@@ -100,12 +100,25 @@
                     >
                         <Label
                             id="_IDGenLabel88"
-                            text="Repeat Count"
+                            text="System Repeat Count"
                             class="sapUiSmallMarginEnd"
                         />
                         <Input
                             id="_IDGenInput4"
+                            editable="false"
                             value="{regularize>/Zrepeatcount}"
+                        />
+                    </HBox>
+                    <HBox
+                        id="_IDGenHBox11"
+                        alignItems="Center"
+                    >
+                        <Label id="_IDGenLabel104"
+                            text="Repeat Count"
+                            class="sapUiSmallMarginEnd"
+                        />
+                        <Input id="_IDGenInput5"
+                            value="{regularize>/Zsysrepeatcount}"
                         />
                     </HBox>
                 </HBox>

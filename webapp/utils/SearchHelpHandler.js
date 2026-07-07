@@ -110,12 +110,14 @@ sap.ui.define([
                     const regularizeModel = controller.getView().getModel("regularize");
                     if (!regularizeModel) { return; }
                     regularizeModel.setProperty("/Zrepeatcount", data.Zrepeatcount);
+                    regularizeModel.setProperty("/Zsysrepeatcount", data.Zsysrepeatcount);
                     regularizeModel.setProperty("/ZfirstIncDate", data.ZfirstInciDate);
                     regularizeModel.setProperty("/isVisible", true);
                 },
                 error: (error) => {
                     const regularizeModel = controller.getView().getModel("regularize");
                     regularizeModel.setProperty("/Zrepeatcount", 0);
+                    regularizeModel.setProperty("/Zsysrepeatcount", 0);
                     regularizeModel.setProperty("/ZfirstIncDate", 0);
                     regularizeModel.setProperty("/isVisible", false);
                     console.error("SearchHelpHandler.loadRepeatInfo: failed", error);
@@ -159,7 +161,8 @@ sap.ui.define([
                 path: "valueHelpItems>/",
                 template: new StandardListItem({
                     title: `{valueHelpItems>${fieldConfig.keyField}}`,
-                    description: `{valueHelpItems>${fieldConfig.descField}}`
+                    description: `{valueHelpItems>${fieldConfig.descField}}`,
+                    wrapping: true
                 })
             });
 

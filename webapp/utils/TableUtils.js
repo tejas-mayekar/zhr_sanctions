@@ -16,9 +16,10 @@ sap.ui.define([
          * @param {sap.ui.table.Table} table          - target table
          * @param {Array}              columnConfigs   - array of column descriptor objects
          * @param {Function}           [timeFormatter] - optional formatter for isTime columns
+         * @param {Function}           [dateFormatter] - optional formatter for isDate columns
          * @param {Function}           [statusFormatter] - optional formatter for isStatus columns
          */
-        buildTableColumns(table, columnConfigs, timeFormatter, statusFormatter) {
+        buildTableColumns(table, columnConfigs, timeFormatter, dateFormatter, statusFormatter) {
             const formatTime = timeFormatter || ODataUtils.formatEdmTime.bind(ODataUtils);
 
             columnConfigs
@@ -28,6 +29,8 @@ sap.ui.define([
 
                     if (col.isTime) {
                         cellBindingInfo = { path: col.binding, formatter: formatTime };
+                    } else if (col.isDate && dateFormatter) {
+                        cellBindingInfo = { path: col.binding, formatter: dateFormatter };
                     } else if (col.isStatus && statusFormatter) {
                         cellBindingInfo = { path: col.binding, formatter: statusFormatter };
                     } else {

@@ -18,21 +18,31 @@ sap.ui.define([
         },
 
         _onRouteMatched() {
-            // Clear all models on load
             this.getView().setModel(new JSONModel({}), "detailData");
             this.getView().setModel(new JSONModel({}), "SHData");
             this.getView().setModel(new JSONModel({
-                Zrepeatcount: 0,
-                ZfirstIncDate: null,
-                isVisible: false
+                Zrepeatcount: 0, ZfirstIncDate: null, isVisible: false
             }), "regularize");
 
             const createModel = this.getOwnerComponent().getModel("create");
-            if (createModel) {
-                this.getView().setModel(createModel, "detailData");
-            }
+            if (createModel) { this.getView().setModel(createModel, "detailData"); }
 
-            this.byId("inputZempId").setEditable(false);
+            this.byId("dpZincDate").setDateValue(null);
+            this.byId("inputZempId").setValue("").setEditable(false);
+            this.byId("inputZincCategory").setValue("");
+            this.byId("inputZincType").setValue("");
+            this.byId("inputZaction").setValue("");
+            this.byId("inputZstatus").setValue("");
+            this.byId("inputZsanction").setValue("");
+            this.byId("inputZinitatedBy").setValue("");
+            this.byId("inputZremark").setValue("");
+            this.byId("inputZrepeatcount").setValue("");
+            this.byId("inputZsysyrepeatcount").setValue("");
+            this.byId("dpZincDisDate").setDateValue(null);
+            this.byId("dpZfirstIncDate").setDateValue(null);
+            this.byId("dpZawaitingactionfrom").setDateValue(null);
+            this.byId("dpZlastaction").setDateValue(null);
+            this.byId("fileUploader").clear();
         },
 
 
