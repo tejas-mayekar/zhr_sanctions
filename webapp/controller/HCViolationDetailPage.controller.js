@@ -74,9 +74,9 @@ sap.ui.define([
             this.getView().getModel("regularize").setProperty("/ZincCategory", selectedKey);
             return selectedKey || null;
         },
-        
+
         // ── Take Action Dialog ────────────────────────────────────────────────
-        
+
         onTakeActionPress() {
             if (!this._takeActionDialog) {
                 this._takeActionDialog = sap.ui.xmlfragment(
@@ -87,11 +87,11 @@ sap.ui.define([
                 this.getView().addDependent(this._takeActionDialog);
             }
             const regularizeModel = this.getView().getModel("regularize");
-                    regularizeModel.setProperty("/Zrepeatcount", 0);
-                    regularizeModel.setProperty("/ZfirstIncDate", 0);
-                    regularizeModel.setProperty("/isVisible", false);
-                    regularizeModel.setProperty("/ZincTypeDesc", "");
-                    regularizeModel.setProperty("/ZincType", "");
+            regularizeModel.setProperty("/Zrepeatcount", 0);
+            regularizeModel.setProperty("/ZfirstIncDate", 0);
+            regularizeModel.setProperty("/isVisible", false);
+            regularizeModel.setProperty("/ZincTypeDesc", "");
+            regularizeModel.setProperty("/ZincType", "");
             this._takeActionDialog.open();
         },
 
@@ -115,6 +115,7 @@ sap.ui.define([
                 Zhcopsremark: actionData.reason,
                 Zhcevpactiondate: new Date(),
                 Zstatus: "4",
+                Zsysyrepeatcount: parseInt(actionData.Zsysrepeatcount),
                 ZlmIdName: ODataUtils.getCurrentUserId()
             }, () => this._takeActionDialog.close());
         },
@@ -209,7 +210,55 @@ sap.ui.define([
         onValueHelpLiveSearch(oEvent) {
             SearchHelpHandler.onLiveSearch(oEvent);
         },
+        onPayrollDeductionPress() {
+            
+            const violationRec = this.getView().getModel("detailData").getData().record;
+            if (!violationRec?.ZactionRefNo) {
+                MessageBox.error("No violation record loaded. Cannot submit Payroll Deduction.");
+                return;
+            }
 
+            const payload = ODataUtils.buildITMPayload(violationRec, { Zaction: "Payroll Deduction" });
+            this._submitToITMSet(
+                payload,
+                "Payroll Deduction submitted successfully.",
+                () => this.onNavBack(),
+                "Error submitting Payroll Deduction"
+            );
+        },
+                /**
+         * POST to ITM_STRSet with a given payload.
+         *
+         * @param {object}   payload       - full ITM_STR entity payload
+         * @param {string}   successMsg    - toast shown on success
+         * @param {Function} onSuccess     - callback invoked after success toast
+         * @param {string}   errorTitle    - MessageBox title on error
+         */
+        _submitToITMSet(payload, successMsg, onSuccess, errorTitle) {
+            const oDataModel = this.getOwnerComponent().getModel()
+                            || this.getView().getModel("mainService");
+
+            if (!oDataModel) {
+                MessageBox.warning(
+                    "No active OData service connected. Payload logged to console:\n"
+                    + JSON.stringify(payload, null, 2)
+                );
+                return;
+            }
+
+            sap.ui.core.BusyIndicator.show(0);
+            oDataModel.create("/ITM_STRSet", payload, {
+                success: () => {
+                    sap.ui.core.BusyIndicator.hide();
+                    MessageToast.show(successMsg);
+                    onSuccess();
+                },
+                error: (error) => {
+                    sap.ui.core.BusyIndicator.hide();
+                    ODataUtils.handleODataError(error, errorTitle);
+                }
+            });
+        },
         onValueHelpClose() {
             // Selection handling is done inside SearchHelpHandler.onConfirm
         },

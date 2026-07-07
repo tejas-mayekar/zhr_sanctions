@@ -138,8 +138,8 @@ sap.ui.define([
                 Zpunchouttime: ODataUtils.formatTimeForPayload(this.byId("tpZpunchouttime").getValue()),
 
                 // Edm.Byte — only these
-                ZdelayHrs: p(this.byId("inputZdelayHrs").getValue()),
-                ZshortHrs: p(this.byId("inputZshortHrs").getValue()),
+                ZdelayHrs: this.byId("inputZdelayHrs").getValue(),
+                ZshortHrs: this.byId("inputZshortHrs").getValue(),
                 Zrepeatcount: p(this.byId("inputZrepeatcount").getValue()),
                 Zsysyrepeatcount: p(this.byId("inputZsysyrepeatcount").getValue()),
 

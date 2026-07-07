@@ -68,7 +68,7 @@
                     }"
                     value="{regularize>/ZincTypeDesc}"
                 />
-                <HBox
+                <VBox
                     id="_IDGenHBox5"
                     justifyContent="SpaceBetween"
                     alignItems="Center"
@@ -76,7 +76,8 @@
                 >
                     <HBox
                         id="_IDGenHBox9"
-                        alignItems="Center"
+                        alignItems="Start"
+                        width="100%"
                     >
                         <Label
                             id="_IDGenLabel87"
@@ -94,34 +95,38 @@
                             }"
                         />
                     </HBox>
-                    <HBox
-                        id="_IDGenHBox10"
-                        alignItems="Center"
-                    >
-                        <Label
-                            id="_IDGenLabel88"
-                            text="System Repeat Count"
-                            class="sapUiSmallMarginEnd"
-                        />
-                        <Input
-                            id="_IDGenInput4"
-                            editable="false"
-                            value="{regularize>/Zrepeatcount}"
-                        />
+                    <HBox id="_IDGenHBox8" alignContent="SpaceBetween">
+                        <HBox
+                            id="_IDGenHBox10"
+                            alignItems="Center"
+                        >
+                            <Label
+                                id="_IDGenLabel88"
+                                text="System Repeat Count"
+                                class="sapUiSmallMarginEnd"
+                            />
+                            <Input
+                                id="_IDGenInput4"
+                                editable="false"
+                                value="{regularize>/Zrepeatcount}"
+                            />
+                        </HBox>
+                        <HBox
+                            id="_IDGenHBox11"
+                            alignItems="Center"
+                        >
+                            <Label
+                                id="_IDGenLabel104"
+                                text="Repeat Count"
+                                class="sapUiSmallMarginEnd"
+                            />
+                            <Input
+                                id="_IDGenInput5"
+                                value="{regularize>/Zsysrepeatcount}"
+                            />
+                        </HBox>
                     </HBox>
-                    <HBox
-                        id="_IDGenHBox11"
-                        alignItems="Center"
-                    >
-                        <Label id="_IDGenLabel104"
-                            text="Repeat Count"
-                            class="sapUiSmallMarginEnd"
-                        />
-                        <Input id="_IDGenInput5"
-                            value="{regularize>/Zsysrepeatcount}"
-                        />
-                    </HBox>
-                </HBox>
+                </VBox>
 
                 <Label
                     id="_IDGenLabel85"

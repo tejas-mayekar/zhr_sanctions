@@ -102,7 +102,7 @@
                         <HBox
                             id="_IDGenHBox7"
                             justifyContent="SpaceBetween"
-                            width="21rem"
+                            width="31rem"
                         >
                             <Button
                                 id="_IDGenButton15"
@@ -121,6 +121,15 @@
                                 visible="{= ${/isEditOn} }"
                                 enabled="{= ${/isEditOn} }"
                                 press=".onTakeNoActionPress"
+                            />
+                            <Button
+                                id="_IDGenButton14"
+                                text="Payroll Deduction"
+                                type="Ghost"
+                                width="10rem"
+                                visible="{= ${/isEditOn} }"
+                                enabled="{= ${/isEditOn} }"
+                                press=".onPayrollDeductionPress"
                             />
                         </HBox>
                     </VBox>

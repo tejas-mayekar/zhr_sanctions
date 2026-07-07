@@ -5,8 +5,9 @@ sap.ui.define([
     "sap/ui/model/FilterOperator",
     "zhrsanctions/utils/ODataUtils",
     "zhrsanctions/utils/TableUtils",
-    "zhrsanctions/utils/ExportUtils"
-], (BaseController, JSONModel, Filter, FilterOperator, ODataUtils, TableUtils, ExportUtils) => {
+    "zhrsanctions/utils/ExportUtils",
+    "sap/ui/core/format/DateFormat"
+], (BaseController, JSONModel, Filter, FilterOperator, ODataUtils, TableUtils, ExportUtils, DateFormat) => {
     "use strict";
 
     // ─── Column Config ────────────────────────────────────────────────────────
@@ -15,7 +16,7 @@ sap.ui.define([
         { label: "Action Ref No", binding: "ZactionRefNo", width: "11rem", sortProperty: "ZactionRefNo", filterProperty: "ZactionRefNo", visible: true },
         { label: "Employee ID", binding: "ZempId", width: "9rem", sortProperty: "ZempId", filterProperty: "ZempId", visible: true },
         { label: "Employee Name", binding: "ZempName", width: "14rem", sortProperty: "ZempName", filterProperty: "ZempName", visible: true },
-        { label: "Incident Date", binding: "ZincDate", width: "10rem", sortProperty: "ZincDate", filterProperty: "ZincDate", visible: true },
+        { label: "Incident Date", binding: "ZincDate", width: "10rem", sortProperty: "ZincDate", filterProperty: "ZincDate", visible: true ,isDate: true},
         { label: "Incident Discovery Date", binding: "ZincDisDate", width: "10rem", sortProperty: "ZincDisDate", filterProperty: "ZincDisDate", visible: true },
         { label: "Action", binding: "Zaction", width: "14rem", sortProperty: "Zaction", filterProperty: "Zaction", visible: true },
         { label: "Status", binding: "Zstatus", width: "10rem", sortProperty: "Zstatus", filterProperty: "Zstatus", visible: true, isStatus: true },
@@ -38,11 +39,16 @@ sap.ui.define([
                 historyCount: 0,
                 ITM_STRSet: []
             }));
-
+       const dateFormatter = (value) => {
+                if (!value) return "";
+                const oDateFormat = DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" });
+                return oDateFormat.format(new Date(value));
+            };
             TableUtils.buildTableColumns(
                 this.byId("HcTable"),
                 HC_TABLE_COLUMNS,
                 this.formatEdmTime.bind(this),
+                dateFormatter,
                 this.formatZstatus.bind(this)
             );
 
