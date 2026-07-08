@@ -95,6 +95,7 @@
                                 id="dpZincDisDate"
                                 displayFormat="yyyy-MM-dd"
                                 placeholder="yyyy-mm-dd"
+                                change=".onIncidentDateChange"
                             />
 
                             <Label

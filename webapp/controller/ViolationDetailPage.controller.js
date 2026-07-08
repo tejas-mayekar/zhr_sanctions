@@ -25,8 +25,8 @@ sap.ui.define([
         if (!timeStr) { return 0; }
         const [hh, mm, ss = "0"] = timeStr.split(":");
         return (parseInt(hh, 10) || 0) * 3600
-             + (parseInt(mm, 10) || 0) * 60
-             + (parseInt(ss, 10) || 0);
+            + (parseInt(mm, 10) || 0) * 60
+            + (parseInt(ss, 10) || 0);
     }
 
     /**
@@ -75,7 +75,7 @@ sap.ui.define([
     const MODE_TITLE = {
         delay: "Regularize Delay",
         short: "Regularize Short Hours",
-        both:  "Regularize Both"
+        both: "Regularize Both"
     };
 
     // ─── Controller ───────────────────────────────────────────────────────────
@@ -114,10 +114,10 @@ sap.ui.define([
          * pre-fills the From/To time pickers to close each attendance gap.
          */
         _populateRegularizeModel(record) {
-            const scheduledIn  = toTimeString(record.ZschTimeIn);
+            const scheduledIn = toTimeString(record.ZschTimeIn);
             const scheduledOut = toTimeString(record.ZschTimeOut);
-            const punchIn      = toTimeString(record.Zpunchintime);
-            const punchOut     = toTimeString(record.Zpunchouttime);
+            const punchIn = toTimeString(record.Zpunchintime);
+            const punchOut = toTimeString(record.Zpunchouttime);
 
             // Detect delay: ZdelayHrs non-zero AND punch-in is later than scheduled-in
             const hasDelay = isNonZeroTime(record.ZdelayHrs) && (
@@ -132,31 +132,31 @@ sap.ui.define([
             );
 
             const hasBoth = hasDelay && hasShort;
-            const mode    = hasBoth ? "both" : hasDelay ? "delay" : "short";
+            const mode = hasBoth ? "both" : hasDelay ? "delay" : "short";
 
             const incidentDateDisplay = this._formatIncidentDateDisplay(record.ZincDate);
 
             const state = {
-                dialogTitle:       hasBoth ? "Regularize Both" : MODE_TITLE[mode],
-                scheduledIn:       buildDateTimeDisplayString(incidentDateDisplay, scheduledIn),
-                scheduledOut:      buildDateTimeDisplayString(incidentDateDisplay, scheduledOut),
-                punchIn:           buildDateTimeDisplayString(incidentDateDisplay, punchIn),
-                punchOut:          buildDateTimeDisplayString(incidentDateDisplay, punchOut),
-                delayHrs:          this._formatHoursDisplay(record.ZdelayHrs),
-                shortHrs:          this._formatHoursDisplay(record.ZshortHrs),
-                incidentDate:      incidentDateDisplay,
+                dialogTitle: hasBoth ? "Regularize Both" : MODE_TITLE[mode],
+                scheduledIn: buildDateTimeDisplayString(incidentDateDisplay, scheduledIn),
+                scheduledOut: buildDateTimeDisplayString(incidentDateDisplay, scheduledOut),
+                punchIn: buildDateTimeDisplayString(incidentDateDisplay, punchIn),
+                punchOut: buildDateTimeDisplayString(incidentDateDisplay, punchOut),
+                delayHrs: this._formatHoursDisplay(record.ZdelayHrs),
+                shortHrs: this._formatHoursDisplay(record.ZshortHrs),
+                incidentDate: incidentDateDisplay,
                 hasDelay,
                 hasShort,
-                showModeSelector:  hasBoth,
+                showModeSelector: hasBoth,
                 mode,
 
                 // Delay gap: scheduled-in → (punch-in minus 1 sec)
                 delayFrom: scheduledIn,
-                delayTo:   secondsToTimeString(timeStringToSeconds(punchIn) - 1),
+                delayTo: secondsToTimeString(timeStringToSeconds(punchIn) - 1),
 
                 // Short gap: (punch-out plus 1 sec) → scheduled-out
                 shortFrom: secondsToTimeString(timeStringToSeconds(punchOut) + 1),
-                shortTo:   scheduledOut,
+                shortTo: scheduledOut,
 
                 reason: ""
             };
@@ -168,14 +168,14 @@ sap.ui.define([
 
         onRegularizeModeChange(oEvent) {
             const regularizeModel = this.getView().getModel("regularize");
-            const modeIndex       = oEvent.getParameter("selectedIndex");
-            const modes           = ["delay", "short", "both"];
-            const selectedMode    = modes[modeIndex] || "both";
+            const modeIndex = oEvent.getParameter("selectedIndex");
+            const modes = ["delay", "short", "both"];
+            const selectedMode = modes[modeIndex] || "both";
 
             const hasDelay = regularizeModel.getProperty("/hasDelay");
             const hasShort = regularizeModel.getProperty("/hasShort");
 
-            regularizeModel.setProperty("/mode",        selectedMode);
+            regularizeModel.setProperty("/mode", selectedMode);
             regularizeModel.setProperty("/dialogTitle", MODE_TITLE[selectedMode] || "Regularize Attendance");
 
             const visibility = resolveSectionVisibility(selectedMode, hasDelay, hasShort);
@@ -185,8 +185,8 @@ sap.ui.define([
 
         onRegularizeSubmit() {
             const regularizeModel = this.getView().getModel("regularize");
-            const state           = regularizeModel.getData();
-            const reason          = (state.reason || "").trim();
+            const state = regularizeModel.getData();
+            const reason = (state.reason || "").trim();
 
             // ── Validate ──────────────────────────────────────────────────────
             if (!reason) {
@@ -223,77 +223,77 @@ sap.ui.define([
             }
 
             // ── Derive corrected punch/schedule times by mode ─────────────────
-            let correctedSchIn   = toTimeString(record.ZschTimeIn);
-            let correctedPunchIn  = toTimeString(record.Zpunchintime);
+            let correctedSchIn = toTimeString(record.ZschTimeIn);
+            let correctedPunchIn = toTimeString(record.Zpunchintime);
             let correctedPunchOut = toTimeString(record.Zpunchouttime);
-            let correctedSchOut  = toTimeString(record.ZschTimeOut);
+            let correctedSchOut = toTimeString(record.ZschTimeOut);
 
             if (state.showDelay && !state.showShort) {
                 // DelayFlag = "1": from = ZschTimeIn, to = Zpunchintime
-                correctedSchIn   = state.delayFrom;
+                correctedSchIn = state.delayFrom;
                 correctedPunchIn = state.delayTo;
 
             } else if (state.showShort && !state.showDelay) {
                 // DelayFlag = "2": from = Zpunchouttime, to = ZschTimeOut
                 correctedPunchOut = state.shortFrom;
-                correctedSchOut   = state.shortTo;
+                correctedSchOut = state.shortTo;
 
             } else if (state.showDelay && state.showShort) {
                 // DelayFlag = "3": FM called twice (delay + short)
-                correctedSchIn    = state.delayFrom;
-                correctedPunchIn  = state.delayTo;
+                correctedSchIn = state.delayFrom;
+                correctedPunchIn = state.delayTo;
                 correctedPunchOut = state.shortFrom;
-                correctedSchOut   = state.shortTo;
+                correctedSchOut = state.shortTo;
             }
 
             const delayFlag = state.showDelay && state.showShort ? "3"
-                            : state.showDelay                    ? "1"
-                            :                                      "2";
+                : state.showDelay ? "1"
+                    : "2";
 
             const oDataModel = this.getOwnerComponent().getModel()
-                            || this.getView().getModel("mainService");
+                || this.getView().getModel("mainService");
             if (!oDataModel) {
                 MessageBox.warning("No active OData service connected.");
                 return;
             }
 
             const itmPayload = ODataUtils.buildITMPayload(record, {
-                Zaction:             "Regularized",
+                Zaction: "Regularized",
                 Zlinemanagerremarks: reason,
-                Zpunchintime:        ODataUtils.formatTimeForPayload(correctedPunchIn),
-                Zpunchouttime:       ODataUtils.formatTimeForPayload(correctedPunchOut),
-                Zstatus:             "4"
+                Zpunchintime: ODataUtils.formatTimeForPayload(correctedPunchIn),
+                Zpunchouttime: ODataUtils.formatTimeForPayload(correctedPunchOut),
+                Zstatus: "4"
             });
 
             sap.ui.core.BusyIndicator.show(0);
 
             // Step 1: PUT punch_regularizeSet
             ODataUtils.submitPunchRegularize(oDataModel, record, {
-                ZschTimeIn:   correctedSchIn,
+                ZschTimeIn: correctedSchIn,
                 Zpunchintime: correctedPunchIn,
-                Zpunchouttime:correctedPunchOut,
-                ZschTimeOut:  correctedSchOut,
-                DelayFlag:    delayFlag
+                Zpunchouttime: correctedPunchOut,
+                ZschTimeOut: correctedSchOut,
+                DelayFlag: delayFlag
             })
-            .then(() => {
-                // Step 2: POST ITM_STRSet
-                oDataModel.create("/ITM_STRSet", itmPayload, {
-                    success: () => {
-                        sap.ui.core.BusyIndicator.hide();
-                        MessageToast.show("Regularization submitted successfully.");
-                        this._closeDialog("regularize");
-                        this.onNavBack();
-                    },
-                    error: (error) => {
-                        sap.ui.core.BusyIndicator.hide();
-                        ODataUtils.handleODataError(error, "Error submitting Regularization");
-                    }
+                .then(() => {
+                    // Step 2: POST ITM_STRSet
+                    oDataModel.create("/ITM_STRSet", itmPayload, {
+                        success: () => {
+                            sap.ui.core.BusyIndicator.hide();
+                            MessageToast.show("Regularization submitted successfully.");
+                            this._closeDialog("regularize");
+                            this.onNavBack();
+                        },
+                        error: (error) => {
+                            sap.ui.core.BusyIndicator.hide();
+                            ODataUtils.handleODataError(error, "Error submitting Regularization");
+                        }
+                    });
+                })
+                .catch((punchError) => {
+                    sap.ui.core.BusyIndicator.hide();
+                    console.error("Punch regularize PUT failed; ITM_STRSet create skipped:", punchError);
                 });
-            })
-            .catch((punchError) => {
-                sap.ui.core.BusyIndicator.hide();
-                console.error("Punch regularize PUT failed; ITM_STRSet create skipped:", punchError);
-            });
         },
 
         onRegularizeCancel() {
@@ -323,7 +323,7 @@ sap.ui.define([
             }
 
             const payload = ODataUtils.buildITMPayload(record, {
-                Zaction:             "Report To HC",
+                Zaction: "Report To HC",
                 Zlinemanagerremarks: reason
             });
 
@@ -346,7 +346,10 @@ sap.ui.define([
                 return;
             }
 
-            const payload = ODataUtils.buildITMPayload(record, { Zaction: "Payroll Deduction" });
+            const payload = ODataUtils.buildITMPayload(record, { 
+                Zaction: "Payroll Deduction", 
+                Zstatus: "4" 
+            });
             this._submitToITMSet(
                 payload,
                 "Payroll Deduction submitted successfully.",
@@ -378,14 +381,14 @@ sap.ui.define([
             }
 
             Fragment.load({
-                id:         this.getView().getId(),
-                name:       fragmentName,
+                id: this.getView().getId(),
+                name: fragmentName,
                 controller: this
             }).then(dialog => {
                 this[cacheKey] = dialog;
                 this.getView().addDependent(dialog);
-                dialog.setModel(this.getView().getModel("detailData"),   "detailData");
-                dialog.setModel(this.getView().getModel("regularize"),   "regularize");
+                dialog.setModel(this.getView().getModel("detailData"), "detailData");
+                dialog.setModel(this.getView().getModel("regularize"), "regularize");
                 dialog.open();
             });
         },
@@ -407,7 +410,7 @@ sap.ui.define([
          */
         _submitToITMSet(payload, successMsg, onSuccess, errorTitle) {
             const oDataModel = this.getOwnerComponent().getModel()
-                            || this.getView().getModel("mainService");
+                || this.getView().getModel("mainService");
 
             if (!oDataModel) {
                 MessageBox.warning(
@@ -450,8 +453,8 @@ sap.ui.define([
 
             if (isNaN(date.getTime())) { return ""; }
 
-            const dd   = String(date.getDate()).padStart(2, "0");
-            const mm   = String(date.getMonth() + 1).padStart(2, "0");
+            const dd = String(date.getDate()).padStart(2, "0");
+            const mm = String(date.getMonth() + 1).padStart(2, "0");
             const yyyy = date.getFullYear();
             return `${dd}-${mm}-${yyyy}`;
         },
@@ -483,25 +486,25 @@ sap.ui.define([
          */
         _buildEmptyRegularizeState() {
             return {
-                dialogTitle:     "Regularize Attendance",
-                scheduledIn:     "",
-                scheduledOut:    "",
-                punchIn:         "",
-                punchOut:        "",
-                delayHrs:        "",
-                shortHrs:        "",
-                incidentDate:    "",
-                hasDelay:        false,
-                hasShort:        false,
-                showModeSelector:false,
-                mode:            "both",
-                showDelay:       false,
-                showShort:       false,
-                delayFrom:       "",
-                delayTo:         "",
-                shortFrom:       "",
-                shortTo:         "",
-                reason:          ""
+                dialogTitle: "Regularize Attendance",
+                scheduledIn: "",
+                scheduledOut: "",
+                punchIn: "",
+                punchOut: "",
+                delayHrs: "",
+                shortHrs: "",
+                incidentDate: "",
+                hasDelay: false,
+                hasShort: false,
+                showModeSelector: false,
+                mode: "both",
+                showDelay: false,
+                showShort: false,
+                delayFrom: "",
+                delayTo: "",
+                shortFrom: "",
+                shortTo: "",
+                reason: ""
             };
         }
     });
