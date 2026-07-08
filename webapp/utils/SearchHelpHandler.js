@@ -98,12 +98,12 @@ sap.ui.define([
          * and earliest incident date for this employee + category + type.
          * Populates regularize>/Zrepeatcount and regularize>/ZfirstIncDate.
          */
-        loadRepeatInfo(controller, employeeId, category, incidentType, incidentDate) {
+        loadRepeatInfo(controller, employeeId, category, incidentType, incidentDate, actionRefNo) {
             if (!employeeId || !category || !incidentType || !incidentDate) { return; }
 
             const model = controller.getView().getModel("mainService");
             const formattedDate = formatDateForODataKey(incidentDate);
-            const entityPath = `/FIST_INC_DATESet(ZempId='${employeeId}',ZincCategory='${category}',ZincType='${incidentType}',ZincDate=datetime'${formattedDate}')`;
+            const entityPath = `/FIST_INC_DATESet(ZempId='${employeeId}',ZincCategory='${category}',ZincType='${incidentType}',ZincDate=datetime'${formattedDate}',ZactionRefNo='${actionRefNo}')`;
 
             model.read(entityPath, {
                 success: (data) => {
@@ -327,8 +327,9 @@ sap.ui.define([
                 const detailModel = controller.getView().getModel("detailData");
                 const employeeId = detailModel?.getProperty("/record/ZempId");
                 const incidentDate = detailModel?.getProperty("/record/ZincDate");
+                const actionRefNo = detailModel?.getProperty("/record/ZactionRefNo");
 
-                this.loadRepeatInfo(controller, employeeId, category, selectedKey, incidentDate);
+                this.loadRepeatInfo(controller, employeeId, category, selectedKey, incidentDate, actionRefNo);
             }
 
             dialog._targetInput.fireChange({ value: selectedKey });

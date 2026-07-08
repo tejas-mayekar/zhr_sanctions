@@ -9,7 +9,24 @@ sap.ui.define([
     "sap/ui/model/FilterOperator"
 ], (BaseController, JSONModel, MessageToast, MessageBox, ODataUtils, SearchHelpHandler, Filter, FilterOperator) => {
     "use strict";
-
+    // add near top of HCViolationDetailPage.controller.js, after other helper fns
+    function toTimeStr(edmTime) {
+        return ODataUtils.formatEdmTime(edmTime) || "";
+    }
+    function timeToSec(t) {
+        if (!t) { return 0; }
+        const [h, m, s = "0"] = t.split(":");
+        return (parseInt(h, 10) || 0) * 3600 + (parseInt(m, 10) || 0) * 60 + (parseInt(s, 10) || 0);
+    }
+    function hasTimeDiff(record) {
+        const schIn = toTimeStr(record.ZschTimeIn);
+        const schOut = toTimeStr(record.ZschTimeOut);
+        const pIn = toTimeStr(record.Zpunchintime);
+        const pOut = toTimeStr(record.Zpunchouttime);
+        const delay = schIn && pIn && timeToSec(pIn) > timeToSec(schIn);
+        const short = schOut && pOut && timeToSec(pOut) < timeToSec(schOut);
+        return delay || short;
+    }
     // ─── Default State ────────────────────────────────────────────────────────
 
     const EMPTY_ACTION_STATE = {
@@ -121,8 +138,16 @@ sap.ui.define([
         },
 
         // ── Take No Action Dialog ─────────────────────────────────────────────
-
+        // replace onTakeNoActionPress
         onTakeNoActionPress() {
+            const violationRec = this.getView().getModel("detailData").getData().record;
+
+            if (hasTimeDiff(violationRec)) {
+                this._populateRegularizeModel(violationRec);
+                this._openRegularizeDialog();
+                return;
+            }
+
             if (!this._takeNoActionDialog) {
                 this._takeNoActionDialog = sap.ui.xmlfragment(
                     this.getView().getId(),
@@ -133,6 +158,97 @@ sap.ui.define([
             }
             this._takeNoActionDialog.open();
         },
+        _populateRegularizeModel(record) {
+            const schIn = toTimeStr(record.ZschTimeIn);
+            const schOut = toTimeStr(record.ZschTimeOut);
+            const pIn = toTimeStr(record.Zpunchintime);
+            const pOut = toTimeStr(record.Zpunchouttime);
+
+            const hasDelay = schIn && pIn && timeToSec(pIn) > timeToSec(schIn);
+            const hasShort = schOut && pOut && timeToSec(pOut) < timeToSec(schOut);
+            const hasBoth = hasDelay && hasShort;
+            const mode = hasBoth ? "both" : hasDelay ? "delay" : "short";
+
+            const state = {
+                dialogTitle: "Regularize Attendance",
+                scheduledIn: schIn,
+                scheduledOut: schOut,
+                punchIn: pIn,
+                punchOut: pOut,
+                delayHrs: record.ZdelayHrs || "0:00",
+                shortHrs: record.ZshortHrs || "0:00",
+                hasDelay,
+                hasShort,
+                showModeSelector: hasBoth,
+                showDelay: hasBoth ? hasDelay : mode === "delay",
+                showShort: hasBoth ? hasShort : mode === "short",
+                mode,
+                delayFrom: schIn,
+                delayTo: pIn,
+                shortFrom: pOut,
+                shortTo: schOut,
+                reason: ""
+            };
+
+            this.getView().getModel("regularize").setData(state);
+        },
+        onRegularizeSubmit() {
+            const state = this.getView().getModel("regularize").getData();
+            const reason = (state.reason || "").trim();
+            if (!reason) {
+                MessageBox.warning("Please enter a reason before submitting.");
+                return;
+            }
+
+            const record = this.getView().getModel("detailData").getData().record;
+            const delayFlag = state.showDelay && state.showShort ? "3"
+                : state.showDelay ? "1" : "2";
+
+            const oDataModel = this.getOwnerComponent().getModel();
+            oDataModel.setUseBatch(false);
+
+            sap.ui.core.BusyIndicator.show(0);
+
+            ODataUtils.submitPunchRegularize(oDataModel, record, {
+                ZschTimeIn: state.delayFrom,
+                Zpunchintime: state.delayTo,
+                Zpunchouttime: state.shortFrom,
+                ZschTimeOut: state.shortTo,
+                DelayFlag: delayFlag
+            })
+                .then(() => ODataUtils.submitHCAction(oDataModel, record, {
+                    Zaction: "Regularized",
+                    Zhcopsremark: reason,
+                    Zstatus: "4"
+                }))
+                .then(() => {
+                    sap.ui.core.BusyIndicator.hide();
+                    MessageToast.show("Regularization submitted successfully.");
+                    this._regularizeDialog.close();
+                    this.getView().getModel("regularize").setData({ ...EMPTY_ACTION_STATE });
+                    this.getView().getModel().setProperty("/isEditOn", false);
+                })
+                .catch((err) => {
+                    sap.ui.core.BusyIndicator.hide();
+                    console.error("HCViolationDetailPage: regularize submit failed:", err);
+                });
+        },
+
+        onRegularizeCancel() {
+            this._regularizeDialog.close();
+        },
+        _openRegularizeDialog() {
+            if (!this._regularizeDialog) {
+                this._regularizeDialog = sap.ui.xmlfragment(
+                    this.getView().getId(),
+                    "zhrsanctions.view.fragments.RegularizeDialog",
+                    this
+                );
+                this.getView().addDependent(this._regularizeDialog);
+            }
+            this._regularizeDialog.open();
+        },
+
 
         onCloseTakeNoActionDialog() {
             this._takeNoActionDialog.close();
@@ -221,9 +337,9 @@ sap.ui.define([
             oDataModel.setUseBatch(false);
 
             sap.ui.core.BusyIndicator.show(0);
-            ODataUtils.submitHCAction(oDataModel, violationRec, { 
-                Zaction: "Payroll Deduction", 
-                Zstatus: "4" 
+            ODataUtils.submitHCAction(oDataModel, violationRec, {
+                Zaction: "Payroll Deduction",
+                Zstatus: "4"
             })
                 .then(() => {
                     sap.ui.core.BusyIndicator.hide();

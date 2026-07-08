@@ -17,7 +17,7 @@ sap.ui.define([
         { label: "Employee ID", binding: "ZempId", width: "9rem", sortProperty: "ZempId", filterProperty: "ZempId", visible: true },
         { label: "Employee Name", binding: "ZempName", width: "14rem", sortProperty: "ZempName", filterProperty: "ZempName", visible: true },
         { label: "Incident Date", binding: "ZincDate", width: "10rem", sortProperty: "ZincDate", filterProperty: "ZincDate", visible: true, isDate: true },
-        { label: "Incident Discovery Date", binding: "ZincDisDate", width: "10rem", sortProperty: "ZincDisDate", filterProperty: "ZincDisDate", visible: true },
+        { label: "Incident Discovery Date", binding: "ZincDisDate", width: "10rem", sortProperty: "ZincDisDate", filterProperty: "ZincDisDate", visible: true, isDate: true },
         { label: "Action", binding: "Zaction", width: "14rem", sortProperty: "Zaction", filterProperty: "Zaction", visible: true },
         { label: "Status", binding: "Zstatus", width: "10rem", sortProperty: "Zstatus", filterProperty: "Zstatus", visible: true, isStatus: true },
         { label: "Sanction", binding: "Zsanction", width: "14rem", sortProperty: "Zsanction", filterProperty: "Zsanction", visible: true },

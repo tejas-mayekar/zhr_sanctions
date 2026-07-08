@@ -115,7 +115,7 @@
                             />
                             <Button
                                 id="_IDGenButton12"
-                                text="Take No Actions"
+                                text="No Actions"
                                 type="Emphasized"
                                 width="10rem"
                                 visible="{= ${/isEditOn} }"
@@ -124,7 +124,7 @@
                             />
                             <Button
                                 id="_IDGenButton14"
-                                text="Payroll Deduction"
+                                text="Payroll Deduction Only"
                                 type="Ghost"
                                 width="10rem"
                                 visible="{= ${/isEditOn} }"
@@ -247,7 +247,7 @@
                             />
                             <Text
                                 id="_IDGenText65"
-                                text="{detailData>/record/ZjobTitle}"
+                                text="{detailData>/record/Zjobtitle}"
                             />
 
                             <Label
@@ -256,7 +256,7 @@
                             />
                             <Text
                                 id="_IDGenText66"
-                                text="{detailData>/record/ZpayGrade}"
+                                text="{detailData>/record/Zpaygrade}"
                             />
 
                             <Label
@@ -274,7 +274,7 @@
                             />
                             <Text
                                 id="_IDGenText68"
-                                text="{detailData>/record/ZhireDate}"
+                                text="{detailData>/record/Zhiredate}"
                             />
 
                             <Label
@@ -332,7 +332,7 @@
                             />
                             <Text
                                 id="_IDGenText75"
-                                text="{detailData>/record/ViolationType}"
+                                text="{detailData>/record/ZincType}"
                             />
 
                             <Label

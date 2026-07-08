@@ -72,7 +72,6 @@
                     id="_IDGenHBox5"
                     justifyContent="SpaceBetween"
                     alignItems="Center"
-                    visible="{regularize>/isVisible}"
                 >
                     <HBox
                         id="_IDGenHBox9"

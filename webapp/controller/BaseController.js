@@ -11,7 +11,11 @@ sap.ui.define([
         "3": "Sent Back to LM",
         "4": "Completed"
     };
-
+const ZACTION_MAP = {
+    "1": "Pending",
+    "2": "In Progress",
+    "3": "Completed",
+}
     return Controller.extend("zhrsanctions.controller.BaseController", {
 
         formatEdmTime(edmTime) {

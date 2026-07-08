@@ -75,8 +75,7 @@ sap.ui.define([
         onIncidentDateChange(oEvent) {
             const oDatePicker = oEvent.getSource();
             const hasDate = !!oDatePicker.getDateValue();
-            this.byId("inputZempId").setEditable(hasDate);
-
+            
             if (hasDate) {
                 const today = new Date();
                 today.setHours(23, 59, 59, 999);
@@ -84,6 +83,7 @@ sap.ui.define([
                     oDatePicker.setValueState("Error");
                     oDatePicker.setValueStateText("Incident Date cannot be in the future.");
                 } else {
+                    this.byId("inputZempId").setEditable(true);
                     oDatePicker.setValueState("None");
                 }
             }
