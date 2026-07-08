@@ -28,7 +28,24 @@ sap.ui.define([
         return delay || short;
     }
     // ─── Default State ────────────────────────────────────────────────────────
+    function timeStringToSeconds(timeStr) {
+        if (!timeStr) { return 0; }
+        const [hh, mm, ss = "0"] = timeStr.split(":");
+        return (parseInt(hh, 10) || 0) * 3600
+            + (parseInt(mm, 10) || 0) * 60
+            + (parseInt(ss, 10) || 0);
+    }
 
+    /**
+     * Convert total seconds → zero-padded "HH:mm:ss".
+     */
+    function secondsToTimeString(totalSeconds) {
+        if (totalSeconds < 0) { totalSeconds = 0; }
+        const hh = String(Math.floor(totalSeconds / 3600)).padStart(2, "0");
+        const mm = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, "0");
+        const ss = String(totalSeconds % 60).padStart(2, "0");
+        return `${hh}:${mm}:${ss}`;
+    }
     const EMPTY_ACTION_STATE = {
         ZactionRefNo: "",
         ZincCategory: "",
@@ -115,7 +132,19 @@ sap.ui.define([
         onCloseTakeActionDialog() {
             this._takeActionDialog.close();
         },
-
+        onRepeatCountChange(oEvent) {
+            const actionData = this.getView().getModel("regularize").getData();
+            
+            const oInput = oEvent.getSource();
+            const newValue = oInput.getValue();
+            if (actionData.Zrepeatcount < parseInt(newValue)) {
+                oInput.setValueState("Error");
+                oInput.setValueStateText("Repeat count cannot be greater than system repeat count");                
+            }
+            else{
+                oInput.setValueState("None");
+            }
+        },
         onSubmitTakeAction() {
             const actionData = this.getView().getModel("regularize").getData();
             const violationRec = this.getView().getModel("detailData").getData().record;
@@ -184,8 +213,8 @@ sap.ui.define([
                 showShort: hasBoth ? hasShort : mode === "short",
                 mode,
                 delayFrom: schIn,
-                delayTo: pIn,
-                shortFrom: pOut,
+                delayTo: secondsToTimeString(timeStringToSeconds(pIn) - 1),
+                shortFrom: secondsToTimeString(timeStringToSeconds(pOut) + 1),
                 shortTo: schOut,
                 reason: ""
             };

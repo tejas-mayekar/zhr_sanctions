@@ -124,6 +124,7 @@
                                 id="_IDGenInput5"
                                 required="true"
                                 value="{regularize>/Zsysrepeatcount}"
+                                change=".onRepeatCountChange"
                             />
                         </HBox>
                     </HBox>
