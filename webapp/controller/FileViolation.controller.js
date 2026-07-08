@@ -94,17 +94,6 @@ sap.ui.define([
             const p = ODataUtils.parseByte.bind(ODataUtils);
             const selectedEmployee = this._getSelectedEmployeeData();
             const emp = selectedEmployee || {};
-            if (!payload.ZempId || !payload.ZincDate) {
-                MessageBox.error("Please fill in all mandatory key fields:\n- Employee ID\n- Incident Date");
-                return;
-            }
-
-            const today = new Date();
-            today.setHours(23, 59, 59, 999);
-            if (payload.ZincDate > today) {
-                MessageBox.error("Incident Date cannot be greater than the current date.");
-                return;
-            }
             const payload = {
                 // Employee
                 ZempId: emp.ZempId || this.byId("inputZempId").getValue(),
@@ -205,6 +194,12 @@ sap.ui.define([
                 return;
             }
 
+            const today = new Date();
+            today.setHours(23, 59, 59, 999);
+            if (payload.ZincDate > today) {
+                MessageBox.error("Incident Date cannot be greater than the current date.");
+                return;
+            }
             const oDataModel = this.getOwnerComponent().getModel()
                 || this.getView().getModel("mainService");
 

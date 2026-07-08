@@ -134,14 +134,14 @@ sap.ui.define([
         },
         onRepeatCountChange(oEvent) {
             const actionData = this.getView().getModel("regularize").getData();
-            
+
             const oInput = oEvent.getSource();
             const newValue = oInput.getValue();
             if (actionData.Zrepeatcount < parseInt(newValue)) {
                 oInput.setValueState("Error");
-                oInput.setValueStateText("Repeat count cannot be greater than system repeat count");                
+                oInput.setValueStateText("Repeat count cannot be greater than system repeat count");
             }
-            else{
+            else {
                 oInput.setValueState("None");
             }
         },
@@ -153,7 +153,10 @@ sap.ui.define([
                 MessageBox.error("Please fill all required fields");
                 return;
             }
-
+            if (actionData.Zrepeatcount < actionData.Zsysrepeatcount) {
+                MessageBox.error("Repeat count cannot be greater than system repeat count");
+                return;
+            }
             this._submitHCAction(violationRec, {
                 ZactionRefNo: violationRec.ZactionRefNo,
                 ZincCategory: actionData.ZincCategory,
