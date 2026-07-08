@@ -118,10 +118,12 @@
                             <Label
                                 id="_IDGenLabel104"
                                 text="Repeat Count"
+                                required="true"
                                 class="sapUiSmallMarginEnd"
                             />
                             <Input
                                 id="_IDGenInput5"
+                                required="true"
                                 value="{regularize>/Zsysrepeatcount}"
                             />
                         </HBox>
