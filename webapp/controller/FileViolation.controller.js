@@ -46,10 +46,10 @@ sap.ui.define([
         },
 
 
-        onIncidentDateChange(oEvent) {
-            const hasDate = !!oEvent.getSource().getDateValue();
-            this.byId("inputZempId").setEditable(hasDate);
-        },
+        // onIncidentDateChange(oEvent) {
+        //     const hasDate = !!oEvent.getSource().getDateValue();
+        //     this.byId("inputZempId").setEditable(hasDate);
+        // },
 
         onValueHelpRequest(oEvent) {
             const incidentDate = this.byId("dpZincDate").getDateValue();
@@ -72,14 +72,39 @@ sap.ui.define([
         onCancel() {
             this.onNavBack();
         },
+        onIncidentDateChange(oEvent) {
+            const oDatePicker = oEvent.getSource();
+            const hasDate = !!oDatePicker.getDateValue();
+            this.byId("inputZempId").setEditable(hasDate);
 
+            if (hasDate) {
+                const today = new Date();
+                today.setHours(23, 59, 59, 999);
+                if (oDatePicker.getDateValue() > today) {
+                    oDatePicker.setValueState("Error");
+                    oDatePicker.setValueStateText("Incident Date cannot be in the future.");
+                } else {
+                    oDatePicker.setValueState("None");
+                }
+            }
+        },
         onSave() {
             // Edm.Byte only: ZdelayHrs, ZshortHrs, Zrepeatcount, Zsysyrepeatcount
             // Zn0-Zn7, ZstdWeekHrs, ZwrkDyWeek = Edm.String in updated metadata
             const p = ODataUtils.parseByte.bind(ODataUtils);
             const selectedEmployee = this._getSelectedEmployeeData();
             const emp = selectedEmployee || {};
+            if (!payload.ZempId || !payload.ZincDate) {
+                MessageBox.error("Please fill in all mandatory key fields:\n- Employee ID\n- Incident Date");
+                return;
+            }
 
+            const today = new Date();
+            today.setHours(23, 59, 59, 999);
+            if (payload.ZincDate > today) {
+                MessageBox.error("Incident Date cannot be greater than the current date.");
+                return;
+            }
             const payload = {
                 // Employee
                 ZempId: emp.ZempId || this.byId("inputZempId").getValue(),

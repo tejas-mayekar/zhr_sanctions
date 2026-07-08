@@ -211,53 +211,29 @@ sap.ui.define([
             SearchHelpHandler.onLiveSearch(oEvent);
         },
         onPayrollDeductionPress() {
-            
             const violationRec = this.getView().getModel("detailData").getData().record;
             if (!violationRec?.ZactionRefNo) {
                 MessageBox.error("No violation record loaded. Cannot submit Payroll Deduction.");
                 return;
             }
 
-            const payload = ODataUtils.buildITMPayload(violationRec, { Zaction: "Payroll Deduction" });
-            this._submitToITMSet(
-                payload,
-                "Payroll Deduction submitted successfully.",
-                () => this.onNavBack(),
-                "Error submitting Payroll Deduction"
-            );
-        },
-                /**
-         * POST to ITM_STRSet with a given payload.
-         *
-         * @param {object}   payload       - full ITM_STR entity payload
-         * @param {string}   successMsg    - toast shown on success
-         * @param {Function} onSuccess     - callback invoked after success toast
-         * @param {string}   errorTitle    - MessageBox title on error
-         */
-        _submitToITMSet(payload, successMsg, onSuccess, errorTitle) {
-            const oDataModel = this.getOwnerComponent().getModel()
-                            || this.getView().getModel("mainService");
-
-            if (!oDataModel) {
-                MessageBox.warning(
-                    "No active OData service connected. Payload logged to console:\n"
-                    + JSON.stringify(payload, null, 2)
-                );
-                return;
-            }
+            const oDataModel = this.getOwnerComponent().getModel();
+            oDataModel.setUseBatch(false);
 
             sap.ui.core.BusyIndicator.show(0);
-            oDataModel.create("/ITM_STRSet", payload, {
-                success: () => {
+            ODataUtils.submitHCAction(oDataModel, violationRec, { 
+                Zaction: "Payroll Deduction", 
+                Zstatus: "4" 
+            })
+                .then(() => {
                     sap.ui.core.BusyIndicator.hide();
-                    MessageToast.show(successMsg);
-                    onSuccess();
-                },
-                error: (error) => {
+                    MessageToast.show("Payroll Deduction submitted successfully.");
+                    this.onNavBack();
+                })
+                .catch((error) => {
                     sap.ui.core.BusyIndicator.hide();
-                    ODataUtils.handleODataError(error, errorTitle);
-                }
-            });
+                    console.error("HCViolationDetailPage: payroll deduction update failed:", error);
+                });
         },
         onValueHelpClose() {
             // Selection handling is done inside SearchHelpHandler.onConfirm
