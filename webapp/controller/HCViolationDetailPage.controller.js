@@ -322,7 +322,20 @@ sap.ui.define([
                 }
             });
         },
-
+        formatRemarkColor(text) {
+            if (!text) { return ""; }
+            const t = text.toUpperCase();
+            let bg = "transparent";
+            if (t.includes("CEO COMMENTS")) {
+                bg = "#c00";
+                return `<span style="background-color:${bg}; padding:2px 6px; color:#fff; border-radius:3px;">${text}</span>`;
+            } else if (t.includes("EVP COMMENTS")) {
+                bg = "#0070c0";
+                return `<span style="background-color:${bg}; padding:2px 6px; color:#fff; border-radius:3px;">${text}</span>`;
+            }else{
+                return `<span style="background-color:${bg}; padding:2px 6px; color:#000; border-radius:3px;">${text}</span>`;
+            }
+        },
         onViewRemarkCancel() {
             this._addRemark.close();
         },
