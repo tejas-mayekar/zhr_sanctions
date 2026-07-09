@@ -18,10 +18,15 @@
                 noDataText="No remarks found"
                 showSeparators="Inner"
             >
-                <StandardListItem
-                    id="_IDGenStandardListItem"
-                    title="{remarks>Tdline}"
-                />
+                <CustomListItem id="_IDGenCustomListItem">
+    <FormattedText id="_IDGenFormattedText"
+        htmlText="{
+            path: 'remarks>Tdline',
+            formatter: '.formatRemarkColor'
+        }"
+        class="sapUiSmallMargin"
+    />
+</CustomListItem>
             </List>
         </content>
 
