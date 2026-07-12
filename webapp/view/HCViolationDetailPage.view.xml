@@ -351,14 +351,6 @@
                             />
 
                             <Label
-                                id="_IDGenLabel91"
-                                text="Incident Date"
-                            />
-                            <Text
-                                id="_IDGenText77"
-                                text="{detailData>/record/ZincDate}"
-                            />
-                            <Label
                                 id="_IDGenLabel96"
                                 text="Scheduled In"
                             />

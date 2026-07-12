@@ -3,7 +3,7 @@ sap.ui.define([
     "sap/ui/core/routing/History",
     "zhrsanctions/utils/ODataUtils",
     "sap/ui/core/format/DateFormat"
-], (Controller, History, ODataUtils) => {
+], (Controller, History, ODataUtils, DateFormat) => {
     "use strict";
 
     const ZSTATUS_MAP = {
@@ -35,7 +35,7 @@ const ZACTION_MAP = {
             const key = String(status).trim();
             return ZSTATUS_MAP[key] || status;
         },
-    displaydateFormatter = (value) => {
+    displaydateFormatter(value)  {
                 if (!value) return "";
                 const oDateFormat = DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" });
                 return oDateFormat.format(new Date(value));
