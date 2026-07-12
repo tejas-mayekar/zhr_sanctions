@@ -205,7 +205,7 @@
                                             icon="sap-icon://detail-view"
                                             text="Details"
                                             type="Transparent"
-                                            press=".onViewDetails"
+                                            press=".onViewCompletedDetails"
                                         />
                                     </t:template>
                                 </t:Column>
