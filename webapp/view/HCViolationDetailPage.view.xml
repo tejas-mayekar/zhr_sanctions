@@ -274,7 +274,10 @@
                             />
                             <Text
                                 id="_IDGenText68"
-                                text="{detailData>/record/Zhiredate}"
+                                text="{
+                                    path: 'detailData>/record/Zhiredate',
+                                    formatter: '.displaydateFormatter'
+                                }"
                             />
 
                             <Label

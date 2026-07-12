@@ -153,6 +153,10 @@ sap.ui.define([
                 MessageBox.error("Please fill all required fields");
                 return;
             }
+            if (!actionData.Zsysrepeatcount || actionData.Zsysrepeatcount === "0") {
+                MessageBox.error("System repeat count is required");
+                return;
+            }
             if (actionData.Zrepeatcount < actionData.Zsysrepeatcount) {
                 MessageBox.error("Repeat count cannot be greater than system repeat count");
                 return;
