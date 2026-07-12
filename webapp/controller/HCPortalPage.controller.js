@@ -37,15 +37,36 @@ sap.ui.define([
         onInit() {
             this.getView().setModel(new JSONModel({
                 historyCount: 0,
-                ITM_STRSet: []
+                newCount: 0,
+                completedCount: 0,
+                ITM_STRSet: [],
+                ITM_NEW_SET: [],
+                ITM_COMPLETED_SET: []
             }));
             const dateFormatter = (value) => {
                 if (!value) return "";
                 const oDateFormat = DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" });
                 return oDateFormat.format(new Date(value));
             };
+
             TableUtils.buildTableColumns(
                 this.byId("HcTable"),
+                HC_TABLE_COLUMNS,
+                this.formatEdmTime.bind(this),
+                dateFormatter,
+                this.formatZstatus.bind(this)
+            );
+
+            TableUtils.buildTableColumns(
+                this.byId("HcNewTable"),
+                HC_TABLE_COLUMNS,
+                this.formatEdmTime.bind(this),
+                dateFormatter,
+                this.formatZstatus.bind(this)
+            );
+
+            TableUtils.buildTableColumns(
+                this.byId("HcCompletedTable"),
                 HC_TABLE_COLUMNS,
                 this.formatEdmTime.bind(this),
                 dateFormatter,
@@ -56,40 +77,12 @@ sap.ui.define([
                 .getRouter()
                 .getRoute("RouteHCPortal")
                 .attachPatternMatched(this._onRouteMatched, this);
-        },
-
+        }
+        ,
         // ── Route Handler ─────────────────────────────────────────────────────
 
         _onRouteMatched() {
             this._loadHCViolations();
-        },
-
-        // ── Data Loading ──────────────────────────────────────────────────────
-
-        async _loadHCViolations() {
-            try {
-                sap.ui.core.BusyIndicator.show(0);
-
-                const filters = [
-                    new Filter("ZlmIdName", FilterOperator.EQ, ODataUtils.getCurrentUserId()),
-                    new Filter("ZIsHc", FilterOperator.EQ, true)
-                ];
-
-                const records = await ODataUtils.fetchOData(
-                    this.getView().getModel("mainService"),
-                    "/ITM_STRSet",
-                    filters
-                );
-
-                const uiModel = this.getView().getModel();
-                uiModel.setProperty("/ITM_STRSet", records || []);
-                uiModel.setProperty("/historyCount", (records || []).length);
-
-            } catch (error) {
-                ODataUtils.handleODataError(error, "Failed to load HC violations.");
-            } finally {
-                sap.ui.core.BusyIndicator.hide();
-            }
         },
 
         // ── Toolbar Actions ───────────────────────────────────────────────────
@@ -138,6 +131,153 @@ sap.ui.define([
             this.getOwnerComponent().getRouter().navTo("RouteHCViolationDetailpage", {
                 actionRefNo: encodeURIComponent(actionRefNo)
             });
+        },
+        // ── Data Loading ──────────────────────────────────────────────────────
+
+        async _loadHCViolations() {
+            try {
+                sap.ui.core.BusyIndicator.show(0);
+
+                const filters = [
+                    new Filter("ZlmIdName", FilterOperator.EQ, ODataUtils.getCurrentUserId()),
+                    new Filter("ZIsHc", FilterOperator.EQ, true),
+                    
+                    new Filter("Zstatus", FilterOperator.EQ, "1")
+                ];
+
+                const records = await ODataUtils.fetchOData(
+                    this.getView().getModel("mainService"),
+                    "/ITM_STRSet",
+                    filters
+                );
+
+                const uiModel = this.getView().getModel();
+                uiModel.setProperty("/ITM_STRSet", records || []);
+                uiModel.setProperty("/historyCount", (records || []).length);
+
+            } catch (error) {
+                ODataUtils.handleODataError(error, "Failed to load HC violations.");
+            } finally {
+                sap.ui.core.BusyIndicator.hide();
+            }
+        },
+
+        async _loadHCNew() {
+            try {
+                sap.ui.core.BusyIndicator.show(0);
+
+                const filters = [
+                    new Filter("ZlmIdName", FilterOperator.EQ, ODataUtils.getCurrentUserId()),
+                    new Filter("Zishc", FilterOperator.EQ, true)
+                ];
+
+                const records = await ODataUtils.fetchOData(
+                    this.getView().getModel("mainService"),
+                    "/HDR_STRSet",
+                    filters
+                );
+
+                const uiModel = this.getView().getModel();
+                uiModel.setProperty("/ITM_NEW_SET", records || []);
+                uiModel.setProperty("/newCount", (records || []).length);
+
+            } catch (error) {
+                ODataUtils.handleODataError(error, "Failed to load new HC violations.");
+            } finally {
+                sap.ui.core.BusyIndicator.hide();
+            }
+        },
+
+        async _loadHCCompleted() {
+            try {
+                sap.ui.core.BusyIndicator.show(0);
+
+                const filters = [
+                    new Filter("ZlmIdName", FilterOperator.EQ, ODataUtils.getCurrentUserId()),
+                    new Filter("ZIsHc", FilterOperator.EQ, true),
+                    new Filter("Zstatus", FilterOperator.EQ, "4")
+                ];
+
+                const records = await ODataUtils.fetchOData(
+                    this.getView().getModel("mainService"),
+                    "/ITM_STRSet",
+                    filters
+                );
+
+                const uiModel = this.getView().getModel();
+                uiModel.setProperty("/ITM_COMPLETED_SET", records || []);
+                uiModel.setProperty("/completedCount", (records || []).length);
+
+            } catch (error) {
+                ODataUtils.handleODataError(error, "Failed to load completed HC violations.");
+            } finally {
+                sap.ui.core.BusyIndicator.hide();
+            }
+        },
+
+        // ── Tab Selection Handler ─────────────────────────────────────────────
+
+        onTabSelect(oEvent) {
+            const selectedKey = oEvent.getParameter("key");
+
+            switch (selectedKey) {
+                case "current":
+                    this._loadHCViolations();
+                    break;
+                case "new":
+                    this._loadHCNew();
+                    break;
+                case "completed":
+                    this._loadHCCompleted();
+                    break;
+            }
+        },
+
+        // ── Toolbar Actions - New Tab ──────────────────────────────────────────
+
+        onSearchNew(oEvent) {
+            TableUtils.applyTableSearch(
+                this.byId("HcNewTable"),
+                HC_TABLE_COLUMNS,
+                oEvent.getParameter("newValue")
+            );
+        },
+
+        onRefreshNew() {
+            this._loadHCNew();
+        },
+
+        onExportNew() {
+            ExportUtils.exportTableToExcel(
+                this.byId("HcNewTable"),
+                HC_TABLE_COLUMNS,
+                "HC_New_Violations",
+                this.formatEdmTime.bind(this)
+            );
+        },
+
+        // ── Toolbar Actions - Completed Tab ────────────────────────────────────
+
+        onSearchCompleted(oEvent) {
+            TableUtils.applyTableSearch(
+                this.byId("HcCompletedTable"),
+                HC_TABLE_COLUMNS,
+                oEvent.getParameter("newValue")
+            );
+        },
+
+        onRefreshCompleted() {
+            this._loadHCCompleted();
+        },
+
+        onExportCompleted() {
+            ExportUtils.exportTableToExcel(
+                this.byId("HcCompletedTable"),
+                HC_TABLE_COLUMNS,
+                "HC_Completed_Violations",
+                this.formatEdmTime.bind(this)
+            );
         }
+
     });
 });
