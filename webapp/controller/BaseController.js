@@ -1,7 +1,8 @@
 sap.ui.define([
     "sap/ui/core/mvc/Controller",
     "sap/ui/core/routing/History",
-    "zhrsanctions/utils/ODataUtils"
+    "zhrsanctions/utils/ODataUtils",
+    "sap/ui/core/format/DateFormat"
 ], (Controller, History, ODataUtils) => {
     "use strict";
 
@@ -34,7 +35,11 @@ const ZACTION_MAP = {
             const key = String(status).trim();
             return ZSTATUS_MAP[key] || status;
         },
-
+    displaydateFormatter = (value) => {
+                if (!value) return "";
+                const oDateFormat = DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" });
+                return oDateFormat.format(new Date(value));
+            },
         onNavBack() {
             const previousHash = History.getInstance().getPreviousHash();
 
