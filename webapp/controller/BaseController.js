@@ -13,9 +13,9 @@ sap.ui.define([
         "4": "Completed"
     };
     const ZACTION_MAP = {
-        "1": "Pending",
-        "2": "In Progress",
-        "3": "Completed",
+        "A": "Regularized",
+        "B": "Payroll Deduction",
+        "C": "Report To HC"
     }
     return Controller.extend("zhrsanctions.controller.BaseController", {
 
@@ -34,6 +34,11 @@ sap.ui.define([
             if (status === null || status === undefined || status === "") { return ""; }
             const key = String(status).trim();
             return ZSTATUS_MAP[key] || status;
+        },
+        formatZaction(action) {
+            if (action === null || action === undefined || action === "") { return ""; }
+            const key = String(action).trim();
+            return ZACTION_MAP[key] || action;
         },
         displaydateFormatter(value) {
             if (!value) return "";

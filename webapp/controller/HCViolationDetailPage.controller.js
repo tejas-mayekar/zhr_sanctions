@@ -253,7 +253,7 @@ sap.ui.define([
                 DelayFlag: delayFlag
             })
                 .then(() => ODataUtils.submitHCAction(oDataModel, record, {
-                    Zaction: "Regularized",
+                    Zaction: "A",
                     Zhcopsremark: reason,
                     Zstatus: "4"
                 }))
@@ -387,7 +387,7 @@ sap.ui.define([
 
             sap.ui.core.BusyIndicator.show(0);
             ODataUtils.submitHCAction(oDataModel, violationRec, {
-                Zaction: "Payroll Deduction",
+                Zaction: "B",
                 Zstatus: "4"
             })
                 .then(() => {
