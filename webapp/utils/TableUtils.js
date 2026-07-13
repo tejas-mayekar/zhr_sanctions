@@ -19,7 +19,7 @@ sap.ui.define([
          * @param {Function}           [dateFormatter] - optional formatter for isDate columns
          * @param {Function}           [statusFormatter] - optional formatter for isStatus columns
          */
-        buildTableColumns(table, columnConfigs, timeFormatter, dateFormatter, statusFormatter) {
+        buildTableColumns(table, columnConfigs, timeFormatter, dateFormatter, statusFormatter, actionFormatter) {
             const formatTime = timeFormatter || ODataUtils.formatEdmTime.bind(ODataUtils);
 
             columnConfigs
@@ -33,17 +33,19 @@ sap.ui.define([
                         cellBindingInfo = { path: col.binding, formatter: dateFormatter };
                     } else if (col.isStatus && statusFormatter) {
                         cellBindingInfo = { path: col.binding, formatter: statusFormatter };
+                    } else if (col.isAction && actionFormatter) {
+                        cellBindingInfo = { path: col.binding, formatter: actionFormatter };
                     } else {
                         cellBindingInfo = `{${col.binding}}`;
                     }
 
                     table.addColumn(new Column({
-                        label:          new Label({ text: col.label }),
-                        template:       new Text({ text: cellBindingInfo, wrapping: false }),
-                        sortProperty:   col.sortProperty,
+                        label: new Label({ text: col.label }),
+                        template: new Text({ text: cellBindingInfo, wrapping: false }),
+                        sortProperty: col.sortProperty,
                         filterProperty: col.filterProperty,
-                        autoResizable:  true,
-                        width:          col.width
+                        autoResizable: true,
+                        width: col.width
                     }));
                 });
         },

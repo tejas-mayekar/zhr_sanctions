@@ -48,7 +48,7 @@ sap.ui.define([
         { label: "Employee ID", binding: "ZempId", width: "9rem", sortProperty: "ZempId", filterProperty: "ZempId", visible: true },
         { label: "Employee Name", binding: "ZempName", width: "14rem", sortProperty: "ZempName", filterProperty: "ZempName", visible: true },
         { label: "Incident Date", binding: "ZincDate", width: "10rem", sortProperty: "ZincDate", filterProperty: "ZincDate", visible: true, isDate: true },
-        { label: "Action", binding: "Zaction", width: "14rem", sortProperty: "Zaction", filterProperty: "Zaction", visible: true },
+        { label: "Action", binding: "Zaction", width: "14rem", sortProperty: "Zaction", filterProperty: "Zaction", visible: true, isAction: true },
         { label: "Status", binding: "Zstatus", width: "10rem", sortProperty: "Zstatus", filterProperty: "Zstatus", visible: true, isStatus: true },
         { label: "Sanction", binding: "Zsanction", width: "14rem", sortProperty: "Zsanction", filterProperty: "Zsanction", visible: true },
         { label: "Initiated By", binding: "ZinitatedBy", width: "14rem", sortProperty: "ZinitatedBy", filterProperty: "ZinitatedBy", visible: true },
@@ -82,14 +82,16 @@ sap.ui.define([
                 CURRENT_VIOLATIONS_COLUMNS,
                 this.formatEdmTime.bind(this),
                 dateFormatter,
-                this.formatZstatus.bind(this)
+                this.formatZstatus.bind(this),
+                this.formatZaction.bind(this)
             );
             TableUtils.buildTableColumns(
                 this.byId("historyTable"),
                 HISTORY_VIOLATIONS_COLUMNS,
                 this.formatEdmTime.bind(this),
                 dateFormatter,
-                this.formatZstatus.bind(this)
+                this.formatZstatus.bind(this),
+                this.formatZaction.bind(this)
             );
 
             // Defer until model attaches
