@@ -312,7 +312,7 @@
                                             icon="sap-icon://detail-view"
                                             text="Details"
                                             type="Transparent"
-                                            press=".onViewDetails"
+                                            press=".onViewNewDetails"
                                         />
                                     </t:template>
                                 </t:Column>

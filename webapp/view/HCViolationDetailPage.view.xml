@@ -488,7 +488,7 @@
                             />
                             <Text
                                 id="_IDGenText86"
-                                text="{detailData>/record/ZlmIdActionDate}"
+                                text="{path: 'detailData>/record/ZlmIdActionDate', formatter: '.displaydateFormatter' }"
                             />
 
                             <Label
