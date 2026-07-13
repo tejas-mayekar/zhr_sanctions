@@ -258,7 +258,7 @@ sap.ui.define([
             }
 
             const itmPayload = ODataUtils.buildITMPayload(record, {
-                Zaction: "Regularized",
+                Zaction: "A",
                 Zlinemanagerremarks: reason,
                 Zpunchintime: ODataUtils.formatTimeForPayload(correctedPunchIn),
                 Zpunchouttime: ODataUtils.formatTimeForPayload(correctedPunchOut),
@@ -323,7 +323,7 @@ sap.ui.define([
             }
 
             const payload = ODataUtils.buildITMPayload(record, {
-                Zaction: "Report To HC",
+                Zaction: "C",
                 Zlinemanagerremarks: reason
             });
 
@@ -347,7 +347,7 @@ sap.ui.define([
             }
 
             const payload = ODataUtils.buildITMPayload(record, {
-                Zaction: "Payroll Deduction",
+                Zaction: "B",
                 Zstatus: "4"
             });
             this._submitToITMSet(
