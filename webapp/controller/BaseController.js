@@ -42,7 +42,7 @@ sap.ui.define([
         },
         displaydateFormatter(value) {
             if (!value) return "";
-            const oDateFormat = DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" });
+            const oDateFormat = DateFormat.getDateInstance({ pattern: "dd-MM-yyyy" });
             return oDateFormat.format(new Date(value));
         },
         onNavBack() {

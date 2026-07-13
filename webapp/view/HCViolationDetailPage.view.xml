@@ -83,10 +83,7 @@
                                     title="Incident Date"
                                     text="{
         path: 'detailData>/record/ZincDate',
-        type: 'sap.ui.model.type.Date',
-        formatOptions: {
-            pattern: 'dd-MM-yyyy'
-        }
+        formatter: '.displaydateFormatter'
     }"
                                 />
                                 <ObjectAttribute
@@ -508,10 +505,7 @@
                                 id="_IDGenText73"
                                 text="{
         path: 'detailData>/record/ZincDate',
-        type: 'sap.ui.model.type.Date',
-        formatOptions: {
-            pattern: 'dd-MM-yyyy'
-        }
+        formatter: '.displaydateFormatter'
     }"
                             />
                         </form:content>
