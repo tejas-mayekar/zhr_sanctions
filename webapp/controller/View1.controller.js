@@ -5,9 +5,8 @@ sap.ui.define([
     "sap/ui/model/FilterOperator",
     "zhrsanctions/utils/ODataUtils",
     "zhrsanctions/utils/TableUtils",
-    "zhrsanctions/utils/ExportUtils",
-    "sap/ui/core/format/DateFormat"
-], (BaseController, JSONModel, Filter, FilterOperator, ODataUtils, TableUtils, ExportUtils, DateFormat) => {
+    "zhrsanctions/utils/ExportUtils"
+], (BaseController, JSONModel, Filter, FilterOperator, ODataUtils, TableUtils, ExportUtils) => {
     "use strict";
 
     // ─── Column Configs ───────────────────────────────────────────────────────
@@ -72,16 +71,11 @@ sap.ui.define([
                 ITM_STRSet: [],
                 isHC: false
             }));
-            const dateFormatter = (value) => {
-                if (!value) return "";
-                const oDateFormat = DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" });
-                return oDateFormat.format(new Date(value));
-            };
             TableUtils.buildTableColumns(
                 this.byId("currentTable"),
                 CURRENT_VIOLATIONS_COLUMNS,
                 this.formatEdmTime.bind(this),
-                dateFormatter,
+                this.displaydateFormatter.bind(this),
                 this.formatZstatus.bind(this),
                 this.formatZaction.bind(this)
             );
@@ -89,7 +83,7 @@ sap.ui.define([
                 this.byId("historyTable"),
                 HISTORY_VIOLATIONS_COLUMNS,
                 this.formatEdmTime.bind(this),
-                dateFormatter,
+                this.displaydateFormatter.bind(this),
                 this.formatZstatus.bind(this),
                 this.formatZaction.bind(this)
             );

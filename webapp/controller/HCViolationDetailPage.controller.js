@@ -161,6 +161,10 @@ sap.ui.define([
                 MessageBox.error("Repeat count cannot be greater than system repeat count");
                 return;
             }
+            if(actionData.reason.trim() === "") {
+                MessageBox.error("Please provide a reason for taking action");
+                return;
+            }
             this._submitHCAction(violationRec, {
                 ZactionRefNo: violationRec.ZactionRefNo,
                 ZincCategory: actionData.ZincCategory,
@@ -349,6 +353,10 @@ sap.ui.define([
             function parseByteField(value) {
                 const parsed = parseInt(value, 10);
                 return isNaN(parsed) ? 0 : parsed;
+            }
+            if (actionData.reason.trim() === "") {
+                MessageBox.error("Please provide a reason for taking action");
+                return;
             }
             this._submitHCAction(violationRec, {
                 ZactionRefNo: violationRec.ZactionRefNo,

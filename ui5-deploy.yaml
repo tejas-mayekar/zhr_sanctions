@@ -18,7 +18,7 @@ builder:
           url: https://sapdev-app01.matarat.local:44300
           client: '100'
         app:
-          name: ZHR_SAN_AND_VIO
+          name: ZHR_SANCTIONS
           description: Sanctions and Violations
           package: ZDAC_HR
           transport: MD4K914310
