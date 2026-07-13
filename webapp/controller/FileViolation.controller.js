@@ -75,7 +75,7 @@ sap.ui.define([
         onIncidentDateChange(oEvent) {
             const oDatePicker = oEvent.getSource();
             const hasDate = !!oDatePicker.getDateValue();
-            
+
             if (hasDate) {
                 const today = new Date();
                 today.setHours(23, 59, 59, 999);

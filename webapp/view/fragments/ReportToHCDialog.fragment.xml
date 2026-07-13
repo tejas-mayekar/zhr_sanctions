@@ -12,8 +12,10 @@
         draggable="true"
     >
         <content>
-            <VBox id="_IDGenVBox13"  class="sapUiSmallMargin">
-
+            <VBox
+                id="_IDGenVBox13"
+                class="sapUiSmallMargin"
+            >
                 <form:SimpleForm
                     id="ReportToHCForm"
                     editable="true"
@@ -27,9 +29,12 @@
                     columnsM="1"
                 >
                     <form:content>
-
                         <!-- Reason -->
-                        <Label id="_IDGenLabel82"  text="Reason / Remarks" required="true" />
+                        <Label
+                            id="_IDGenLabel82"
+                            text="Reason / Remarks"
+                            required="true"
+                        />
                         <TextArea
                             id="ReportToHCReason"
                             value="{regularize>/reason}"
@@ -39,7 +44,6 @@
                             width="100%"
                             placeholder="Enter reason for regularization..."
                         />
-
                     </form:content>
                 </form:SimpleForm>
             </VBox>

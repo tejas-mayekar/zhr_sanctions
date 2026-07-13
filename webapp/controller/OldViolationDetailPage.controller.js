@@ -3,7 +3,7 @@ sap.ui.define([
     "sap/ui/model/json/JSONModel",
     "sap/ui/model/Filter",
     "sap/ui/model/FilterOperator"
-], (BaseController, JSONModel,Filter,FilterOperator) => {
+], (BaseController, JSONModel, Filter, FilterOperator) => {
     "use strict";
 
     return BaseController.extend("zhrsanctions.controller.OldViolationDetailPage", {

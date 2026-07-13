@@ -336,7 +336,7 @@ sap.ui.define([
             } else if (t.includes("EVP COMMENTS")) {
                 bg = "#0070c0";
                 return `<span style="background-color:${bg}; padding:2px 6px; color:#fff; border-radius:3px;">${text}</span>`;
-            }else{
+            } else {
                 return `<span style="background-color:${bg}; padding:2px 6px; color:#000; border-radius:3px;">${text}</span>`;
             }
         },

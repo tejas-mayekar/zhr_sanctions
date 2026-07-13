@@ -19,14 +19,15 @@
                 showSeparators="Inner"
             >
                 <CustomListItem id="_IDGenCustomListItem">
-    <FormattedText id="_IDGenFormattedText"
-        htmlText="{
+                    <FormattedText
+                        id="_IDGenFormattedText"
+                        htmlText="{
             path: 'remarks>Tdline',
             formatter: '.formatRemarkColor'
         }"
-        class="sapUiSmallMargin"
-    />
-</CustomListItem>
+                        class="sapUiSmallMargin"
+                    />
+                </CustomListItem>
             </List>
         </content>
 

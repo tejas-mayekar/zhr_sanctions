@@ -94,7 +94,10 @@
                             }"
                         />
                     </HBox>
-                    <HBox id="_IDGenHBox8" alignContent="SpaceBetween">
+                    <HBox
+                        id="_IDGenHBox8"
+                        alignContent="SpaceBetween"
+                    >
                         <HBox
                             id="_IDGenHBox10"
                             alignItems="Center"

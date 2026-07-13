@@ -346,9 +346,9 @@ sap.ui.define([
                 return;
             }
 
-            const payload = ODataUtils.buildITMPayload(record, { 
-                Zaction: "Payroll Deduction", 
-                Zstatus: "4" 
+            const payload = ODataUtils.buildITMPayload(record, {
+                Zaction: "Payroll Deduction",
+                Zstatus: "4"
             });
             this._submitToITMSet(
                 payload,

@@ -13,6 +13,7 @@ builder:
     - name: deploy-to-abap
       afterTask: generateCachebusterInfo
       configuration:
+        ignoreCertErrors: true
         target:
           url: https://sapdev-app01.matarat.local:44300
           client: '100'

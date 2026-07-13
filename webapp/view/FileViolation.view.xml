@@ -59,8 +59,7 @@
                         columnsM="2"
                     >
                         <form:content>
-
-                               <Label
+                            <Label
                                 id="lblReqZincDate"
                                 text="Incident Date"
                                 required="true"
@@ -84,8 +83,6 @@
                                 valueHelpRequest="onValueHelpRequest"
                                 editable="false"
                             />
-
-                     
 
                             <Label
                                 id="lblZincDisDate"

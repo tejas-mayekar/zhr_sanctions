@@ -11,12 +11,14 @@
         contentWidth="600px"
     >
         <content>
-            <VBox id="_IDGenVBox6"
+            <VBox
+                id="_IDGenVBox6"
                 class="sapUiMediumMargin"
             >
-                <Label id="_IDGenLabel86"
+                <Label
+                    id="_IDGenLabel86"
                     text="Reason / Remarks"
-                          required="true"
+                    required="true"
                 />
                 <TextArea
                     id="dTaNaReason"
@@ -24,13 +26,14 @@
                     width="100%"
                     rows="4"
                     placeholder="Enter reason or remarks"
-                          required="true"
+                    required="true"
                 />
             </VBox>
         </content>
 
         <beginButton>
-            <Button id="_IDGenButton13"
+            <Button
+                id="_IDGenButton13"
                 text="Submit"
                 type="Emphasized"
                 press=".onSubmitTakeNoAction"
@@ -38,7 +41,8 @@
         </beginButton>
 
         <endButton>
-            <Button id="_IDGenButton18"
+            <Button
+                id="_IDGenButton18"
                 text="Cancel"
                 press=".onCloseTakeNoActionDialog"
             />

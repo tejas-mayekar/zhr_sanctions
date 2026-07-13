@@ -151,7 +151,7 @@
                         </t:Table>
                     </IconTabFilter>
                 </items>
-                       <items>
+                <items>
                     <!-- ─── COMPLETED TAB ─── -->
                     <IconTabFilter
                         id="_IDGenIconTabFilterCompleted"
@@ -173,7 +173,8 @@
                             rowMode="Auto"
                         >
                             <t:noData>
-                                <VBox id="_IDGenVBox16"
+                                <VBox
+                                    id="_IDGenVBox16"
                                     alignItems="Center"
                                     justifyContent="Center"
                                     class="sapUiMediumMargin"
@@ -185,7 +186,8 @@
                                         color="sapContent_NonInteractiveIconColor"
                                         class="sapUiSmallMarginBottom"
                                     />
-                                    <Text id="_IDGenText92"
+                                    <Text
+                                        id="_IDGenText92"
                                         text="No data available"
                                     />
                                 </VBox>
@@ -197,11 +199,13 @@
                                     width="8rem"
                                     hAlign="Center"
                                 >
-                                    <Label id="_IDGenLabel106"
+                                    <Label
+                                        id="_IDGenLabel106"
                                         text="Actions"
                                     />
                                     <t:template>
-                                        <Button id="_IDGenButton23"
+                                        <Button
+                                            id="_IDGenButton23"
                                             icon="sap-icon://detail-view"
                                             text="Details"
                                             type="Transparent"
@@ -216,7 +220,8 @@
                                     id="_IDGenOverflowToolbar8"
                                     style="Standard"
                                 >
-                                    <HBox id="_IDGenHBox13"
+                                    <HBox
+                                        id="_IDGenHBox13"
                                         alignItems="Center"
                                         columnGap="0.5rem"
                                     >
@@ -233,7 +238,8 @@
                                         />
                                     </HBox>
                                     <ToolbarSpacer id="_IDGenToolbarSpacer4" />
-                                    <Button id="_IDGenButton24"
+                                    <Button
+                                        id="_IDGenButton24"
                                         icon="sap-icon://refresh"
                                         tooltip="Refresh"
                                         press=".onRefreshCompleted"
@@ -249,7 +255,8 @@
 
                             <t:footer>
                                 <OverflowToolbar id="_IDGenOverflowToolbar9">
-                                    <Label id="_IDGenLabel107"
+                                    <Label
+                                        id="_IDGenLabel107"
                                         visible="{= ${/completedCount} > 0 }"
                                         text="Number of Records: {/completedCount}"
                                     />
@@ -280,7 +287,8 @@
                             rowMode="Auto"
                         >
                             <t:noData>
-                                <VBox id="_IDGenVBox15"
+                                <VBox
+                                    id="_IDGenVBox15"
                                     alignItems="Center"
                                     justifyContent="Center"
                                     class="sapUiMediumMargin"
@@ -292,7 +300,8 @@
                                         color="sapContent_NonInteractiveIconColor"
                                         class="sapUiSmallMarginBottom"
                                     />
-                                    <Text id="_IDGenText91"
+                                    <Text
+                                        id="_IDGenText91"
                                         text="No data available"
                                     />
                                 </VBox>
@@ -304,11 +313,13 @@
                                     width="8rem"
                                     hAlign="Center"
                                 >
-                                    <Label id="_IDGenLabel64"
+                                    <Label
+                                        id="_IDGenLabel64"
                                         text="Actions"
                                     />
                                     <t:template>
-                                        <Button id="_IDGenButton21"
+                                        <Button
+                                            id="_IDGenButton21"
                                             icon="sap-icon://detail-view"
                                             text="Details"
                                             type="Transparent"
@@ -319,10 +330,12 @@
                             </t:columns>
 
                             <t:extension>
-                                <OverflowToolbar id="_IDGenOverflowToolbar10"
+                                <OverflowToolbar
+                                    id="_IDGenOverflowToolbar10"
                                     style="Standard"
                                 >
-                                    <HBox id="_IDGenHBox12"
+                                    <HBox
+                                        id="_IDGenHBox12"
                                         alignItems="Center"
                                         columnGap="0.5rem"
                                     >
@@ -339,7 +352,8 @@
                                         />
                                     </HBox>
                                     <ToolbarSpacer id="_IDGenToolbarSpacer5" />
-                                    <Button id="_IDGenButton22"
+                                    <Button
+                                        id="_IDGenButton22"
                                         icon="sap-icon://refresh"
                                         tooltip="Refresh"
                                         press=".onRefreshNew"
@@ -355,7 +369,8 @@
 
                             <t:footer>
                                 <OverflowToolbar id="_IDGenOverflowToolbar7">
-                                    <Label id="_IDGenLabel105"
+                                    <Label
+                                        id="_IDGenLabel105"
                                         visible="{= ${/newCount} > 0 }"
                                         text="Number of Records: {/newCount}"
                                     />
@@ -364,7 +379,6 @@
                         </t:Table>
                     </IconTabFilter>
                 </items>
-         
             </IconTabBar>
         </f:content>
     </f:DynamicPage>

@@ -4,7 +4,7 @@ sap.ui.define([
   "use strict";
 
   return BaseController.extend("zhrsanctions.controller.App", {
-      onInit() {
-      }
+    onInit() {
+    }
   });
 });

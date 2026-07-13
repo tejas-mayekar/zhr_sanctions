@@ -112,13 +112,21 @@
                     expanded="true"
                     class="sapUiSmallMarginBottom"
                 >
-                  <headerToolbar>
-        <OverflowToolbar id="_IDGenOverflowToolbarRemarks">
-            <Title id="_IDGenTitleEmpInfo" text="Employee Information" />
-            <ToolbarSpacer id="_IDGenToolbarSpacerRemarks" />
-            <Button id="_IDGenButtonViewRemark" icon="sap-icon://comment" text="View Remarks" press=".onViewRemarkPress" />
-        </OverflowToolbar>
-    </headerToolbar>
+                    <headerToolbar>
+                        <OverflowToolbar id="_IDGenOverflowToolbarRemarks">
+                            <Title
+                                id="_IDGenTitleEmpInfo"
+                                text="Employee Information"
+                            />
+                            <ToolbarSpacer id="_IDGenToolbarSpacerRemarks" />
+                            <Button
+                                id="_IDGenButtonViewRemark"
+                                icon="sap-icon://comment"
+                                text="View Remarks"
+                                press=".onViewRemarkPress"
+                            />
+                        </OverflowToolbar>
+                    </headerToolbar>
                     <form:SimpleForm
                         id="_IDGenSimpleForm"
                         editable="false"
@@ -335,7 +343,7 @@
                                     formatter: '.formatEdmTime'
                                 }"
                             />
-                            
+
                             <Label
                                 id="_IDGenLabel52"
                                 text="Punch In Time"
@@ -359,7 +367,6 @@
                                     formatter: '.formatEdmTime'
                                 }"
                             />
-
 
                             <Label
                                 id="_IDGenLabel56"
