@@ -18,7 +18,7 @@ sap.ui.define([
         { label: "Employee Name", binding: "ZempName", width: "14rem", sortProperty: "ZempName", filterProperty: "ZempName", visible: true },
         { label: "Incident Date", binding: "ZincDate", width: "10rem", sortProperty: "ZincDate", filterProperty: "ZincDate", visible: true, isDate: true },
         { label: "Incident Discovery Date", binding: "ZincDisDate", width: "10rem", sortProperty: "ZincDisDate", filterProperty: "ZincDisDate", visible: true, isDate: true },
-        { label: "Action", binding: "Zaction", width: "14rem", sortProperty: "Zaction", filterProperty: "Zaction", visible: true },
+        { label: "Action", binding: "Zaction", width: "14rem", sortProperty: "Zaction", filterProperty: "Zaction", visible: true, isAction: true },
         { label: "Status", binding: "Zstatus", width: "10rem", sortProperty: "Zstatus", filterProperty: "Zstatus", visible: true, isStatus: true },
         { label: "Sanction", binding: "Zsanction", width: "14rem", sortProperty: "Zsanction", filterProperty: "Zsanction", visible: true },
         { label: "Initiated By", binding: "ZinitatedBy", width: "14rem", sortProperty: "ZinitatedBy", filterProperty: "ZinitatedBy", visible: true },
@@ -83,7 +83,8 @@ sap.ui.define([
                 HC_TABLE_COLUMNS,
                 this.formatEdmTime.bind(this),
                 dateFormatter,
-                this.formatZstatus.bind(this)
+                this.formatZstatus.bind(this),
+                this.formatZaction.bind(this)
             );
 
             TableUtils.buildTableColumns(
@@ -91,7 +92,8 @@ sap.ui.define([
                 NEW_VIOLATIONS,
                 this.formatEdmTime.bind(this),
                 dateFormatter,
-                this.formatZstatus.bind(this)
+                this.formatZstatus.bind(this),
+                this.formatZaction.bind(this)
             );
 
             TableUtils.buildTableColumns(
@@ -99,7 +101,8 @@ sap.ui.define([
                 HC_TABLE_COLUMNS,
                 this.formatEdmTime.bind(this),
                 dateFormatter,
-                this.formatZstatus.bind(this)
+                this.formatZstatus.bind(this),
+                this.formatZaction.bind(this)
             );
 
             this.getOwnerComponent()
