@@ -89,7 +89,7 @@
                                 <ObjectStatus
                                     id="_IDGenObjectStatus1"
                                     title="Incident Date"
-                                    text="{detailData>/record/ZincDate}"
+                                    text="{path: 'detailData>/record/ZincDate', formatter: '.displaydateFormatter' }"
                                 />
                             </statuses>
                         </ObjectHeader>
@@ -228,7 +228,7 @@
                             />
                             <Text
                                 id="_IDGenText42"
-                                text="{detailData>/record/ZhireDate}"
+                                text="{path:'detailData>/record/ZhireDate', formatter: '.displaydateFormatter' }"
                             />
 
                             <Label
@@ -309,7 +309,7 @@
                             />
                             <Text
                                 id="_IDGenText48"
-                                text="{detailData>/record/ZincDate}"
+                                text="{path: 'detailData>/record/ZincDate', formatter: '.displaydateFormatter' }"
                             />
 
                             <Label
@@ -453,7 +453,7 @@
                             />
                             <Text
                                 id="_IDGenText60"
-                                text="{detailData>/record/ZlmIdActionDate}"
+                                text="{path: 'detailData>/record/ZlmIdActionDate', formatter: '.displaydateFormatter' }"
                             />
                         </form:content>
                     </form:SimpleForm>

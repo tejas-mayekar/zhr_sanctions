@@ -29,7 +29,7 @@ sap.ui.define([
         { label: "LM Remarks", binding: "Zlinemanagerremarks", width: "16rem", sortProperty: "Zlinemanagerremarks", filterProperty: "Zlinemanagerremarks", visible: true },
         { label: "HC Remarks", binding: "Zhcopsremark", width: "16rem", sortProperty: "Zhcopsremark", filterProperty: "Zhcopsremark", visible: true }
     ];
- const NEW_VIOLATIONS = [
+    const NEW_VIOLATIONS = [
         { label: "Action Ref No", binding: "ZACTION_REF_NO", width: "11rem", sortProperty: "ZACTION_REF_NO", filterProperty: "ZACTION_REF_NO", visible: true },
         { label: "Employee ID", binding: "ZempId", width: "9rem", sortProperty: "ZempId", filterProperty: "ZempId", visible: true },
         { label: "Employee Name", binding: "ZempName", width: "14rem", sortProperty: "ZempName", filterProperty: "ZempName", visible: true },
@@ -162,7 +162,7 @@ sap.ui.define([
             });
         },
         onViewCompletedDetails(oEvent) {
-             const context = oEvent.getSource().getBindingContext();
+            const context = oEvent.getSource().getBindingContext();
             if (!context) { return; }
 
             const actionRefNo = context.getProperty("ZactionRefNo");
@@ -192,7 +192,7 @@ sap.ui.define([
                 const filters = [
                     new Filter("ZlmIdName", FilterOperator.EQ, ODataUtils.getCurrentUserId()),
                     new Filter("ZIsHc", FilterOperator.EQ, true),
-                    
+
                     new Filter("Zstatus", FilterOperator.EQ, "1")
                 ];
 
@@ -320,7 +320,28 @@ sap.ui.define([
         onRefreshCompleted() {
             this._loadHCCompleted();
         },
+        onViewNewDetails(oEvent) {
+            const context = oEvent.getSource().getBindingContext();
+            if (!context) { return; }
 
+            const actionRefNo = context.getProperty("ZACTION_REF_NO");
+            if (!actionRefNo) {
+                sap.m.MessageToast.show("Cannot open details: record has no Action Ref No.");
+                return;
+            }
+
+            const allRecords = this.getView().getModel().getProperty("/ITM_NEW_SET") || [];
+            const selectedRecord = allRecords.find(rec => rec.ZACTION_REF_NO === actionRefNo);
+
+            this.getOwnerComponent().setModel(
+                new JSONModel({ record: selectedRecord || {}, source: "hcdetail" }),
+                "detailData"
+            );
+
+            this.getOwnerComponent().getRouter().navTo("RouteOldViolationDetailpage", {
+                actionRefNo: encodeURIComponent(actionRefNo)
+            });
+        },
         onExportCompleted() {
             ExportUtils.exportTableToExcel(
                 this.byId("HcCompletedTable"),
