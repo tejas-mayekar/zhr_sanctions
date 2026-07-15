@@ -248,7 +248,58 @@
                         </form:content>
                     </form:SimpleForm>
                 </VBox>
-
+                <!-- ── Unauth Section ── -->
+                <VBox
+                    id="regularizeUnauthBox"
+                    visible="{regularize>/showUnauth}"
+                    class="sapUiSmallMarginBottom"
+                >
+                    <Title
+                        id="titleUnauthSection"
+                        text="Regularize Unauthorized Absence"
+                        level="H5"
+                        class="sapUiSmallMarginBottom"
+                    />
+                    <form:SimpleForm
+                        id="formUnauthSection"
+                        editable="true"
+                        layout="ResponsiveGridLayout"
+                        labelSpanL="4"
+                        labelSpanM="4"
+                        labelSpanS="12"
+                        columnsL="2"
+                        columnsM="2"
+                    >
+                        <form:content>
+                            <Label
+                                id="lblUnauthIn"
+                                text="Punch In Time"
+                                required="true"
+                            />
+                            <TimePicker
+                                id="regularizeUnauthPunchIn"
+                                value="{regularize>/unauthPunchIn}"
+                                valueFormat="HH:mm:ss"
+                                displayFormat="hh:mm:ss a"
+                                placeholder="HH:MM:SS"
+                                width="100%"
+                            />
+                            <Label
+                                id="lblUnauthOut"
+                                text="Punch Out Time"
+                                required="true"
+                            />
+                            <TimePicker
+                                id="regularizeUnauthPunchOut"
+                                value="{regularize>/unauthPunchOut}"
+                                valueFormat="HH:mm:ss"
+                                displayFormat="hh:mm:ss a"
+                                placeholder="HH:MM:SS"
+                                width="100%"
+                            />
+                        </form:content>
+                    </form:SimpleForm>
+                </VBox>
                 <!-- ── Reason ── -->
                 <Label
                     id="_IDGenLabel66"

@@ -118,7 +118,8 @@ sap.ui.define([
             const scheduledOut = toTimeString(record.ZschTimeOut);
             const punchIn = toTimeString(record.Zpunchintime);
             const punchOut = toTimeString(record.Zpunchouttime);
-
+            const unautDays = parseInt(record.ZunautDays, 10) || 0;
+            const hasUnauth = unautDays > 0;
             // Detect delay: ZdelayHrs non-zero AND punch-in is later than scheduled-in
             const hasDelay = isNonZeroTime(record.ZdelayHrs) && (
                 !punchIn || !scheduledIn ||
@@ -137,7 +138,7 @@ sap.ui.define([
             const incidentDateDisplay = this._formatIncidentDateDisplay(record.ZincDate);
 
             const state = {
-                dialogTitle: hasBoth ? "Regularize Both" : MODE_TITLE[mode],
+                dialogTitle: hasUnauth ? "Regularize Unauthorized Absence" : (hasBoth ? "Regularize Both" : MODE_TITLE[mode]),
                 scheduledIn: buildDateTimeDisplayString(incidentDateDisplay, scheduledIn),
                 scheduledOut: buildDateTimeDisplayString(incidentDateDisplay, scheduledOut),
                 punchIn: buildDateTimeDisplayString(incidentDateDisplay, punchIn),
@@ -145,23 +146,26 @@ sap.ui.define([
                 delayHrs: this._formatHoursDisplay(record.ZdelayHrs),
                 shortHrs: this._formatHoursDisplay(record.ZshortHrs),
                 incidentDate: incidentDateDisplay,
-                hasDelay,
-                hasShort,
-                showModeSelector: hasBoth,
-                mode,
+                hasDelay: hasUnauth ? false : hasDelay,
+                hasShort: hasUnauth ? false : hasShort,
+                showModeSelector: hasUnauth ? false : hasBoth,
+                mode: hasUnauth ? "unauth" : mode,
 
-                // Delay gap: scheduled-in → (punch-in minus 1 sec)
+                showUnauth: hasUnauth,
+                unauthPunchIn: scheduledIn,
+                unauthPunchOut: scheduledOut,
+
                 delayFrom: scheduledIn,
                 delayTo: secondsToTimeString(timeStringToSeconds(punchIn) - 1),
-
-                // Short gap: (punch-out plus 1 sec) → scheduled-out
                 shortFrom: secondsToTimeString(timeStringToSeconds(punchOut) + 1),
                 shortTo: scheduledOut,
 
                 reason: ""
             };
 
-            Object.assign(state, resolveSectionVisibility(mode, hasDelay, hasShort));
+            Object.assign(state, hasUnauth
+                ? { showDelay: false, showShort: false }
+                : resolveSectionVisibility(mode, hasDelay, hasShort));
 
             this.getView().getModel("regularize").setData(state);
         },
@@ -215,7 +219,12 @@ sap.ui.define([
                     return;
                 }
             }
-
+            if (state.showUnauth) {
+                if (!state.unauthPunchIn || !state.unauthPunchOut) {
+                    MessageBox.warning("Please fill in both Punch In and Punch Out times.");
+                    return;
+                }
+            }
             const record = this.getView().getModel("detailData").getProperty("/record");
             if (!record?.ZACTION_REF_NO) {
                 MessageBox.error("No violation record loaded. Cannot submit Regularization.");
@@ -227,8 +236,12 @@ sap.ui.define([
             let correctedPunchIn = toTimeString(record.Zpunchintime);
             let correctedPunchOut = toTimeString(record.Zpunchouttime);
             let correctedSchOut = toTimeString(record.ZschTimeOut);
-
-            if (state.showDelay && !state.showShort) {
+            if (state.showUnauth) {
+                correctedSchIn = state.unauthPunchIn;
+                correctedPunchIn = state.unauthPunchIn;
+                correctedPunchOut = state.unauthPunchOut;
+                correctedSchOut = state.unauthPunchOut;
+            } else if (state.showDelay && !state.showShort) {
                 // DelayFlag = "1": from = ZschTimeIn, to = Zpunchintime
                 correctedSchIn = state.delayFrom;
                 correctedPunchIn = state.delayTo;
@@ -246,9 +259,10 @@ sap.ui.define([
                 correctedSchOut = state.shortTo;
             }
 
-            const delayFlag = state.showDelay && state.showShort ? "3"
-                : state.showDelay ? "1"
-                    : "2";
+            const delayFlag = state.showUnauth ? "4"
+                : state.showDelay && state.showShort ? "3"
+                    : state.showDelay ? "1"
+                        : "2";
 
             const oDataModel = this.getOwnerComponent().getModel()
                 || this.getView().getModel("mainService");
