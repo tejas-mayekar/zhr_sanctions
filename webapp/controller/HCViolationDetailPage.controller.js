@@ -161,7 +161,7 @@ sap.ui.define([
                 MessageBox.error("Repeat count cannot be greater than system repeat count");
                 return;
             }
-            if(actionData.reason.trim() === "") {
+            if (actionData.reason.trim() === "") {
                 MessageBox.error("Please provide a reason for taking action");
                 return;
             }
@@ -182,7 +182,7 @@ sap.ui.define([
         onTakeNoActionPress() {
             const violationRec = this.getView().getModel("detailData").getData().record;
 
-            if (hasTimeDiff(violationRec)) {
+            if (hasTimeDiff(violationRec) || (parseInt(violationRec.ZunautDays, 10) || 0) > 0) {
                 this._populateRegularizeModel(violationRec);
                 this._openRegularizeDialog();
                 return;
@@ -203,26 +203,30 @@ sap.ui.define([
             const schOut = toTimeStr(record.ZschTimeOut);
             const pIn = toTimeStr(record.Zpunchintime);
             const pOut = toTimeStr(record.Zpunchouttime);
-
+            const unautDays = parseInt(record.ZunautDays, 10) || 0;
+            const hasUnauth = unautDays > 0;
             const hasDelay = schIn && pIn && timeToSec(pIn) > timeToSec(schIn);
             const hasShort = schOut && pOut && timeToSec(pOut) < timeToSec(schOut);
             const hasBoth = hasDelay && hasShort;
             const mode = hasBoth ? "both" : hasDelay ? "delay" : "short";
 
             const state = {
-                dialogTitle: "Regularize Attendance",
+                dialogTitle: hasUnauth ? "Regularize Unauthorized Absence" : "Regularize Attendance",
                 scheduledIn: schIn,
                 scheduledOut: schOut,
                 punchIn: pIn,
                 punchOut: pOut,
                 delayHrs: record.ZdelayHrs || "0:00",
                 shortHrs: record.ZshortHrs || "0:00",
-                hasDelay,
-                hasShort,
-                showModeSelector: hasBoth,
-                showDelay: hasBoth ? hasDelay : mode === "delay",
-                showShort: hasBoth ? hasShort : mode === "short",
-                mode,
+                hasDelay: hasUnauth ? false : hasDelay,
+                hasShort: hasUnauth ? false : hasShort,
+                showModeSelector: hasUnauth ? false : hasBoth,
+                showDelay: hasUnauth ? false : (hasBoth ? hasDelay : mode === "delay"),
+                showShort: hasUnauth ? false : (hasBoth ? hasShort : mode === "short"),
+                showUnauth: hasUnauth,
+                unauthPunchIn: schIn,
+                unauthPunchOut: schOut,
+                mode: hasUnauth ? "unauth" : mode,
                 delayFrom: schIn,
                 delayTo: secondsToTimeString(timeStringToSeconds(pIn) - 1),
                 shortFrom: secondsToTimeString(timeStringToSeconds(pOut) + 1),
@@ -241,8 +245,9 @@ sap.ui.define([
             }
 
             const record = this.getView().getModel("detailData").getData().record;
-            const delayFlag = state.showDelay && state.showShort ? "3"
-                : state.showDelay ? "1" : "2";
+            const delayFlag = state.showUnauth ? "4"
+                : state.showDelay && state.showShort ? "3"
+                    : state.showDelay ? "1" : "2";
 
             const oDataModel = this.getOwnerComponent().getModel();
             oDataModel.setUseBatch(false);
@@ -250,10 +255,10 @@ sap.ui.define([
             sap.ui.core.BusyIndicator.show(0);
 
             ODataUtils.submitPunchRegularize(oDataModel, record, {
-                ZschTimeIn: state.delayFrom,
-                Zpunchintime: state.delayTo,
-                Zpunchouttime: state.shortFrom,
-                ZschTimeOut: state.shortTo,
+                ZschTimeIn: state.showUnauth ? state.unauthPunchIn : state.delayFrom,
+                Zpunchintime: state.showUnauth ? state.unauthPunchIn : state.delayTo,
+                Zpunchouttime: state.showUnauth ? state.unauthPunchOut : state.shortFrom,
+                ZschTimeOut: state.showUnauth ? state.unauthPunchOut : state.shortTo,
                 DelayFlag: delayFlag
             })
                 .then(() => ODataUtils.submitHCAction(oDataModel, record, {
@@ -339,6 +344,13 @@ sap.ui.define([
                 return `<span style="background-color:${bg}; padding:2px 6px; color:#fff; border-radius:3px;">${text}</span>`;
             } else if (t.includes("EVP COMMENTS")) {
                 bg = "#0070c0";
+                return `<span style="background-color:${bg}; padding:2px 6px; color:#fff; border-radius:3px;">${text}</span>`;
+                return `<span style="background-color:${bg}; padding:2px 6px; color:#fff; border-radius:3px;">${text}</span>`;
+            } else if (t.includes("HC COMMENTS")) {
+                bg = "#9b7dbe";
+                return `<span style="background-color:${bg}; padding:2px 6px; color:#fff; border-radius:3px;">${text}</span>`;
+            } else if (t.includes("LINE MANAGER COMMENTS")) {
+                bg = "#31c699";
                 return `<span style="background-color:${bg}; padding:2px 6px; color:#fff; border-radius:3px;">${text}</span>`;
             } else {
                 return `<span style="background-color:${bg}; padding:2px 6px; color:#000; border-radius:3px;">${text}</span>`;

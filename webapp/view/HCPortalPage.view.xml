@@ -266,11 +266,11 @@
                     </IconTabFilter>
                 </items>
                 <items>
-                    <!-- ─── NEW TAB ─── -->
+                    <!-- ─── UNATTENDED TAB ─── -->
                     <IconTabFilter
                         id="_IDGenIconTabFilterNew"
-                        text="New"
-                        icon="sap-icon://add"
+                        text="Unattended"
+                        icon="sap-icon://begin"
                         iconDensityAware="false"
                         design="Horizontal"
                         class="sapUiResponsiveContentPadding custom-tab-filter"

@@ -127,12 +127,16 @@ sap.ui.define([
                     "/HDR_STRSet",
                     filters
                 );
-
+                // const isHC = await ODataUtils.fetchOData(
+                //     this.getView().getModel("mainService"),
+                //     `/ZHR_IS_HCSet(Zempid='200030')`,
+                //     new Filter("Zempid", FilterOperator.EQ, ODataUtils.getCurrentUserId())
+                // );
                 const uiModel = this.getView().getModel();
                 uiModel.setProperty("/HDR_STRSet", records || []);
                 uiModel.setProperty("/currentCount", (records || []).length);
                 uiModel.setProperty("/isHC",
-                    (records && records.length > 0 && records[0].Zishc === true)
+                    false
                 );
 
 

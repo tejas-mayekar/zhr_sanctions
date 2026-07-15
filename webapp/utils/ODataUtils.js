@@ -2,7 +2,7 @@ sap.ui.define([], () => {
     "use strict";
 
     const LOCAL_HOSTNAMES = ["localhost", "127.0.0.1"];
-    const DEV_USER_ID     = "DACO_EAMV04";
+    const DEV_USER_ID = "DACO_EAMV04";
 
     // ITM_STR Edm.Byte fields — ONLY these four
     // ZdelayHrs, ZshortHrs, Zrepeatcount, Zsysyrepeatcount
@@ -46,8 +46,8 @@ sap.ui.define([], () => {
             let message = title || "An error occurred.";
             try {
                 if (error.responseText) {
-                    const parsed      = JSON.parse(error.responseText);
-                    const errorBody   = parsed.error || parsed;
+                    const parsed = JSON.parse(error.responseText);
+                    const errorBody = parsed.error || parsed;
                     const innerErrors = errorBody.innererror?.errordetails;
                     if (innerErrors?.[0]?.message) {
                         message = innerErrors[0].message;
@@ -115,11 +115,22 @@ sap.ui.define([], () => {
 
         formatTimeForPayload(timeString) {
             if (!timeString) { return null; }
-            const parts = timeString.split(":");
-            if (parts.length < 2) { return null; }
-            const h = parseInt(parts[0], 10);
-            const m = parseInt(parts[1], 10);
-            const s = parts[2] ? parseInt(parts[2], 10) : 0;
+            const ampmMatch = timeString.match(/^(\d{1,2}):(\d{2}):?(\d{2})?\s*(AM|PM)$/i);
+            let h, m, s;
+            if (ampmMatch) {
+                h = parseInt(ampmMatch[1], 10);
+                m = parseInt(ampmMatch[2], 10);
+                s = ampmMatch[3] ? parseInt(ampmMatch[3], 10) : 0;
+                const period = ampmMatch[4].toUpperCase();
+                if (period === "PM" && h !== 12) { h += 12; }
+                if (period === "AM" && h === 12) { h = 0; }
+            } else {
+                const parts = timeString.split(":");
+                if (parts.length < 2) { return null; }
+                h = parseInt(parts[0], 10);
+                m = parseInt(parts[1], 10);
+                s = parts[2] ? parseInt(parts[2], 10) : 0;
+            }
             return { ms: ((h * 60 + m) * 60 + s) * 1000, __edmType: "Edm.Time" };
         },
 
@@ -136,7 +147,16 @@ sap.ui.define([], () => {
             }
             return isNaN(date.getTime()) ? null : `/Date(${date.getTime()})/`;
         },
+        async HCPortalSetter() {
+            var userid = this.getCurrentUserId();
+            const records = await this.fetchOData(
+                this.getView().getModel("mainService"),
+                `/ZHR_IS_HCSet(Zempid='${userid}')`,
+            );
+            debugger;
+            return true;
 
+        },
         formatTimeDurationForPayload(timeValue) {
             if (timeValue === null || timeValue === undefined || timeValue === "") { return null; }
             let ms;
@@ -146,20 +166,31 @@ sap.ui.define([], () => {
                 ms = timeValue;
             } else if (typeof timeValue === "string") {
                 if (/^P\d+DT\d+H\d+M\d+S$/.test(timeValue)) { return timeValue; }
-                const parts = timeValue.split(":");
-                if (parts.length < 2) { return null; }
-                const h = parseInt(parts[0], 10) || 0;
-                const m = parseInt(parts[1], 10) || 0;
-                const s = parts[2] ? (parseInt(parts[2], 10) || 0) : 0;
+                const ampmMatch = timeValue.match(/^(\d{1,2}):(\d{2}):?(\d{2})?\s*(AM|PM)$/i);
+                let h, m, s;
+                if (ampmMatch) {
+                    h = parseInt(ampmMatch[1], 10);
+                    m = parseInt(ampmMatch[2], 10) || 0;
+                    s = ampmMatch[3] ? (parseInt(ampmMatch[3], 10) || 0) : 0;
+                    const period = ampmMatch[4].toUpperCase();
+                    if (period === "PM" && h !== 12) { h += 12; }
+                    if (period === "AM" && h === 12) { h = 0; }
+                } else {
+                    const parts = timeValue.split(":");
+                    if (parts.length < 2) { return null; }
+                    h = parseInt(parts[0], 10) || 0;
+                    m = parseInt(parts[1], 10) || 0;
+                    s = parts[2] ? (parseInt(parts[2], 10) || 0) : 0;
+                }
                 ms = ((h * 60 + m) * 60 + s) * 1000;
             } else {
                 return null;
             }
             const total = Math.floor(ms / 1000);
-            const days  = Math.floor(total / 86400);
-            const h     = Math.floor((total % 86400) / 3600);
-            const m     = Math.floor((total % 3600) / 60);
-            const s     = total % 60;
+            const days = Math.floor(total / 86400);
+            const h = Math.floor((total % 86400) / 3600);
+            const m = Math.floor((total % 3600) / 60);
+            const s = total % 60;
             return `P${pad2(days)}DT${pad2(h)}H${pad2(m)}M${pad2(s)}S`;
         },
 
@@ -200,29 +231,29 @@ sap.ui.define([], () => {
 
             const base = {
                 // ── Employee ──────────────────────────────────────────────
-                ZempId:             s(r.ZempId),
-                ZempName:           s(r.ZempName),
-                ZempType:           s(r.ZempType),
-                ZempTypeDesc:       s(r.ZempTypeDesc),
-                ZempClass:          s(r.ZempClass),
-                ZempClassDesc:      s(r.ZempClassDesc),
-                Zcompany:           s(r.Zcompany),
-                Znationality:       s(r.Znationality),
-                Zhiredate:          r.Zhiredate   || r.ZhireDate   || null,
-                Zpaygrade:          s(r.Zpaygrade || r.ZpayGrade),
+                ZempId: s(r.ZempId),
+                ZempName: s(r.ZempName),
+                ZempType: s(r.ZempType),
+                ZempTypeDesc: s(r.ZempTypeDesc),
+                ZempClass: s(r.ZempClass),
+                ZempClassDesc: s(r.ZempClassDesc),
+                Zcompany: s(r.Zcompany),
+                Znationality: s(r.Znationality),
+                Zhiredate: r.Zhiredate || r.ZhireDate || null,
+                Zpaygrade: s(r.Zpaygrade || r.ZpayGrade),
 
                 // ── Position / Location ───────────────────────────────────
-                Zposition:          s(r.Zposition),
-                Zjobtitle:          s(r.Zjobtitle          || r.ZjobTitle),
+                Zposition: s(r.Zposition),
+                Zjobtitle: s(r.Zjobtitle || r.ZjobTitle),
                 Zjobclassification: s(r.Zjobclassification || r.ZjobClass),
-                Zlocation:          s(r.Zlocation),
-                Zlocationgroup:     s(r.Zlocationgroup      || r.ZlocGroup),
-                Zworkschedule:      s(r.Zworkschedule),
-                ZlatestNode:        s(r.ZlatestNode),
+                Zlocation: s(r.Zlocation),
+                Zlocationgroup: s(r.Zlocationgroup || r.ZlocGroup),
+                Zworkschedule: s(r.Zworkschedule),
+                ZlatestNode: s(r.ZlatestNode),
 
                 // Edm.String in updated metadata
-                ZstdWeekHrs:        s(r.ZstdWeekHrs),
-                ZwrkDyWeek:         s(r.ZwrkDyWeek),
+                ZstdWeekHrs: s(r.ZstdWeekHrs),
+                ZwrkDyWeek: s(r.ZwrkDyWeek),
 
                 // ── Org Indicators — Edm.String (updated metadata) ────────
                 Zn0: s(r.Zn0),
@@ -236,63 +267,63 @@ sap.ui.define([], () => {
 
                 // ── Violation ─────────────────────────────────────────────
                 ZactionRefNo: s(r.ZactionRefNo || r.ZACTION_REF_NO),
-                ZincDate:     r.ZincDate || null,
+                ZincDate: r.ZincDate || null,
                 ZincCategory: s(r.ZincCategory),
-                ZincType:     s(r.ZincType),
-                Zaction:      s(r.Zaction),
-                Zstatus:      s(r.Zstatus || r.Status),   // HDR_STR: Zstatus; old code: r.Status (wrong)
-                Zsanction:    s(r.Zsanction),
-                Zremark:      s(r.Zremark),
+                ZincType: s(r.ZincType),
+                Zaction: s(r.Zaction),
+                Zstatus: s(r.Zstatus || r.Status),   // HDR_STR: Zstatus; old code: r.Status (wrong)
+                Zsanction: s(r.Zsanction),
+                Zremark: s(r.Zremark),
 
                 // ── Timeline ──────────────────────────────────────────────
-                ZincDisDate:         r.ZincDisDate         || null,
-                ZinitatedBy:         s(r.ZinitatedBy),
-                ZinitDate:           r.ZinitDate           || null,
-                ZfirstIncDate:       r.ZfirstIncDate       || null,
+                ZincDisDate: r.ZincDisDate || null,
+                ZinitatedBy: s(r.ZinitatedBy),
+                ZinitDate: r.ZinitDate || null,
+                ZfirstIncDate: r.ZfirstIncDate || null,
                 Zawaitingactionfrom: r.Zawaitingactionfrom || null,
-                Zlastaction:         r.Zlastaction         || null,
+                Zlastaction: r.Zlastaction || null,
 
                 // ── Shift Times (Edm.Time) ────────────────────────────────
-                ZschTimeIn:    r.ZschTimeIn    || null,
-                ZschTimeOut:   r.ZschTimeOut   || null,
-                Zpunchintime:  r.Zpunchintime  || null,
+                ZschTimeIn: r.ZschTimeIn || null,
+                ZschTimeOut: r.ZschTimeOut || null,
+                Zpunchintime: r.Zpunchintime || null,
                 Zpunchouttime: r.Zpunchouttime || null,
 
                 // ── Edm.Byte — only these four remain as integers ─────────
-                ZdelayHrs:        s(r.ZdelayHrs),
-                ZshortHrs:        s(r.ZshortHrs),
-                Zrepeatcount:     p(r.Zrepeatcount),
+                ZdelayHrs: s(r.ZdelayHrs),
+                ZshortHrs: s(r.ZshortHrs),
+                Zrepeatcount: p(r.Zrepeatcount),
                 Zsysyrepeatcount: p(r.Zsysyrepeatcount),
 
                 // ── Workflow: Line Manager ────────────────────────────────
-                ZlmIdName:              s(r.ZlmIdName),
-                Zlinemanagername:       s(r.Zlinemanagername),
-                Zlinemanageraction:     s(r.Zlinemanageraction),
+                ZlmIdName: s(r.ZlmIdName),
+                Zlinemanagername: s(r.Zlinemanagername),
+                Zlinemanageraction: s(r.Zlinemanageraction),
                 Zlinemanageractiondate: r.Zlinemanageractiondate || r.ZlmIdActionDate || null,
-                Zlinemanagerremarks:    s(r.Zlinemanagerremarks),
+                Zlinemanagerremarks: s(r.Zlinemanagerremarks),
 
                 // ── Workflow: HC Ops ──────────────────────────────────────
-                Zhcopsname:       s(r.Zhcopsname),
-                Zhcopsaction:     s(r.Zhcopsaction),
+                Zhcopsname: s(r.Zhcopsname),
+                Zhcopsaction: s(r.Zhcopsaction),
                 Zhcopsactiondate: r.Zhcopsactiondate || null,
-                Zhcopsremark:     s(r.Zhcopsremark),
+                Zhcopsremark: s(r.Zhcopsremark),
 
                 // ── Workflow: HC EVP ──────────────────────────────────────
-                Zhcevpname:       s(r.Zhcevpname),
-                Zhcevpaction:     s(r.Zhcevpaction),
+                Zhcevpname: s(r.Zhcevpname),
+                Zhcevpaction: s(r.Zhcevpaction),
                 Zhcevpactiondate: r.Zhcevpactiondate || null,
-                Zhcevpremark:     s(r.Zhcevpremark),
+                Zhcevpremark: s(r.Zhcevpremark),
 
                 // ── Workflow: Legal ───────────────────────────────────────
-                Zlegalmembername:       s(r.Zlegalmembername),
-                Zlegalmemberaction:     s(r.Zlegalmemberaction),
+                Zlegalmembername: s(r.Zlegalmembername),
+                Zlegalmemberaction: s(r.Zlegalmemberaction),
                 Zlegalmemberactiondate: r.Zlegalmemberactiondate || null,
-                Zlegalremark:           s(r.Zlegalremark),
+                Zlegalremark: s(r.Zlegalremark),
 
                 // ── Workflow: CEO ─────────────────────────────────────────
-                Zceoname:         s(r.Zceoname),
-                Zceoaction:       s(r.Zceoaction),
-                Zceoactiondate:   r.Zceoactiondate || null,
+                Zceoname: s(r.Zceoname),
+                Zceoaction: s(r.Zceoaction),
+                Zceoactiondate: r.Zceoactiondate || null,
                 Zceoactionremark: s(r.Zceoactionremark)
             };
 
@@ -303,15 +334,15 @@ sap.ui.define([], () => {
             const o = overrides || {};
             const r = violationRecord;
             return {
-                ZempId:        safeStr(r.ZempId),
-                ZactionRefNo:  safeStr(r.ZACTION_REF_NO || r.ZactionRefNo),
-                ZincDate:      this.formatDateTimeForPayload(r.ZincDate),
-                ZschTimeIn:    this.formatTimeDurationForPayload(o.ZschTimeIn    || r.ZschTimeIn),
-                Zpunchintime:  this.formatTimeDurationForPayload(o.Zpunchintime  || r.Zpunchintime),
+                ZempId: safeStr(r.ZempId),
+                ZactionRefNo: safeStr(r.ZACTION_REF_NO || r.ZactionRefNo),
+                ZincDate: this.formatDateTimeForPayload(r.ZincDate),
+                ZschTimeIn: this.formatTimeDurationForPayload(o.ZschTimeIn || r.ZschTimeIn),
+                Zpunchintime: this.formatTimeDurationForPayload(o.Zpunchintime || r.Zpunchintime),
                 Zpunchouttime: this.formatTimeDurationForPayload(o.Zpunchouttime || r.Zpunchouttime),
-                ZschTimeOut:   this.formatTimeDurationForPayload(o.ZschTimeOut   || r.ZschTimeOut),
-                DelayFlag:     (o.DelayFlag !== undefined && o.DelayFlag !== null)
-                                   ? String(o.DelayFlag) : "0"
+                ZschTimeOut: this.formatTimeDurationForPayload(o.ZschTimeOut || r.ZschTimeOut),
+                DelayFlag: (o.DelayFlag !== undefined && o.DelayFlag !== null)
+                    ? String(o.DelayFlag) : "0"
             };
         },
 
@@ -335,15 +366,15 @@ sap.ui.define([], () => {
             if (!violationRecord.ZactionRefNo) {
                 return Promise.reject(new Error("ODataUtils.submitHCAction: ZactionRefNo required."));
             }
-            const payload    = this.buildITMPayload(violationRecord, overrides || {});
+            const payload = this.buildITMPayload(violationRecord, overrides || {});
             const normalized = this.normalizePayloadForOData(payload);
-            const keyDate    = this.formatDateTimeForEntityKey(violationRecord.ZincDate);
+            const keyDate = this.formatDateTimeForEntityKey(violationRecord.ZincDate);
             const entityPath = `/ITM_STRSet(ZactionRefNo='${violationRecord.ZactionRefNo}',ZempId='${violationRecord.ZempId}',ZincDate=datetime'${keyDate}')`;
             oDataModel.setUseBatch(false);
             return new Promise((resolve, reject) => {
                 oDataModel.update(entityPath, normalized, {
                     success: (r) => { console.log("submitHCAction: success", r); resolve(r); },
-                    error:   (e) => { console.error("submitHCAction: error", e); this.handleODataError(e, "Failed to submit action"); reject(e); }
+                    error: (e) => { console.error("submitHCAction: error", e); this.handleODataError(e, "Failed to submit action"); reject(e); }
                 });
             });
         },
@@ -364,16 +395,16 @@ sap.ui.define([], () => {
             if (!actionRefNo) {
                 return Promise.reject(new Error("ODataUtils.submitPunchRegularize: ZactionRefNo required."));
             }
-            const payload    = this.buildPunchRegularizePayload(violationRecord, overrides || {});
-            const keyDate    = this.formatDateTimeForEntityKey(violationRecord.ZincDate);
-            const delayFlag  = payload.DelayFlag;
+            const payload = this.buildPunchRegularizePayload(violationRecord, overrides || {});
+            const keyDate = this.formatDateTimeForEntityKey(violationRecord.ZincDate);
+            const delayFlag = payload.DelayFlag;
             const entityPath = `/punch_regularizeSet(ZempId='${violationRecord.ZempId}',ZactionRefNo='${actionRefNo}',ZincDate=datetime'${keyDate}',DelayFlag='${delayFlag}')`;
             oDataModel.setUseBatch(false);
             return new Promise((resolve, reject) => {
                 oDataModel.update(entityPath, payload, {
                     bMerge: false,
                     success: (r) => { console.log("submitPunchRegularize: success", r); resolve(r); },
-                    error:   (e) => { console.error("submitPunchRegularize: error", e); this.handleODataError(e, "Failed to submit regularization"); reject(e); }
+                    error: (e) => { console.error("submitPunchRegularize: error", e); this.handleODataError(e, "Failed to submit regularization"); reject(e); }
                 });
             });
         }

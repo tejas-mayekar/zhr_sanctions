@@ -133,7 +133,7 @@ sap.ui.define([
                 ZincCategory: this.byId("inputZincCategory").getValue(),
                 ZincType: this.byId("inputZincType").getValue(),
                 Zaction: "C",
-                Zstatus: "PENDING",
+                Zstatus: "1",
                 Zsanction: this.byId("inputZsanction").getValue(),
                 Zremark: "",
 
