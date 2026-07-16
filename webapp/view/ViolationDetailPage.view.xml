@@ -78,20 +78,14 @@
                                     title="Position"
                                     text="{detailData>/record/Zposition}"
                                 />
-                            </attributes>
-                            <statuses>
-                                <ObjectStatus
-                                    id="statusViolation"
-                                    title="Violation"
-                                    text="{detailData>/record/ViolationType}"
-                                    state="Warning"
-                                />
-                                <ObjectStatus
+                                
+                                <ObjectAttribute
                                     id="statusDate"
                                     title="Incident Date"
                                     text="{path: 'detailData>/record/ZincDate', formatter: '.displaydateFormatter' }"
                                 />
-                            </statuses>
+                            </attributes>
+
                         </ObjectHeader>
                     </VBox>
 
@@ -305,14 +299,7 @@
                                 text="{detailData>/record/ZACTION_REF_NO}"
                             />
 
-                            <Label
-                                id="_IDGenLabel18"
-                                text="Violation Type"
-                            />
-                            <Text
-                                id="_IDGenText16"
-                                text="{detailData>/record/ViolationType}"
-                            />
+                         
                             <Label
                                 id="_IDGenLabel19"
                                 text="Status"

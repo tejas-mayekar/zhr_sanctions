@@ -73,12 +73,23 @@ sap.ui.define([
         formatRemarkColor(text) {
             if (!text) { return ""; }
             const t = text.toUpperCase();
+            let bg = "transparent";
             if (t.includes("CEO COMMENTS")) {
-                return `<span style="background-color:#c00; padding:2px 6px; color:#fff; border-radius:3px;">${text}</span>`;
+                bg = "#c00";
+                return `<span style="background-color:${bg}; padding:2px 6px; color:#fff; border-radius:3px;">${text}</span>`;
             } else if (t.includes("EVP COMMENTS")) {
-                return `<span style="background-color:#0070c0; padding:2px 6px; color:#fff; border-radius:3px;">${text}</span>`;
+                bg = "#0070c0";
+                return `<span style="background-color:${bg}; padding:2px 6px; color:#fff; border-radius:3px;">${text}</span>`;
+                return `<span style="background-color:${bg}; padding:2px 6px; color:#fff; border-radius:3px;">${text}</span>`;
+            } else if (t.includes("HC COMMENTS")) {
+                bg = "#9b7dbe";
+                return `<span style="background-color:${bg}; padding:2px 6px; color:#fff; border-radius:3px;">${text}</span>`;
+            } else if (t.includes("LINE MANAGER COMMENTS")) {
+                bg = "#31c699";
+                return `<span style="background-color:${bg}; padding:2px 6px; color:#fff; border-radius:3px;">${text}</span>`;
+            } else {
+                return `<span style="background-color:${bg}; padding:2px 6px; color:#000; border-radius:3px;">${text}</span>`;
             }
-            return `<span style="background-color:transparent; padding:2px 6px; color:#000; border-radius:3px;">${text}</span>`;
         },
 
         onViewRemarkCancel() {

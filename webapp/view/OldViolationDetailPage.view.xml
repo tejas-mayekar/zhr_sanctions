@@ -78,20 +78,13 @@
                                     title="Position"
                                     text="{detailData>/record/Zposition}"
                                 />
-                            </attributes>
-                            <statuses>
-                                <ObjectStatus
-                                    id="_IDGenObjectStatus"
-                                    title="Violation"
-                                    text="{detailData>/record/ViolationType}"
-                                    state="Warning"
-                                />
-                                <ObjectStatus
+                                
+                                <ObjectAttribute
                                     id="_IDGenObjectStatus1"
                                     title="Incident Date"
                                     text="{path: 'detailData>/record/ZincDate', formatter: '.displaydateFormatter' }"
                                 />
-                            </statuses>
+                            </attributes>
                         </ObjectHeader>
                     </VBox>
                 </HBox>
@@ -209,7 +202,7 @@
                             />
                             <Text
                                 id="_IDGenText39"
-                                text="{detailData>/record/ZjobTitle}"
+                                text="{detailData>/record/Zjobtitle}"
                             />
 
                             <Label
@@ -218,7 +211,7 @@
                             />
                             <Text
                                 id="_IDGenText40"
-                                text="{detailData>/record/ZpayGrade}"
+                                text="{detailData>/record/Zpaygrade}"
                             />
 
                             <Label
@@ -236,7 +229,7 @@
                             />
                             <Text
                                 id="_IDGenText42"
-                                text="{path:'detailData>/record/ZhireDate', formatter: '.displaydateFormatter' }"
+                                text="{path:'detailData>/record/Zhiredate', formatter: '.displaydateFormatter' }"
                             />
 
                             <Label
@@ -254,7 +247,7 @@
                             />
                             <Text
                                 id="_IDGenText44"
-                                text="{detailData>/record/ZlocGroup}"
+                                text="{detailData>/record/Zlocationgroup}"
                             />
                         </form:content>
                     </form:SimpleForm>
@@ -287,16 +280,7 @@
                             />
                             <Text
                                 id="_IDGenText45"
-                                text="{detailData>/record/ZACTION_REF_NO}"
-                            />
-
-                            <Label
-                                id="_IDGenLabel49"
-                                text="Violation Type"
-                            />
-                            <Text
-                                id="_IDGenText46"
-                                text="{detailData>/record/ViolationType}"
+                                text="{detailData>/record/ZactionRefNo}"
                             />
 
                             <Label

@@ -2,7 +2,7 @@ sap.ui.define([], () => {
     "use strict";
 
     const LOCAL_HOSTNAMES = ["localhost", "127.0.0.1"];
-    const DEV_USER_ID = "DACO_EAMV04";
+    const DEV_USER_ID = "200030";
 
     // ITM_STR Edm.Byte fields — ONLY these four
     // ZdelayHrs, ZshortHrs, Zrepeatcount, Zsysyrepeatcount
@@ -90,7 +90,29 @@ sap.ui.define([], () => {
                 });
             });
         },
-
+        fetchODataEntity(oDataModel, entityPath) {
+            if (!oDataModel) {
+                return Promise.reject(new Error("ODataUtils.fetchODataEntity: oDataModel is null or undefined."));
+            }
+            if (typeof oDataModel.read !== "function") {
+                return Promise.reject(new Error("ODataUtils.fetchODataEntity: oDataModel has no read() method."));
+            }
+            return new Promise((resolve, reject) => {
+                oDataModel.read(entityPath, {
+                    success: (data) => {
+                        if (!data) {
+                            reject(new Error(`ODataUtils.fetchODataEntity: no entity found at ${entityPath}`));
+                        } else {
+                            resolve(data);
+                        }
+                    },
+                    error: (error) => {
+                        console.error("ODataUtils.fetchODataEntity error:", { entityPath, statusCode: error.statusCode, statusText: error.statusText, message: error.message });
+                        reject(error);
+                    }
+                });
+            });
+        },
         formatEdmTime(edmTime) {
             if (edmTime === null || edmTime === undefined) { return ""; }
             if (typeof edmTime === "string") { return edmTime; }
@@ -112,6 +134,10 @@ sap.ui.define([], () => {
 
         /** @deprecated */
         getuserId() { return this.getCurrentUserId(); },
+        getCurrentUserName() {
+            if (LOCAL_HOSTNAMES.includes(window.location.hostname)) { return "Dev User"; }
+            return sap.ushell.Container.getService("UserInfo").getUser().getFullName();
+        },
 
         formatTimeForPayload(timeString) {
             if (!timeString) { return null; }
