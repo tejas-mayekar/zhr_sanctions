@@ -134,6 +134,10 @@ sap.ui.define([], () => {
 
         /** @deprecated */
         getuserId() { return this.getCurrentUserId(); },
+        getCurrentUserName() {
+            if (LOCAL_HOSTNAMES.includes(window.location.hostname)) { return "Dev User"; }
+            return sap.ushell.Container.getService("UserInfo").getUser().getFullName();
+        },
 
         formatTimeForPayload(timeString) {
             if (!timeString) { return null; }

@@ -55,7 +55,6 @@ sap.ui.define([
         { label: "Line Manager ID", binding: "ZlmIdName", width: "14rem", sortProperty: "ZlmIdName", filterProperty: "ZlmIdName", visible: true },
         { label: "Line Manager Name", binding: "Zlinemanagername", width: "14rem", sortProperty: "Zlinemanagername", filterProperty: "Zlinemanagername", visible: true },
         { label: "LM Action Date", binding: "Zlinemanageractiondate", width: "12rem", sortProperty: "Zlinemanageractiondate", filterProperty: "Zlinemanageractiondate", visible: true, isDate: true },
-        { label: "Remark", binding: "Zremark", width: "16rem", sortProperty: "Zremark", filterProperty: "Zremark", visible: true }
     ];
 
     // ─── Controller ───────────────────────────────────────────────────────────
@@ -126,6 +125,7 @@ sap.ui.define([
                     "/HDR_STRSet",
                     filters
                 );
+                console.log("User",ODataUtils.getCurrentUserName())
                 const isHC = await ODataUtils.fetchODataEntity(
                     this.getView().getModel("mainService"),
                     `/ZHR_IS_HCSet(Zempid='${ODataUtils.getCurrentUserId()}')`

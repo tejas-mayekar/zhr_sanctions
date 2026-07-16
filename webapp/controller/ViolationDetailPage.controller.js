@@ -274,6 +274,7 @@ sap.ui.define([
             const itmPayload = ODataUtils.buildITMPayload(record, {
                 Zaction: "A",
                 Zlinemanagerremarks: reason,
+                Zlinemanagername: ODataUtils.getCurrentUserName(),
                 Zpunchintime: ODataUtils.formatTimeForPayload(correctedPunchIn),
                 Zpunchouttime: ODataUtils.formatTimeForPayload(correctedPunchOut),
                 Zstatus: "4"
@@ -338,6 +339,7 @@ sap.ui.define([
 
             const payload = ODataUtils.buildITMPayload(record, {
                 Zaction: "C",
+                Zlinemanagername: ODataUtils.getCurrentUserName(),
                 Zlinemanagerremarks: reason
             });
 
@@ -362,6 +364,7 @@ sap.ui.define([
 
             const payload = ODataUtils.buildITMPayload(record, {
                 Zaction: "B",
+                Zlinemanagername: ODataUtils.getCurrentUserName(),
                 Zstatus: "4"
             });
             this._submitToITMSet(

@@ -78,20 +78,13 @@
                                     title="Position"
                                     text="{detailData>/record/Zposition}"
                                 />
-                            </attributes>
-                            <statuses>
-                                <ObjectStatus
-                                    id="_IDGenObjectStatus"
-                                    title="Violation"
-                                    text="{detailData>/record/ViolationType}"
-                                    state="Warning"
-                                />
-                                <ObjectStatus
+                                
+                                <ObjectAttribute
                                     id="_IDGenObjectStatus1"
                                     title="Incident Date"
                                     text="{path: 'detailData>/record/ZincDate', formatter: '.displaydateFormatter' }"
                                 />
-                            </statuses>
+                            </attributes>
                         </ObjectHeader>
                     </VBox>
                 </HBox>
@@ -288,15 +281,6 @@
                             <Text
                                 id="_IDGenText45"
                                 text="{detailData>/record/ZactionRefNo}"
-                            />
-
-                            <Label
-                                id="_IDGenLabel49"
-                                text="Violation Type"
-                            />
-                            <Text
-                                id="_IDGenText46"
-                                text="{detailData>/record/ZincType}"
                             />
 
                             <Label

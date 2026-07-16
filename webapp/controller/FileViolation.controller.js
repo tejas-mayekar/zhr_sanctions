@@ -158,7 +158,7 @@ sap.ui.define([
                 Zsysyrepeatcount: p(this.byId("inputZsysyrepeatcount").getValue()),
 
                 // Workflow: Line Manager
-                Zlinemanagername: this.byId("inputZlinemanagername").getValue(),
+                Zlinemanagername: ODataUtils.getCurrentUserName(),
                 ZlmIdName: ODataUtils.getCurrentUserId(),
                 Zlinemanageraction: this.byId("inputZlinemanageraction").getValue(),
                 Zlinemanageractiondate: this.byId("dpZlinemanageractiondate").getDateValue(),

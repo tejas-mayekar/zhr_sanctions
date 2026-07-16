@@ -161,6 +161,10 @@ sap.ui.define([
                 MessageBox.error("Repeat count cannot be greater than system repeat count");
                 return;
             }
+            if (actionData.Zsysrepeatcount > 4 ) {
+                MessageBox.error("Repeat count cannot be more than 4");
+                return;
+            }
             if (actionData.reason.trim() === "") {
                 MessageBox.error("Please provide a reason for taking action");
                 return;
