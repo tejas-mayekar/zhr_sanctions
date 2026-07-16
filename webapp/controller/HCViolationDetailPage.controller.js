@@ -57,6 +57,7 @@ sap.ui.define([
         ZincDate: "",
         isVisible: false,
         reason: "",
+        insdescription: "",
         actionOptions: []
     };
 
@@ -136,13 +137,38 @@ sap.ui.define([
             const actionData = this.getView().getModel("regularize").getData();
 
             const oInput = oEvent.getSource();
-            const newValue = oInput.getValue();
-            if (actionData.Zrepeatcount < parseInt(newValue)) {
+            const newValue = parseInt(oInput.getValue()); // Parse as integer index
+
+            // Validate repeat count
+            if (actionData.Zrepeatcount < newValue) {
                 oInput.setValueState("Error");
                 oInput.setValueStateText("Repeat count cannot be greater than system repeat count");
-            }
-            else {
+                return;
+            } else {
                 oInput.setValueState("None");
+            }
+
+            // Parse JSON and select by index
+            try {
+                const insdescription = JSON.parse(actionData.insdescriptionstring);
+                console.log("Full data:", insdescription);
+
+                // Get value at index
+                const selectedValue = insdescription.ins1[newValue];
+                console.log(`Value at index ${newValue}:`, selectedValue);
+
+                if (selectedValue !== undefined) {
+                    // Set insdescription to the selected value
+                    actionData.insdescription = selectedValue;
+                    this.getView().getModel("regularize").refresh();
+                    console.log("Updated insdescription:", actionData.insdescription);
+                } else {
+                    console.warn(`Index ${newValue} is out of bounds. Array length: ${insdescription.ins1.length}`);
+                }
+            } catch (error) {
+                console.error("Invalid JSON:", error.message);
+                oInput.setValueState("Error");
+                oInput.setValueStateText("Invalid data format");
             }
         },
         onSubmitTakeAction() {

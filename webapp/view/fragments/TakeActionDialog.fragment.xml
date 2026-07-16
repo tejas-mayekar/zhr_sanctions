@@ -131,6 +131,22 @@
                             />
                         </HBox>
                     </HBox>
+                    <HBox id="_IDGenHBox14"
+                        alignContent="Start"
+                    >
+                        <HBox id="_IDGenHBox15"
+                            alignItems="Start"
+                        >
+                            <Label id="_IDGenLabel18"
+                                text="System Repeat Count"
+                                class="sapUiSmallMarginEnd"
+                            />
+                            <Input id="_IDGenInput7"
+                                editable="false"
+                                value="{regularize>/insdescription}"
+                            />
+                        </HBox>
+                    </HBox>
                 </VBox>
 
                 <Label
