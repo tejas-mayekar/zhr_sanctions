@@ -54,7 +54,6 @@ sap.ui.define([
         { label: "Initiated Date", binding: "ZinitDate", width: "12rem", sortProperty: "ZinitDate", filterProperty: "ZinitDate", visible: true, isDate: true },
         { label: "Line Manager ID", binding: "ZlmIdName", width: "14rem", sortProperty: "ZlmIdName", filterProperty: "ZlmIdName", visible: true },
         { label: "Line Manager Name", binding: "Zlinemanagername", width: "14rem", sortProperty: "Zlinemanagername", filterProperty: "Zlinemanagername", visible: true },
-        { label: "LM Action", binding: "Zlinemanageraction", width: "12rem", sortProperty: "Zlinemanageraction", filterProperty: "Zlinemanageraction", visible: true },
         { label: "LM Action Date", binding: "Zlinemanageractiondate", width: "12rem", sortProperty: "Zlinemanageractiondate", filterProperty: "Zlinemanageractiondate", visible: true, isDate: true },
         { label: "Remark", binding: "Zremark", width: "16rem", sortProperty: "Zremark", filterProperty: "Zremark", visible: true }
     ];
@@ -127,16 +126,15 @@ sap.ui.define([
                     "/HDR_STRSet",
                     filters
                 );
-                // const isHC = await ODataUtils.fetchOData(
-                //     this.getView().getModel("mainService"),
-                //     `/ZHR_IS_HCSet(Zempid='200030')`,
-                //     new Filter("Zempid", FilterOperator.EQ, ODataUtils.getCurrentUserId())
-                // );
+                const isHC = await ODataUtils.fetchODataEntity(
+                    this.getView().getModel("mainService"),
+                    `/ZHR_IS_HCSet(Zempid='${ODataUtils.getCurrentUserId()}')`
+                );
                 const uiModel = this.getView().getModel();
                 uiModel.setProperty("/HDR_STRSet", records || []);
                 uiModel.setProperty("/currentCount", (records || []).length);
                 uiModel.setProperty("/isHC",
-                    false
+                    isHC.Zishc === 'X' ? true : false
                 );
 
 
