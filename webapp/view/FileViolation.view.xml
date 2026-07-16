@@ -66,8 +66,8 @@
                             />
                             <DatePicker
                                 id="dpZincDate"
-                                displayFormat="yyyy-MM-dd"
-                                placeholder="yyyy-mm-dd"
+                                displayFormat="dd-MM-yyyy"
+                                placeholder="dd-mm-yyyy"
                                 change=".onIncidentDateChange"
                             />
                             <Label
@@ -90,8 +90,8 @@
                             />
                             <DatePicker
                                 id="dpZincDisDate"
-                                displayFormat="yyyy-MM-dd"
-                                placeholder="yyyy-mm-dd"
+                                displayFormat="dd-MM-yyyy"
+                                placeholder="dd-mm-yyyy"
                                 change=".onIncidentDateChange"
                             />
 

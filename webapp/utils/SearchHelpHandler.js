@@ -112,6 +112,7 @@ sap.ui.define([
                     regularizeModel.setProperty("/Zrepeatcount", data.Zrepeatcount);
                     regularizeModel.setProperty("/Zsysrepeatcount", data.Zsysrepeatcount);
                     regularizeModel.setProperty("/ZfirstIncDate", data.ZfirstInciDate);
+                    regularizeModel.setProperty("/insdescriptionstring", data.Zpenaltyinstancedesc);
                     regularizeModel.setProperty("/isVisible", true);
                 },
                 error: (error) => {

@@ -219,16 +219,14 @@ sap.ui.define([
                     MessageToast.show("Violation record created successfully.");
                     console.log("Action Reference No: " + zactionRefNo);
                     const fileUploader = this.byId("fileUploader");
-                    const files = fileUploader.getItems();
+                    const domRef = fileUploader.getFocusDomRef(); // <input type=file>
+                    const files = domRef && domRef.files ? Array.from(domRef.files) : [];
 
-                    // Check if files are attached
-                    if (files && files.length > 0) {
+                    if (files.length > 0) {
                         sap.ui.core.BusyIndicator.show();
                         this.UploadFiles(files, zactionRefNo);
-                        // this.onNavBack();
                     } else {
                         MessageToast.show("Violation record created successfully.");
-                        // this.onNavBack();
                     }
                 },
                 error: (error) => {
@@ -238,22 +236,29 @@ sap.ui.define([
             });
         },
         UploadFiles(files, zactionRefNo) {
-            const that = this;
-            const oDataModel = this.getModel();
+            const domFiles = this.byId("fileUploader").oFileUpload.files; // native FileList
 
-            files.forEach((file) => {
+            Array.from(domFiles).forEach((file) => {
                 const formData = new FormData();
-                formData.append("file", file);
                 formData.append("ZactionRefNo", zactionRefNo);
+                formData.append("Filename", file.name);
+                formData.append("Mimetype", file.type);
+                formData.append("Value", file); // append file directly
 
-                oDataModel.create("/ZHR_SANC_MEDIAUPLOAD", formData, {
-                    success: function () {
+                fetch("/ZHR_SANC_MEDIAUPLOADSet", {
+                    method: "POST",
+                    body: formData
+                    // Note: Do NOT set Content-Type header; browser will set it with boundary
+                })
+                    .then((response) => {
+                        if (!response.ok) throw new Error(`HTTP ${response.status}`);
                         MessageToast.show("File " + file.name + " uploaded successfully.");
-                    },
-                    error: function (error) {
+                        sap.ui.core.BusyIndicator.hide();
+                    })
+                    .catch((error) => {
                         ODataUtils.handleODataError(error, "Error uploading " + file.name);
-                    }
-                });
+                        sap.ui.core.BusyIndicator.hide();
+                    });
             });
         },
         _getSelectedEmployeeData() {
