@@ -161,7 +161,7 @@ sap.ui.define([
                 MessageBox.error("Repeat count cannot be greater than system repeat count");
                 return;
             }
-            if (actionData.Zsysrepeatcount > 4 ) {
+            if (actionData.Zsysrepeatcount > 4) {
                 MessageBox.error("Repeat count cannot be more than 4");
                 return;
             }
@@ -177,7 +177,8 @@ sap.ui.define([
                 Zhcevpactiondate: new Date(),
                 Zstatus: "4",
                 Zsysyrepeatcount: parseInt(actionData.Zsysrepeatcount),
-                ZlmIdName: ODataUtils.getCurrentUserId()
+                ZlmIdName: ODataUtils.getCurrentUserId(),
+                Zhcopsname: ODataUtils.getCurrentUserName(),
             }, () => this._takeActionDialog.close());
         },
 
@@ -268,7 +269,8 @@ sap.ui.define([
                 .then(() => ODataUtils.submitHCAction(oDataModel, record, {
                     Zaction: "A",
                     Zhcopsremark: reason,
-                    Zstatus: "4"
+                    Zstatus: "4",
+                    Zhcopsname: ODataUtils.getCurrentUserName(),
                 }))
                 .then(() => {
                     sap.ui.core.BusyIndicator.hide();
@@ -380,7 +382,8 @@ sap.ui.define([
                 Zrepeatcount: parseByteField(actionData.Zrepeatcount),
                 Zhcevpactiondate: new Date(),
                 Zstatus: "4",
-                ZlmIdName: ODataUtils.getCurrentUserId()
+                ZlmIdName: ODataUtils.getCurrentUserId(),
+                Zhcopsname: ODataUtils.getCurrentUserName(),
             }, () => this._takeNoActionDialog.close());
         },
 

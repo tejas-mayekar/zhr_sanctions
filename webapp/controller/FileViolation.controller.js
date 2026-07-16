@@ -213,10 +213,23 @@ sap.ui.define([
 
             sap.ui.core.BusyIndicator.show(0);
             oDataModel.create("/ITM_STRSet", payload, {
-                success: () => {
+                success: (data) => {
                     sap.ui.core.BusyIndicator.hide();
+                    const zactionRefNo = data.ZactionRefNo;
                     MessageToast.show("Violation record created successfully.");
-                    this.onNavBack();
+                    console.log("Action Reference No: " + zactionRefNo);
+                    const fileUploader = this.byId("fileUploader");
+                    const files = fileUploader.getItems();
+
+                    // Check if files are attached
+                    if (files && files.length > 0) {
+                        sap.ui.core.BusyIndicator.show();
+                        this.UploadFiles(files, zactionRefNo);
+                        // this.onNavBack();
+                    } else {
+                        MessageToast.show("Violation record created successfully.");
+                        // this.onNavBack();
+                    }
                 },
                 error: (error) => {
                     sap.ui.core.BusyIndicator.hide();
@@ -224,7 +237,25 @@ sap.ui.define([
                 }
             });
         },
+        UploadFiles(files, zactionRefNo) {
+            const that = this;
+            const oDataModel = this.getModel();
 
+            files.forEach((file) => {
+                const formData = new FormData();
+                formData.append("file", file);
+                formData.append("ZactionRefNo", zactionRefNo);
+
+                oDataModel.create("/ZHR_SANC_MEDIAUPLOAD", formData, {
+                    success: function () {
+                        MessageToast.show("File " + file.name + " uploaded successfully.");
+                    },
+                    error: function (error) {
+                        ODataUtils.handleODataError(error, "Error uploading " + file.name);
+                    }
+                });
+            });
+        },
         _getSelectedEmployeeData() {
             const shDataModel = this.getView().getModel("SHData");
             return shDataModel?.getProperty("/selectedEmployeeData") || null;

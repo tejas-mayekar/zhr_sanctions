@@ -112,7 +112,7 @@
                             />
                             <unified:FileUploader
                                 id="fileUploader"
-                                multiple="false"
+                                multiple="true"
                             />
                         </form:content>
                     </form:SimpleForm>

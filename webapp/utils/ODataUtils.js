@@ -2,7 +2,7 @@ sap.ui.define([], () => {
     "use strict";
 
     const LOCAL_HOSTNAMES = ["localhost", "127.0.0.1"];
-    const DEV_USER_ID = "DACO_EAMV04";
+    const DEV_USER_ID = "200030";
 
     // ITM_STR Edm.Byte fields — ONLY these four
     // ZdelayHrs, ZshortHrs, Zrepeatcount, Zsysyrepeatcount

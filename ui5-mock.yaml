@@ -18,7 +18,7 @@ server:
         backend:
           - path: /sap
             url: https://sapdev-app01.matarat.local:44300
-            client: '100'
+            client: '150'
     - name: fiori-tools-appreload
       afterMiddleware: compression
       configuration:
@@ -40,3 +40,8 @@ server:
             mockdataPath: ./webapp/localService/mainService/data
             generateMockData: true
         annotations: []
+builder:
+  resources:
+    excludes:
+      - /test/**
+      - /localService/**
