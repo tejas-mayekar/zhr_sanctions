@@ -29,7 +29,7 @@ sap.ui.define([
         { label: "Action Ref No", binding: "ZACTION_REF_NO", width: "11rem", sortProperty: "ZACTION_REF_NO", filterProperty: "ZACTION_REF_NO", visible: true },
         { label: "Employee ID", binding: "ZempId", width: "9rem", sortProperty: "ZempId", filterProperty: "ZempId", visible: true },
         { label: "Employee Name", binding: "ZempName", width: "14rem", sortProperty: "ZempName", filterProperty: "ZempName", visible: true },
-        { label: "Status", binding: "Status", width: "8rem", sortProperty: "Status", filterProperty: "Status", visible: false, isStatus: true },
+        { label: "Status", binding: "Zstatus", width: "8rem", sortProperty: "Zstatus", filterProperty: "Zstatus", visible: true, isStatus: true },
         { label: "Incident Date", binding: "ZincDate", width: "10rem", sortProperty: "ZincDate", filterProperty: "ZincDate", visible: true, isDate: true },
         { label: "Employee Type", binding: "ZempTypeDesc", width: "12rem", sortProperty: "ZempTypeDesc", filterProperty: "ZempTypeDesc", visible: true },
         { label: "Employment Class", binding: "ZempClass", width: "14rem", sortProperty: "ZempClass", filterProperty: "ZempClass", visible: true },
@@ -328,11 +328,11 @@ sap.ui.define([
             const selectedRecord = allRecords.find(rec => rec.ZACTION_REF_NO === actionRefNo);
 
             this.getOwnerComponent().setModel(
-                new JSONModel({ record: selectedRecord || {}, source: "hcdetail" }),
+                new JSONModel({ record: selectedRecord || {}, source: "hcunattendeddetail" }),
                 "detailData"
             );
 
-            this.getOwnerComponent().getRouter().navTo("RouteHCViolationDetailpage", {
+            this.getOwnerComponent().getRouter().navTo("RouteHCUnattendedDetailpage", {
                 actionRefNo: encodeURIComponent(actionRefNo)
             });
         },

@@ -1,0 +1,531 @@
+<mvc:View
+    controllerName="zhrsanctions.controller.HCUnattendedDetailPage"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:f="sap.f"
+    xmlns:core="sap.ui.core"
+    xmlns:form="sap.ui.layout.form"
+    xmlns="sap.m"
+>
+    <f:DynamicPage id="_IDGenDynamicPage4"
+         
+        fitContent="true"
+    >
+        <!-- ─── Header ─── -->
+        <f:title>
+            <f:DynamicPageTitle id="_IDGenDynamicPageTitle5"  >
+                <f:navigationActions>
+                    <Button id="_IDGenButton25"
+                         
+                        icon="sap-icon://nav-back"
+                        tooltip="Back to list"
+                        press=".onNavBack"
+                    />
+                </f:navigationActions>
+                <f:heading>
+                    <Title id="_IDGenTitle7"
+                         
+                        text="HC Unattended Details – {detailData>/record/ZACTION_REF_NO}"
+                    />
+                </f:heading>
+                <f:snappedHeading>
+                    <Title id="_IDGenTitle8"
+                         
+                        text="{detailData>/record/ZACTION_REF_NO}"
+                    />
+                </f:snappedHeading>
+            </f:DynamicPageTitle>
+        </f:title>
+
+        <f:header>
+            <f:DynamicPageHeader id="_IDGenDynamicPageHeader2"
+                 
+                pinnable="true"
+            >
+                <HBox id="_IDGenHBox16"
+                     
+                    wrap="Wrap"
+                    class="sapUiSmallMargin"
+                    width="100%"
+                    justifyContent="SpaceBetween"
+                >
+                    <!-- Employee snapshot card -->
+                    <VBox id="_IDGenVBox14"
+                         
+                        class="sapUiSmallMarginEnd"
+                        width="50rem"
+                    >
+                        <ObjectHeader id="_IDGenObjectHeader2"
+                             
+                            title="{detailData>/record/ZempName}"
+                            number="{detailData>/record/ZempId}"
+                            numberUnit="Employee ID"
+                            icon="sap-icon://employee"
+                            backgroundDesign="Transparent"
+                        >
+                            <attributes>
+                                <ObjectAttribute id="_IDGenObjectAttribute6"
+                                     
+                                    title="Company"
+                                    text="{detailData>/record/Zn0}"
+                                />
+                                <ObjectAttribute id="_IDGenObjectAttribute7"
+                                     
+                                    title="Department"
+                                    text="{detailData>/record/Zn3}"
+                                />
+                                <ObjectAttribute id="_IDGenObjectAttribute8"
+                                     
+                                    title="Position"
+                                    text="{detailData>/record/Zposition}"
+                                />
+                                <ObjectAttribute id="_IDGenObjectAttribute9"
+                                     
+                                    title="Incident Date"
+                                    text="{
+        path: 'detailData>/record/ZincDate',
+        formatter: '.displaydateFormatter'
+    }"
+                                />
+                                <ObjectAttribute id="_IDGenObjectAttribute10"
+                                     
+                                    title="Manager Remark"
+                                    text="{detailData>/record/Zlinemanagerremarks}"
+                                />
+                            </attributes>
+                        </ObjectHeader>
+                    </VBox>
+
+                    <VBox id="_IDGenVBox17"  >
+                        <HBox id="_IDGenHBox17"
+                             
+                            justifyContent="SpaceBetween"
+                            width="31rem"
+                        >
+                            <Button id="_IDGenButton26"
+                                 
+                                text="Take Actions"
+                                type="Reject"
+                                width="10rem"
+                                visible="{= ${/isEditOn} }"
+                                enabled="{= ${/isEditOn} }"
+                                press=".onTakeActionPress"
+                            />
+                            <Button id="_IDGenButton27"
+                                 
+                                text="No Actions"
+                                type="Emphasized"
+                                width="10rem"
+                                visible="{= ${/isEditOn} }"
+                                enabled="{= ${/isEditOn} }"
+                                press=".onTakeNoActionPress"
+                            />
+                            <Button id="_IDGenButton28"
+                                 
+                                text="Payroll Deduction Only"
+                                type="Ghost"
+                                width="10rem"
+                                visible="{= ${/isEditOn} }"
+                                enabled="{= ${/isEditOn} }"
+                                press=".onPayrollDeductionPress"
+                            />
+                        </HBox>
+                    </VBox>
+                </HBox>
+            </f:DynamicPageHeader>
+        </f:header>
+
+        <!-- ─── Content ─── -->
+        <f:content>
+            <VBox id="_IDGenVBox18"
+                 
+                class="sapUiMediumMargin"
+            >
+                <!-- ── Section 1: Employee Details ── -->
+                <Panel id="_IDGenPanel4"
+                     
+                    expandable="true"
+                    expanded="true"
+                    class="sapUiSmallMarginBottom"
+                >
+                    <headerToolbar>
+                        <OverflowToolbar id="_IDGenOverflowToolbar11"  >
+                            <Title id="_IDGenTitle9"
+                                 
+                                text="Employee Information"
+                            />
+                            <ToolbarSpacer id="_IDGenToolbarSpacer6"   />
+                            <Button id="_IDGenButton29"
+                                 
+                                icon="sap-icon://comment"
+                                text="View Remarks"
+                                press=".onViewRemarkPress"
+                            />
+                        </OverflowToolbar>
+                    </headerToolbar>
+                    <form:SimpleForm id="_IDGenSimpleForm4"
+                         
+                        editable="false"
+                        layout="ResponsiveGridLayout"
+                        labelSpanL="4"
+                        labelSpanM="4"
+                        labelSpanS="12"
+                        emptySpanL="0"
+                        emptySpanM="0"
+                        columnsL="2"
+                        columnsM="2"
+                    >
+                        <form:content>
+                            <Label id="_IDGenLabel49"
+                                 
+                                text="Employee ID"
+                            />
+                            <Text id="_IDGenText16"
+                                 
+                                text="{detailData>/record/ZempId}"
+                            />
+
+                            <Label id="_IDGenLabel91"
+                                 
+                                text="Employee Name"
+                            />
+                            <Text id="_IDGenText46"
+                                 
+                                text="{detailData>/record/ZempName}"
+                            />
+
+                            <Label id="_IDGenLabel108"
+                                 
+                                text="Employee Type"
+                            />
+                            <Text id="_IDGenText77"
+                                 
+                                text="{detailData>/record/ZempTypeDesc}"
+                            />
+
+                            <Label id="_IDGenLabel109"
+                                 
+                                text="Employment Class"
+                            />
+                            <Text id="_IDGenText93"
+                                 
+                                text="{detailData>/record/ZempClass}"
+                            />
+
+                            <Label id="_IDGenLabel110"
+                                 
+                                text="Company"
+                            />
+                            <Text id="_IDGenText94"
+                                 
+                                text="{detailData>/record/Zn0}"
+                            />
+
+                            <Label id="_IDGenLabel111"   
+                                text="Business Unit"
+                            />
+                            <Text id="_IDGenText95"   
+                                text="{detailData>/record/Zn1}"
+                            />
+
+                            <Label id="_IDGenLabel112"  
+                                text="Division"
+                            />
+                            <Text id="_IDGenText96"  
+                                text="{detailData>/record/Zn2}"
+                            />
+
+                            <Label id="_IDGenLabel113"
+                                 
+                                text="Department"
+                            />
+                            <Text id="_IDGenText97"
+                                 
+                                text="{detailData>/record/Zn3}"
+                            />
+
+                            <Label id="_IDGenLabel114"
+                                 
+                                text="Position"
+                            />
+                            <Text id="_IDGenText98"
+                                 
+                                text="{detailData>/record/Zposition}"
+                            />
+
+                            <Label id="_IDGenLabel115"
+                                 
+                                text="Job Title"
+                            />
+                            <Text id="_IDGenText99"
+                                 
+                                text="{detailData>/record/Zjobtitle}"
+                            />
+
+                            <Label id="_IDGenLabel116"
+                                 
+                                text="Pay Grade"
+                            />
+                            <Text id="_IDGenText100"
+                                 
+                                text="{detailData>/record/Zpaygrade}"
+                            />
+
+                            <Label id="_IDGenLabel117"
+                                 
+                                text="Nationality"
+                            />
+                            <Text id="_IDGenText101"
+                                 
+                                text="{detailData>/record/Znationality}"
+                            />
+
+                            <Label id="_IDGenLabel118"
+                                 
+                                text="Hire Date"
+                            />
+                            <Text id="_IDGenText102"
+                                 
+                                text="{
+                                    path: 'detailData>/record/Zhiredate',
+                                    formatter: '.displaydateFormatter'
+                                }"
+                            />
+
+                            <Label id="_IDGenLabel119"
+                                 
+                                text="Location"
+                            />
+                            <Text id="_IDGenText103"
+                                 
+                                text="{detailData>/record/Zlocation}"
+                            />
+
+                            <Label id="_IDGenLabel120"
+                                 
+                                text="Location Group"
+                            />
+                            <Text id="_IDGenText104"
+                                 
+                                text="{detailData>/record/Zlocationgroup}"
+                            />
+                        </form:content>
+                    </form:SimpleForm>
+                </Panel>
+                <Panel id="_IDGenPanel6"
+                     
+                    headerText="Violation Details"
+                    expandable="true"
+                    expanded="true"
+                    class="sapUiSmallMarginBottom"
+                >
+                    <form:SimpleForm id="_IDGenSimpleForm6"
+                         
+                        editable="false"
+                        layout="ResponsiveGridLayout"
+                        labelSpanL="4"
+                        labelSpanM="4"
+                        labelSpanS="12"
+                        emptySpanL="0"
+                        emptySpanM="0"
+                        columnsL="2"
+                        columnsM="2"
+                    >
+                        <form:content>
+                            <Label id="_IDGenLabel121"
+                                 
+                                text="Action Ref No"
+                            />
+                            <Text id="_IDGenText105"
+                                 
+                                text="{detailData>/record/ZactionRefNo}"
+                            />
+
+                            <Label id="_IDGenLabel122"
+                                 
+                                text="Violation Type"
+                            />
+                            <Text id="_IDGenText106"
+                                 
+                                text="{detailData>/record/ZincType}"
+                            />
+
+                            <Label id="_IDGenLabel123"
+                                 
+                                text="Status"
+                            />
+                            <Text id="_IDGenText107"
+                                 
+                                text="{
+                                    path: 'detailData>/record/Zstatus',
+                                    formatter: '.formatZstatus'
+                                }"
+                            />
+
+                            <Label id="_IDGenLabel124"
+                                 
+                                text="Scheduled In"
+                            />
+                            <Text id="_IDGenText108"
+                                 
+                                text="{
+                                    path: 'detailData>/record/ZschTimeIn',
+                                    formatter: '.formatEdmTime'
+                                }"
+                            />
+
+                            <Label id="_IDGenLabel125"
+                                 
+                                text="Scheduled Out"
+                            />
+                            <Text id="_IDGenText109"
+                                 
+                                text="{
+                                    path: 'detailData>/record/ZschTimeOut',
+                                    formatter: '.formatEdmTime'
+                                }"
+                            />
+
+                            <Label id="_IDGenLabel126"
+                                 
+                                text="Punch In Time"
+                            />
+                            <Text id="_IDGenText110"
+                                 
+                                text="{
+                                    path: 'detailData>/record/Zpunchintime',
+                                    formatter: '.formatEdmTime'
+                                }"
+                            />
+
+                            <Label id="_IDGenLabel127"
+                                 
+                                text="Punch Out Time"
+                            />
+                            <Text id="_IDGenText111"
+                                 
+                                text="{
+                                    path: 'detailData>/record/Zpunchouttime',
+                                    formatter: '.formatEdmTime'
+                                }"
+                            />
+
+                            <Label id="_IDGenLabel128"
+                                 
+                                text="Delay Hours"
+                            />
+                            <Text id="_IDGenText112"
+                                 
+                                text="{detailData>/record/ZdelayHrs}"
+                            />
+
+                            <Label id="_IDGenLabel129"
+                                 
+                                text="Short Hours"
+                            />
+                            <Text id="_IDGenText113"
+                                 
+                                text="{detailData>/record/ZshortHrs}"
+                            />
+
+                            <Label id="_IDGenLabel130"
+                                 
+                                text="Unauthorized Days"
+                            />
+                            <Text id="_IDGenText114"
+                                 
+                                text="{detailData>/record/ZunautDays}"
+                            />
+
+                            <Label id="_IDGenLabel131"
+                                 
+                                text="Work Schedule"
+                            />
+                            <Text id="_IDGenText115"
+                                 
+                                text="{detailData>/record/Zworkschedule}"
+                            />
+
+                            <Label id="_IDGenLabel132"
+                                 
+                                text="Standard Weekly Hours"
+                            />
+                            <Text id="_IDGenText116"
+                                 
+                                text="{detailData>/record/ZstdWeekHrs}"
+                            />
+
+                            <Label id="_IDGenLabel133"
+                                 
+                                text="Working Days/Week"
+                            />
+                            <Text id="_IDGenText117"
+                                 
+                                text="{detailData>/record/ZwrkDyWeek}"
+                            />
+                        </form:content>
+                    </form:SimpleForm>
+                </Panel>
+                <Panel id="_IDGenPanel7"
+                     
+                    headerText="Manager Details"
+                    expandable="true"
+                    expanded="true"
+                >
+                    <form:SimpleForm id="_IDGenSimpleForm7"
+                         
+                        editable="false"
+                        layout="ResponsiveGridLayout"
+                        labelSpanL="4"
+                        labelSpanM="4"
+                        labelSpanS="12"
+                        emptySpanL="0"
+                        emptySpanM="0"
+                        columnsL="2"
+                        columnsM="2"
+                    >
+                        <form:content>
+                            <Label id="_IDGenLabel136"
+                                 
+                                text="Manager ID"
+                            />
+                            <Text id="_IDGenText119"
+                                 
+                                text="{detailData>/record/ZlmIdName}"
+                            />
+
+                            <Label id="_IDGenLabel137"
+                                 
+                                text="Manager Action Date"
+                            />
+                            <Text id="_IDGenText121"
+                                 
+                                text="{path: 'detailData>/record/Zlinemanageractiondate', formatter: '.displaydateFormatter' }"
+                            />
+
+                            <Label id="_IDGenLabel138"
+                                 
+                                text="Manager Remark"
+                            />
+                            <Text id="_IDGenText122"
+                                 
+                                text="{detailData>/record/Zlinemanagerremarks}"
+                            />
+
+                            <Label id="_IDGenLabel139"
+                                 
+                                text="Incident Date"
+                            />
+                            <Text id="_IDGenText123"
+                                 
+                                text="{
+        path: 'detailData>/record/ZincDate',
+        formatter: '.displaydateFormatter'
+    }"
+                            />
+                        </form:content>
+                    </form:SimpleForm>
+                </Panel>
+            </VBox>
+        </f:content>
+    </f:DynamicPage>
+</mvc:View>

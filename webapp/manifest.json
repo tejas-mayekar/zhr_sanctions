@@ -124,6 +124,13 @@
           ]
         },
         {
+          "name": "RouteHCUnattendedDetailpage",
+          "pattern": "hcunattendeddetail/{actionRefNo}",
+          "target": [
+            "TargetHCUnattendedDetailPage"
+          ]
+        },
+        {
           "name": "RouteFileViolation",
           "pattern": "create",
           "target": [
@@ -154,6 +161,10 @@
         "TargetHCViolationDetailPage": {
           "id": "HCViolationDetailPage",
           "name": "HCViolationDetailPage"
+        },
+        "TargetHCUnattendedDetailPage": {
+          "id": "HCUnattendedDetailPage",
+          "name": "HCUnattendedDetailPage"
         },
         "TargetFileViolation": {
           "id": "FileViolation",
