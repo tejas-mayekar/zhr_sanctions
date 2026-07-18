@@ -7,22 +7,16 @@ sap.ui.define([
     "zhrsanctions/utils/ODataUtils"
 ], (Filter, FilterOperator, JSONModel, SelectDialog, StandardListItem, ODataUtils) => {
     "use strict";
-
-    // ─── Field Configurations ─────────────────────────────────────────────────
-
-    /**
-     * Maps input field IDs to their OData search-help configuration.
-     * Extend here to add more value-help fields.
-     */
     const FIELD_CONFIG = {
         inputZempId: {
             modelName: "mainService",
-            entitySetPath: "EMP_SEARCHHELPSet",
+            entitySetPath: "GET_EMP_BY_LMSet",       // list source now
+            detailEntitySetPath: "EMP_SEARCHHELPSet", // fetched on select
             keyField: "ZempId",
             descField: "ZempName",
             title: "Employee Search Help",
             defaultFilters: [
-                new Filter("ZlmIdName", FilterOperator.EQ, ODataUtils.getCurrentUserId())
+                new Filter("ZlmId", FilterOperator.EQ, ODataUtils.getCurrentUserId())
             ]
         },
         dIpZincType: {
@@ -34,12 +28,6 @@ sap.ui.define([
             defaultFilters: []
         }
     };
-
-    // ─── Internal Helpers ─────────────────────────────────────────────────────
-
-    /**
-     * Format a Date or "/Date(ms)/" string → "yyyy-M-dTHH:mm:ss" for OData keys.
-     */
     function formatDateForODataKey(dateValue) {
         const date = typeof dateValue === "string" ? new Date(dateValue) : dateValue;
         const year = date.getFullYear();
@@ -47,28 +35,11 @@ sap.ui.define([
         const day = date.getDate();
         return `${year}-${month}-${day}T00:00:00`;
     }
-
-    /**
-     * Build the dialog cache key used to store it on the controller.
-     */
     function dialogCacheKey(inputId) {
         return `_valueHelpDialog_${inputId}`;
     }
 
-    // ─── Module ───────────────────────────────────────────────────────────────
-
     const SearchHelpHandler = {
-
-        // ── Data Fetching ─────────────────────────────────────────────────────
-
-        /**
-         * Read an OData entity set and return the results as a Promise.
-         *
-         * @param {sap.ui.core.mvc.Controller} controller
-         * @param {string} modelName   - named model on the view (or "" for default)
-         * @param {string} entitySetPath
-         * @param {Array}  filters
-         */
         fetchEntitySet(controller, modelName, entitySetPath, filters) {
             const model = modelName
                 ? controller.getView().getModel(modelName)
@@ -90,14 +61,6 @@ sap.ui.define([
                 });
             });
         },
-
-        // ── Repeat-Count Lookup ───────────────────────────────────────────────
-
-        /**
-         * After a violation type is selected (HC flow), look up prior repeat count
-         * and earliest incident date for this employee + category + type.
-         * Populates regularize>/Zrepeatcount and regularize>/ZfirstIncDate.
-         */
         loadRepeatInfo(controller, employeeId, category, incidentType, incidentDate, actionRefNo) {
             if (!employeeId || !category || !incidentType || !incidentDate) { return; }
 
@@ -125,13 +88,6 @@ sap.ui.define([
                 }
             });
         },
-
-        // ── Dialog Lifecycle ──────────────────────────────────────────────────
-
-        /**
-         * Build and register a SelectDialog for the given input field.
-         * Stored on the controller as `_valueHelpDialog_<inputId>`.
-         */
         _createDialog(controller, view, inputId, fieldConfig, targetInput) {
             const handler = this;
 
@@ -179,17 +135,6 @@ sap.ui.define([
 
             return dialog;
         },
-
-        // ── Open ──────────────────────────────────────────────────────────────
-
-        /**
-         * Open (or create then open) the value-help dialog for the triggering input.
-         *
-         * @param {sap.ui.core.mvc.Controller} controller
-         * @param {sap.ui.base.Event}          triggerEvent   - valueHelpRequest event
-         * @param {Date|string}                extraParam     - incident date (emp search) or
-         *                                                      violation category (type search)
-         */
         openValueHelpDialog(controller, triggerEvent, extraParam) {
             const sourceInput = triggerEvent.getSource();
             const inputId = sourceInput.getId().split("--").pop();
@@ -217,11 +162,10 @@ sap.ui.define([
             dialog.setBusy(true);
             dialog.open(currentValue);
 
-            // Build filters: default + context-specific
             const filters = [...(fieldConfig.defaultFilters || [])];
 
             if (extraParam && inputId === "inputZempId") {
-                filters.push(new Filter("ZincDate", FilterOperator.EQ, extraParam));
+                // filters.push(new Filter("ZincDate", FilterOperator.EQ, extraParam));
             }
             if (extraParam && inputId === "dIpZincType") {
                 filters.push(new Filter("Zviolationcategory", FilterOperator.EQ, extraParam));
@@ -250,13 +194,6 @@ sap.ui.define([
                     sap.m.MessageBox.error(msg);
                 });
         },
-
-        // ── Live Search ───────────────────────────────────────────────────────
-
-        /**
-         * Client-side filter on already-loaded data as the user types.
-         * Handles both liveChange and search (Enter) events.
-         */
         onLiveSearch(oEvent) {
             const dialog = oEvent.getSource();
             const query = oEvent.getParameter("value") || "";
@@ -277,12 +214,6 @@ sap.ui.define([
 
             dialog.getModel("valueHelpItems").setData(filteredData);
         },
-
-        // ── Confirm (selection) ───────────────────────────────────────────────
-
-        /**
-         * Handle item selection: set value on source input, update models.
-         */
         onConfirm(controller, oEvent) {
             const selectedItem = oEvent.getParameter("selectedItem");
             const dialog = oEvent.getSource();
@@ -298,12 +229,8 @@ sap.ui.define([
             const selectedKey = context
                 ? context.getProperty(fieldConfig.keyField)
                 : selectedItem.getTitle();
-
-            // Write selected key back to input field
             dialog._targetInput.setValue(selectedKey);
             selectedData.initiatedDay = new Date();
-
-            // NEW: violation-type desc → regularize model for display
             if (inputId === "dIpZincType") {
                 const regularizeModel = controller.getView().getModel("regularize");
                 if (regularizeModel) {
@@ -313,13 +240,36 @@ sap.ui.define([
                     );
                 }
             }
-            // Persist selected employee/violation data in SHData model
-            const shDataModel = controller.getView().getModel("SHData");
-            if (shDataModel) {
-                shDataModel.setProperty("/selectedEmployeeData", selectedData);
+            if (inputId === "inputZempId" && fieldConfig.detailEntitySetPath) {
+                const detailFilters = [
+                    new Filter(fieldConfig.keyField, FilterOperator.EQ, selectedKey),
+                    new Filter("ZincDate", FilterOperator.EQ, dialog._extraParam)
+                ];
+                
+                // filters.push(new Filter("ZincDate", FilterOperator.EQ, extraParam));
+                this.fetchEntitySet(controller, fieldConfig.modelName, fieldConfig.detailEntitySetPath, detailFilters)
+                    .then(results => {
+                        const fullData = results?.[0] || selectedData;
+                        fullData.initiatedDay = new Date();
+                        const shDataModel = controller.getView().getModel("SHData");
+                        if (shDataModel) {
+                            shDataModel.setProperty("/selectedEmployeeData", fullData);
+                        }
+                    })
+                    .catch(err => {
+                        console.error("SearchHelpHandler.onConfirm: detail fetch failed", err);
+                        const shDataModel = controller.getView().getModel("SHData");
+                        if (shDataModel) {
+                            shDataModel.setProperty("/selectedEmployeeData", selectedData);
+                        }
+                    });
+            } else {
+                // Persist selected employee/violation data in SHData model (other fields, e.g. violation type)
+                const shDataModel = controller.getView().getModel("SHData");
+                if (shDataModel) {
+                    shDataModel.setProperty("/selectedEmployeeData", selectedData);
+                }
             }
-
-            // HC flow only: load repeat-count history when a violation TYPE is picked
             const isHCController = controller.getMetadata().getName() ===
                 "zhrsanctions.controller.HCViolationDetailPage";
 
@@ -335,9 +285,6 @@ sap.ui.define([
 
             dialog._targetInput.fireChange({ value: selectedKey });
         },
-
-        // ── Legacy API aliases ────────────────────────────────────────────────
-
         /** @deprecated Use onLiveSearch */
         liveSearchValueHelpDialog(oEvent) { return this.onLiveSearch(oEvent); },
         /** @deprecated Use onLiveSearch */
