@@ -236,29 +236,35 @@ sap.ui.define([
             });
         },
         UploadFiles(files, zactionRefNo) {
-            const domFiles = this.byId("fileUploader").oFileUpload.files; // native FileList
+            const oDataModel = this.getOwnerComponent().getModel() || this.getView().getModel("mainService");
+            const sServiceUrl = oDataModel.sServiceUrl;
+            const sCsrfToken = oDataModel.getSecurityToken ? oDataModel.getSecurityToken() : oDataModel.oHeaders["x-csrf-token"];
 
-            Array.from(domFiles).forEach((file) => {
-                const formData = new FormData();
-                formData.append("ZactionRefNo", zactionRefNo);
-                formData.append("Filename", file.name);
-                formData.append("Mimetype", file.type);
-                formData.append("Value", file); // append file directly
+            files.forEach((file) => {
+                const sUrl = `${sServiceUrl}/ZHR_SANC_MEDIAUPLOADSet`;
 
-                fetch("/ZHR_SANC_MEDIAUPLOADSet", {
-                    method: "POST",
-                    body: formData
-                    // Note: Do NOT set Content-Type header; browser will set it with boundary
-                })
-                    .then((response) => {
-                        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const oReq = new XMLHttpRequest();
+                oReq.open("POST", sUrl, true);
+                oReq.setRequestHeader("Content-Type", file.type || "application/octet-stream");
+                oReq.setRequestHeader("x-csrf-token", sCsrfToken);
+                oReq.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+                oReq.setRequestHeader("slug", encodeURIComponent(file.name) + ";" + encodeURIComponent(zactionRefNo));
+                oReq.onload = () => {
+                    if (oReq.status >= 200 && oReq.status < 300) {
+                        sap.ui.core.BusyIndicator.hide();
                         MessageToast.show("File " + file.name + " uploaded successfully.");
+                    } else {
                         sap.ui.core.BusyIndicator.hide();
-                    })
-                    .catch((error) => {
-                        ODataUtils.handleODataError(error, "Error uploading " + file.name);
-                        sap.ui.core.BusyIndicator.hide();
-                    });
+                        MessageToast.show("Upload failed: " + file.name);
+                        console.error(oReq.responseText);
+                    }
+                };
+                oReq.onerror = () => {
+
+                    sap.ui.core.BusyIndicator.hide();
+                    MessageToast.show("Upload error: " + file.name);
+                }
+                oReq.send(file);
             });
         },
         _getSelectedEmployeeData() {
