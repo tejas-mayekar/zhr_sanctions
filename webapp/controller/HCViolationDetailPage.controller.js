@@ -201,7 +201,7 @@ sap.ui.define([
                 ZincType: actionData.ZincType,
                 Zhcopsremark: actionData.reason,
                 Zhcevpactiondate: new Date(),
-                Zstatus: "4",
+                Zstatus: "5",
                 Zsysyrepeatcount: parseInt(actionData.Zsysrepeatcount),
                 ZlmIdName: ODataUtils.getCurrentUserId(),
                 Zhcopsname: ODataUtils.getCurrentUserName(),

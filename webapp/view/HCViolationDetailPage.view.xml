@@ -66,7 +66,7 @@
                                 <ObjectAttribute
                                     id="_IDGenObjectAttribute3"
                                     title="Company"
-                                    text="{detailData>/record/Zcompany}"
+                                    text="{detailData>/record/Zn0}"
                                 />
                                 <ObjectAttribute
                                     id="_IDGenObjectAttribute4"
@@ -217,7 +217,21 @@
                             />
                             <Text
                                 id="_IDGenText62"
-                                text="{detailData>/record/Zcompany}"
+                                text="{detailData>/record/Zn0}"
+                            />
+
+                            <Label id="_IDGenLabel134" 
+                                text="Business Unit"
+                            />
+                            <Text id="_IDGenText120" 
+                                text="{detailData>/record/Zn1}"
+                            />
+
+                            <Label id="_IDGenLabel135"
+                                text="Division"
+                            />
+                            <Text id="_IDGenText118"
+                                text="{detailData>/record/Zn2}"
                             />
 
                             <Label
@@ -292,7 +306,7 @@
                             />
                             <Text
                                 id="_IDGenText70"
-                                text="{detailData>/record/ZlocGroup}"
+                                text="{detailData>/record/Zlocationgroup}"
                             />
                         </form:content>
                     </form:SimpleForm>
@@ -485,7 +499,7 @@
                             />
                             <Text
                                 id="_IDGenText86"
-                                text="{path: 'detailData>/record/ZlmIdActionDate', formatter: '.displaydateFormatter' }"
+                                text="{path: 'detailData>/record/Zlinemanageractiondate', formatter: '.displaydateFormatter' }"
                             />
 
                             <Label

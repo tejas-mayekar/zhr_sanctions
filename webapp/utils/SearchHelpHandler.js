@@ -242,7 +242,7 @@ sap.ui.define([
             }
             if (inputId === "inputZempId" && fieldConfig.detailEntitySetPath) {
                 const detailFilters = [
-                    new Filter(fieldConfig.keyField, FilterOperator.EQ, selectedKey),
+                    new Filter("ZlmIdName", FilterOperator.EQ, selectedKey),
                     new Filter("ZincDate", FilterOperator.EQ, dialog._extraParam)
                 ];
                 

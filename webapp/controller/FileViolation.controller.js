@@ -94,6 +94,19 @@ sap.ui.define([
             const p = ODataUtils.parseByte.bind(ODataUtils);
             const selectedEmployee = this._getSelectedEmployeeData();
             const emp = selectedEmployee || {};
+            const dateInput = this.byId("dpZincDate").getDateValue();
+const localincDate = new Date(
+    dateInput.getFullYear(),
+    dateInput.getMonth(),
+    dateInput.getDate()
+);
+            const datediscInput = this.byId("dpZincDisDate").getDateValue();
+const localincdiscDate = new Date(
+    datediscInput.getFullYear(),
+    datediscInput.getMonth(),
+    datediscInput.getDate()
+);
+
             const payload = {
                 // Employee
                 ZempId: emp.ZempId || this.byId("inputZempId").getValue(),
@@ -129,7 +142,8 @@ sap.ui.define([
                 Zn7: emp.Zn7 || this.byId("inputZn7").getValue(),
 
                 // Violation
-                ZincDate: this.byId("dpZincDate").getDateValue(),
+                
+                ZincDate: localincDate,
                 ZincCategory: this.byId("inputZincCategory").getValue(),
                 ZincType: this.byId("inputZincType").getValue(),
                 Zaction: "C",
@@ -138,8 +152,8 @@ sap.ui.define([
                 Zremark: "",
 
                 // Timeline
-                ZincDisDate: this.byId("dpZincDisDate").getDateValue(),
-                ZinitatedBy: this.byId("inputZinitatedBy").getValue(),
+                ZincDisDate: localincdiscDate,
+                ZinitatedBy: ODataUtils.getCurrentUserId(),
                 ZinitDate: new Date(),
                 ZfirstIncDate: this.byId("dpZfirstIncDate").getDateValue(),
                 Zawaitingactionfrom: this.byId("dpZawaitingactionfrom").getDateValue(),
@@ -161,7 +175,7 @@ sap.ui.define([
                 Zlinemanagername: ODataUtils.getCurrentUserName(),
                 ZlmIdName: ODataUtils.getCurrentUserId(),
                 Zlinemanageraction: this.byId("inputZlinemanageraction").getValue(),
-                Zlinemanageractiondate: this.byId("dpZlinemanageractiondate").getDateValue(),
+                Zlinemanageractiondate:new Date(),
                 Zlinemanagerremarks: this.byId("inputZremark").getValue(),
 
                 // Workflow: HC Ops
