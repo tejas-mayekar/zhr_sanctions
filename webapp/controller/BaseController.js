@@ -10,7 +10,9 @@ sap.ui.define([
         "1": "In Progress",
         "2": "Sent Back to HR",
         "3": "Sent Back to LM",
-        "4": "Completed"
+        "4": "Completed",
+        "5": "Sent to EVP",
+        "6": "Sent to CEO",
     };
     const ZACTION_MAP = {
         "A": "Regularized",

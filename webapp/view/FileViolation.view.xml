@@ -86,11 +86,12 @@
 
                             <Label
                                 id="lblZincDisDate"
-                                text="Incident Disc. Date"
+                                text="Incident Discovery Date"
                             />
                             <DatePicker
                                 id="dpZincDisDate"
                                 displayFormat="dd-MM-yyyy"
+                                required="true"
                                 placeholder="dd-mm-yyyy"
                                 change=".onIncidentDateChange"
                             />
@@ -240,6 +241,7 @@
                             />
                             <Input
                                 id="inputZpaygrade"
+                                value="{SHData>/selectedEmployeeData/ZpayGrade}"
                                 editable="false"
                             />
 
@@ -460,136 +462,9 @@
                     <form:SimpleForm
                         id="formViolationInfo"
                         editable="true"
-                        layout="ResponsiveGridLayout"
-                        labelSpanL="4"
-                        labelSpanM="4"
-                        labelSpanS="12"
-                        emptySpanL="0"
-                        emptySpanM="0"
-                        columnsL="2"
-                        columnsM="2"
+                        width="40vw"
                     >
                         <form:content>
-                            <core:Title
-                                id="titleViolKeys"
-                                text="Keys &amp; Category"
-                            />
-
-                            <Label
-                                id="lblZincCategory"
-                                text="Incident Category"
-                            />
-                            <Input
-                                id="inputZincCategory"
-                                placeholder="Enter Category"
-                                maxLength="60"
-                                editable="false"
-                            />
-
-                            <Label
-                                id="lblZincType"
-                                text="Incident Type"
-                            />
-                            <Input
-                                id="inputZincType"
-                                placeholder="Enter Type"
-                                maxLength="10"
-                                editable="false"
-                            />
-
-                            <Label
-                                id="lblZaction"
-                                text="Action"
-                            />
-                            <Input
-                                id="inputZaction"
-                                placeholder="Enter Action"
-                                maxLength="50"
-                                editable="false"
-                            />
-
-                            <Label
-                                id="lblZstatus"
-                                text="Status"
-                            />
-                            <Input
-                                id="inputZstatus"
-                                placeholder="Enter Status"
-                                maxLength="50"
-                                editable="false"
-                            />
-
-                            <Label
-                                id="lblZsanction"
-                                text="Sanction"
-                            />
-                            <Input
-                                id="inputZsanction"
-                                placeholder="Enter Sanction"
-                                maxLength="60"
-                                editable="false"
-                            />
-
-                            <core:Title
-                                id="titleViolTimeline"
-                                text="Timeline &amp; Hours"
-                            />
-
-                            <Label
-                                id="lblZinitatedBy"
-                                text="Initiated By"
-                            />
-                            <Input
-                                id="inputZinitatedBy"
-                                placeholder="Enter Initiated By Name"
-                                maxLength="50"
-                                editable="false"
-                            />
-
-                            <Label
-                                id="lblZinitDate"
-                                text="Initiated Date"
-                            />
-                            <DatePicker
-                                value="{SHData>/selectedEmployeeData/initiatedDay}"
-                                id="dpZinitDate"
-                                displayFormat="yyyy-MM-dd"
-                                placeholder="yyyy-mm-dd"
-                                editable="false"
-                            />
-
-                            <Label
-                                id="lblZfirstIncDate"
-                                text="First Incident Date"
-                            />
-                            <DatePicker
-                                id="dpZfirstIncDate"
-                                displayFormat="yyyy-MM-dd"
-                                placeholder="yyyy-mm-dd"
-                                editable="false"
-                            />
-
-                            <Label
-                                id="lblZawaitingactionfrom"
-                                text="Awaiting Action From"
-                            />
-                            <DatePicker
-                                id="dpZawaitingactionfrom"
-                                displayFormat="yyyy-MM-dd"
-                                placeholder="yyyy-mm-dd"
-                                editable="false"
-                            />
-
-                            <Label
-                                id="lblZlastaction"
-                                text="Last Action Date"
-                            />
-                            <DatePicker
-                                id="dpZlastaction"
-                                displayFormat="yyyy-MM-dd"
-                                placeholder="yyyy-mm-dd"
-                                editable="false"
-                            />
 
                             <core:Title
                                 id="titleViolTimes"
@@ -703,6 +578,40 @@
                                 type="Number"
                                 placeholder="0"
                                 visible="false"
+                            />
+
+                            <Label
+                                id="ZunautDays"
+                                text="Unauthorized Days"
+                                visible="true"
+                            />
+                            <Input
+                                id="inputZunautDays"
+                                value="{SHData>/selectedEmployeeData/ZunautDays}"
+                                placeholder="0"
+                                editable="false"
+                            />
+                               <Label
+                                id="lblZinitatedBy"
+                                text="Initiated By"
+                            />
+                            <Input
+                                id="inputZinitatedBy"
+                                placeholder="Enter Initiated By Name"
+                                maxLength="50"
+                                editable="false"
+                            />
+
+                            <Label
+                                id="lblZinitDate"
+                                text="Initiated Date"
+                            />
+                            <DatePicker
+                                value="{SHData>/selectedEmployeeData/initiatedDay}"
+                                id="dpZinitDate"
+                                displayFormat="yyyy-MM-dd"
+                                placeholder="yyyy-mm-dd"
+                                editable="false"
                             />
                         </form:content>
                     </form:SimpleForm>

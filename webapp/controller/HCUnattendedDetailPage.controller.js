@@ -63,7 +63,7 @@ sap.ui.define([
 
     // ─── Controller ───────────────────────────────────────────────────────────
 
-    return BaseController.extend("zhrsanctions.controller.HCViolationDetailPage", {
+    return BaseController.extend("zhrsanctions.controller.HCUnattendedDetailPage", {
 
         onInit() {
             // Default model: drive button visibility
@@ -74,7 +74,7 @@ sap.ui.define([
 
             this.getOwnerComponent()
                 .getRouter()
-                .getRoute("RouteHCViolationDetailpage")
+                .getRoute("RouteHCUnattendedDetailpage")
                 .attachPatternMatched(this._onRouteMatched, this);
         },
 
@@ -85,7 +85,7 @@ sap.ui.define([
             if (detailModel) {
                 this.getView().setModel(detailModel, "detailData");
             }
-
+console.log(detailModel?.getData())
             // Show action buttons only when the record is still open
             const isOpen = detailModel?.getData().record?.Zstatus !== "4";
             this.getView().getModel().setProperty("/isEditOn", isOpen);

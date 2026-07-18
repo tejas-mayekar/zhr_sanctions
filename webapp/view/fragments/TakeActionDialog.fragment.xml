@@ -71,7 +71,9 @@
                 <VBox
                     id="_IDGenHBox5"
                     justifyContent="SpaceBetween"
-                    alignItems="Center"
+                    alignItems="Start"
+                    gap="10px"
+                    
                 >
                     <HBox
                         id="_IDGenHBox9"
