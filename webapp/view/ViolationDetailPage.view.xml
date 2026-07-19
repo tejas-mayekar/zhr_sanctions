@@ -465,6 +465,25 @@
                         </form:content>
                     </form:SimpleForm>
                 </Panel>
+                                <!-- ── Section 4: Attached Media ── -->
+                <Panel id="_IDGenPanel8"
+                    headerText="Attached Files"
+                    expandable="true"
+                    expanded="true"
+                    class="sapUiSmallMarginTop"
+                >
+                    <List id="_IDGenList"
+                        items="{media>/results}"
+                        noDataText="No files found"
+                    >
+                        <StandardListItem id="_IDGenStandardListItem1"
+                            title="{media>Filename}"
+                            icon="sap-icon://attachment"
+                            type="Active"
+                            press=".onMediaFilePress"
+                        />
+                    </List>
+                </Panel>
             </VBox>
         </f:content>
     </f:DynamicPage>
