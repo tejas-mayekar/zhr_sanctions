@@ -41,7 +41,7 @@
                 <items>
                     <IconTabFilter
                         id="_IDGenIconTabFilter"
-                        text="Current"
+                        text="In Progress with HC"
                         icon="sap-icon://activity-items"
                         iconDensityAware="false"
                         design="Horizontal"
@@ -155,7 +155,7 @@
                     <!-- ─── COMPLETED TAB ─── -->
                     <IconTabFilter
                         id="_IDGenIconTabFilterCompleted"
-                        text="Completed"
+                        text="In Progress / Completed"
                         icon="sap-icon://complete"
                         iconDensityAware="false"
                         design="Horizontal"
