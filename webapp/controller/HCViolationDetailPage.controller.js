@@ -85,7 +85,8 @@ sap.ui.define([
             if (detailModel) {
                 this.getView().setModel(detailModel, "detailData");
             }
-
+            const violationRec = detailModel?.getData().record;
+            this._loadMediaFiles(violationRec);
             // Show action buttons only when the record is still open
             const isOpen = detailModel?.getData().record?.Zstatus !== "4";
             this.getView().getModel().setProperty("/isEditOn", isOpen);
@@ -93,7 +94,64 @@ sap.ui.define([
             // Reset action form
             this.getView().getModel("regularize").setData({ ...EMPTY_ACTION_STATE });
         },
+        _loadMediaFiles(violationRec) {
+            if (!violationRec) { return; }
+            const actionRefNo = violationRec.ZactionRefNo || violationRec.ZACTION_REF_NO;
+            if (!actionRefNo) { return; }
 
+            const oDataModel = this.getOwnerComponent().getModel();
+            oDataModel.setUseBatch(false);
+            oDataModel.read("/ZHR_GET_MEDIASet", {
+                filters: [
+                    new Filter("ZactionRefNo", FilterOperator.EQ, actionRefNo)
+                ],
+                success: (data) => {
+                    const media = { results: data.results || [] };
+                    if (!this.getView().getModel("media")) {
+                        this.getView().setModel(new JSONModel(media), "media");
+                    } else {
+                        this.getView().getModel("media").setData(media);
+                    }
+                },
+                error: (err) => {
+                    console.error("ZHR_GET_MEDIASet fetch failed:", err);
+                }
+            });
+        },
+
+        onMediaFilePress(oEvent) {
+            const ctx = oEvent.getSource().getBindingContext("media");
+            if (!ctx) { return; }
+            const item = ctx.getObject();
+
+            const oDataModel = this.getOwnerComponent().getModel();
+            const sServiceUrl = oDataModel.sServiceUrl;
+            const key = `ZactionRefNo='${item.ZactionRefNo}',ZitemNo='${item.ZitemNo}',Filename='${item.Filename}'`;
+            const sUrl = `${sServiceUrl}/ZHR_SANC_MEDIAUPLOADSet(${key})/$value`;
+
+            sap.ui.core.BusyIndicator.show(0);
+            const oReq = new XMLHttpRequest();
+            oReq.open("GET", sUrl, true);
+            oReq.responseType = "blob";
+            oReq.onload = () => {
+                sap.ui.core.BusyIndicator.hide();
+                if (oReq.status >= 200 && oReq.status < 300) {
+                    const blob = oReq.response;
+                    const link = document.createElement("a");
+                    link.href = window.URL.createObjectURL(blob);
+                    link.download = item.Filename;
+                    link.click();
+                    window.URL.revokeObjectURL(link.href);
+                } else {
+                    sap.m.MessageBox.error("Failed to download file: " + item.Filename);
+                }
+            };
+            oReq.onerror = () => {
+                sap.ui.core.BusyIndicator.hide();
+                sap.m.MessageBox.error("Error downloading file: " + item.Filename);
+            };
+            oReq.send();
+        },
         // ── Violation Category Helper ─────────────────────────────────────────
 
         /**
@@ -194,6 +252,15 @@ sap.ui.define([
             if (actionData.reason.trim() === "") {
                 MessageBox.error("Please provide a reason for taking action");
                 return;
+            }
+            const zactionRefNo = violationRec.ZactionRefNo;
+            const fileUploader = this.byId("hcfileUploader");
+            const domRef = fileUploader.getFocusDomRef(); // <input type=file>
+            const files = domRef && domRef.files ? Array.from(domRef.files) : [];
+
+            if (files.length > 0) {
+                sap.ui.core.BusyIndicator.show();
+                this.UploadFiles(files, zactionRefNo);
             }
             this._submitHCAction(violationRec, {
                 ZactionRefNo: violationRec.ZactionRefNo,
@@ -480,6 +547,39 @@ sap.ui.define([
                 .catch(error => {
                     console.error("HCViolationDetailPage: failed to submit action:", error);
                 });
-        }
+        },
+
+        UploadFiles(files, zactionRefNo) {
+            const oDataModel = this.getOwnerComponent().getModel() || this.getView().getModel("mainService");
+            const sServiceUrl = oDataModel.sServiceUrl;
+            const sCsrfToken = oDataModel.getSecurityToken ? oDataModel.getSecurityToken() : oDataModel.oHeaders["x-csrf-token"];
+
+            files.forEach((file, index) => {
+                const sUrl = `${sServiceUrl}/ZHR_SANC_MEDIAUPLOADSet`;
+
+                const oReq = new XMLHttpRequest();
+                oReq.open("POST", sUrl, true);
+                oReq.setRequestHeader("Content-Type", file.type || "application/octet-stream");
+                oReq.setRequestHeader("x-csrf-token", sCsrfToken);
+                oReq.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+                oReq.setRequestHeader("slug", encodeURIComponent(file.name) + ";" + encodeURIComponent(zactionRefNo) + ";" + encodeURIComponent(index));
+                oReq.onload = () => {
+                    if (oReq.status >= 200 && oReq.status < 300) {
+                        sap.ui.core.BusyIndicator.hide();
+                        MessageToast.show("File " + file.name + " uploaded successfully.");
+                    } else {
+                        sap.ui.core.BusyIndicator.hide();
+                        MessageToast.show("Upload failed: " + file.name);
+                        console.error(oReq.responseText);
+                    }
+                };
+                oReq.onerror = () => {
+
+                    sap.ui.core.BusyIndicator.hide();
+                    MessageToast.show("Upload error: " + file.name);
+                }
+                oReq.send(file);
+            });
+        },
     });
 });

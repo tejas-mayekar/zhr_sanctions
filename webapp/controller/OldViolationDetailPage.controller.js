@@ -2,8 +2,9 @@ sap.ui.define([
     "zhrsanctions/controller/BaseController",
     "sap/ui/model/json/JSONModel",
     "sap/ui/model/Filter",
-    "sap/ui/model/FilterOperator"
-], (BaseController, JSONModel, Filter, FilterOperator) => {
+    "sap/ui/model/FilterOperator",
+    "zhrsanctions/utils/ODataUtils"
+], (BaseController, JSONModel, Filter, FilterOperator, ODataUtils) => {
     "use strict";
 
     return BaseController.extend("zhrsanctions.controller.OldViolationDetailPage", {
@@ -36,6 +37,68 @@ sap.ui.define([
             this.getView().getModel("regularize").setData({
                 punchIn: "", punchOut: "", reason: ""
             });
+
+            const violationRec = oDetailModel?.getData().record;
+            this._loadMediaFiles(violationRec);
+        },
+
+        _loadMediaFiles(violationRec) {
+            if (!violationRec) { return; }
+            const actionRefNo = violationRec.ZactionRefNo || violationRec.ZACTION_REF_NO;
+            if (!actionRefNo) { return; }
+
+            const oDataModel = this.getOwnerComponent().getModel();
+            oDataModel.setUseBatch(false);
+            oDataModel.read("/ZHR_GET_MEDIASet", {
+                filters: [
+                    new Filter("ZactionRefNo", FilterOperator.EQ, actionRefNo)
+                ],
+                success: (data) => {
+                    const media = { results: data.results || [] };
+                    if (!this.getView().getModel("media")) {
+                        this.getView().setModel(new JSONModel(media), "media");
+                    } else {
+                        this.getView().getModel("media").setData(media);
+                    }
+                },
+                error: (err) => {
+                    console.error("ZHR_GET_MEDIASet fetch failed:", err);
+                }
+            });
+        },
+
+        onMediaFilePress(oEvent) {
+            const ctx = oEvent.getSource().getBindingContext("media");
+            if (!ctx) { return; }
+            const item = ctx.getObject();
+
+            const oDataModel = this.getOwnerComponent().getModel();
+            const sServiceUrl = oDataModel.sServiceUrl;
+            const key = `ZactionRefNo='${item.ZactionRefNo}',ZitemNo='${item.ZitemNo}',Filename='${item.Filename}'`;
+            const sUrl = `${sServiceUrl}/ZHR_SANC_MEDIAUPLOADSet(${key})/$value`;
+
+            sap.ui.core.BusyIndicator.show(0);
+            const oReq = new XMLHttpRequest();
+            oReq.open("GET", sUrl, true);
+            oReq.responseType = "blob";
+            oReq.onload = () => {
+                sap.ui.core.BusyIndicator.hide();
+                if (oReq.status >= 200 && oReq.status < 300) {
+                    const blob = oReq.response;
+                    const link = document.createElement("a");
+                    link.href = window.URL.createObjectURL(blob);
+                    link.download = item.Filename;
+                    link.click();
+                    window.URL.revokeObjectURL(link.href);
+                } else {
+                    sap.m.MessageBox.error("Failed to download file: " + item.Filename);
+                }
+            };
+            oReq.onerror = () => {
+                sap.ui.core.BusyIndicator.hide();
+                sap.m.MessageBox.error("Error downloading file: " + item.Filename);
+            };
+            oReq.send();
         },
         onViewRemarkPress() {
             if (!this._addRemark) {

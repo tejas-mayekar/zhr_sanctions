@@ -1,6 +1,7 @@
 <core:FragmentDefinition
     xmlns:core="sap.ui.core"
     xmlns:f="sap.f"
+    xmlns:unified="sap.ui.unified"
     xmlns="sap.m"
 >
     <Dialog
@@ -73,7 +74,6 @@
                     justifyContent="SpaceBetween"
                     alignItems="Start"
                     gap="10px"
-                    
                 >
                     <HBox
                         id="_IDGenHBox9"
@@ -133,17 +133,21 @@
                             />
                         </HBox>
                     </HBox>
-                    <HBox id="_IDGenHBox14"
+                    <HBox
+                        id="_IDGenHBox14"
                         alignContent="Start"
                     >
-                        <HBox id="_IDGenHBox15"
+                        <HBox
+                            id="_IDGenHBox15"
                             alignItems="Start"
                         >
-                            <Label id="_IDGenLabel18"
+                            <Label
+                                id="_IDGenLabel18"
                                 text="Penalty Applicable"
                                 class="sapUiSmallMarginEnd"
                             />
-                            <Input id="_IDGenInput7"
+                            <Input
+                                id="_IDGenInput7"
                                 editable="false"
                                 value="{regularize>/insdescription}"
                             />
@@ -162,6 +166,14 @@
                     width="100%"
                     rows="4"
                     placeholder="Enter reason or remarks"
+                />
+                <Label
+                    id="lblReqZfile1"
+                    text="Supporting Documents"
+                />
+                <unified:FileUploader
+                    id="hcfileUploader"
+                    multiple="true"
                 />
             </VBox>
         </content>
