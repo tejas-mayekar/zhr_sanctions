@@ -91,6 +91,7 @@ sap.ui.define([
                 .getRouter()
                 .getRoute("RouteViolationDetailPage")
                 .attachPatternMatched(this._onRouteMatched, this);
+            this._pendingFiles = [];
         },
 
         // ── Route Handler ─────────────────────────────────────────────────────
@@ -101,6 +102,7 @@ sap.ui.define([
                 this.getView().setModel(detailModel, "detailData");
             }
             const violationRec = detailModel?.getData().record;
+            this._pendingFiles = [];
             this._loadMediaFiles(violationRec);
         },
         _loadMediaFiles(violationRec) {
@@ -127,7 +129,10 @@ sap.ui.define([
                 }
             });
         },
-
+        onFileChange(oEvent) {
+            const files = oEvent.getParameter("files");
+            this._pendingFiles = files ? Array.from(files) : [];
+        },
         onMediaFilePress(oEvent) {
             const ctx = oEvent.getSource().getBindingContext("media");
             if (!ctx) { return; }
@@ -411,13 +416,10 @@ sap.ui.define([
             const zactionRefNo = record.ZACTION_REF_NO || record.ZactionRefNo;
 
             this._submitToITMSet(payload, "Report to HC submitted successfully.", () => {
-                const fileUploader = this.byId("reportToHCFileUploader");
-                const domRef = fileUploader && fileUploader.getFocusDomRef();
-                const files = domRef && domRef.files ? Array.from(domRef.files) : [];
 
-                if (files.length > 0) {
+                if (this._pendingFiles.length > 0) {
                     sap.ui.core.BusyIndicator.show();
-                    this.UploadFiles(files, zactionRefNo);
+                    this.UploadFiles(this._pendingFiles, zactionRefNo);
                 }
 
                 this._closeDialog("reportToHC");
