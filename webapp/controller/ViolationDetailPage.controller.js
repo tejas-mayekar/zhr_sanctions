@@ -408,13 +408,52 @@ sap.ui.define([
                 ZinitDate: new Date(),
                 Zlinemanagerremarks: reason
             });
+            const zactionRefNo = record.ZACTION_REF_NO || record.ZactionRefNo;
 
             this._submitToITMSet(payload, "Report to HC submitted successfully.", () => {
+                const fileUploader = this.byId("reportToHCFileUploader");
+                const domRef = fileUploader && fileUploader.getFocusDomRef();
+                const files = domRef && domRef.files ? Array.from(domRef.files) : [];
+
+                if (files.length > 0) {
+                    sap.ui.core.BusyIndicator.show();
+                    this.UploadFiles(files, zactionRefNo);
+                }
+
                 this._closeDialog("reportToHC");
                 this.onNavBack();
             }, "Error submitting Report to HC");
         },
+        UploadFiles(files, zactionRefNo) {
+            const oDataModel = this.getOwnerComponent().getModel() || this.getView().getModel("mainService");
+            const sServiceUrl = oDataModel.sServiceUrl;
+            const sCsrfToken = oDataModel.getSecurityToken ? oDataModel.getSecurityToken() : oDataModel.oHeaders["x-csrf-token"];
 
+            files.forEach((file, index) => {
+                const sUrl = `${sServiceUrl}/ZHR_SANC_MEDIAUPLOADSet`;
+
+                const oReq = new XMLHttpRequest();
+                oReq.open("POST", sUrl, true);
+                oReq.setRequestHeader("Content-Type", file.type || "application/octet-stream");
+                oReq.setRequestHeader("x-csrf-token", sCsrfToken);
+                oReq.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+                oReq.setRequestHeader("slug", encodeURIComponent(file.name) + ";" + encodeURIComponent(zactionRefNo) + ";" + encodeURIComponent(index));
+                oReq.onload = () => {
+                    sap.ui.core.BusyIndicator.hide();
+                    if (oReq.status >= 200 && oReq.status < 300) {
+                        MessageToast.show("File " + file.name + " uploaded successfully.");
+                    } else {
+                        MessageToast.show("Upload failed: " + file.name);
+                        console.error(oReq.responseText);
+                    }
+                };
+                oReq.onerror = () => {
+                    sap.ui.core.BusyIndicator.hide();
+                    MessageToast.show("Upload error: " + file.name);
+                };
+                oReq.send(file);
+            });
+        },
         onReportToHCCancel() {
             this._closeDialog("reportToHC");
         },

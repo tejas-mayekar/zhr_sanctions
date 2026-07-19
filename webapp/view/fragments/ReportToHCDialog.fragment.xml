@@ -2,6 +2,7 @@
     xmlns="sap.m"
     xmlns:core="sap.ui.core"
     xmlns:form="sap.ui.layout.form"
+    xmlns:unified="sap.ui.unified"
 >
     <Dialog
         id="ReportToHCDialog"
@@ -29,6 +30,14 @@
                     columnsM="1"
                 >
                     <form:content>
+                    <Label
+                            id="lblReportToHCFile"
+                            text="Supporting Documents"
+                        />
+                        <unified:FileUploader
+                            id="reportToHCFileUploader"
+                            multiple="true"
+                        />
                         <!-- Reason -->
                         <Label
                             id="_IDGenLabel82"
