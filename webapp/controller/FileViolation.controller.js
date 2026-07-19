@@ -29,19 +29,19 @@ sap.ui.define([
 
             this.byId("dpZincDate").setDateValue(null);
             this.byId("inputZempId").setValue("").setEditable(false);
-            this.byId("inputZincCategory").setValue("");
-            this.byId("inputZincType").setValue("");
-            this.byId("inputZaction").setValue("");
-            this.byId("inputZstatus").setValue("");
-            this.byId("inputZsanction").setValue("");
+            // this.byId("inputZincCategory").setValue("");
+            // this.byId("inputZincType").setValue("");
+            // this.byId("inputZaction").setValue("");
+            // this.byId("inputZstatus").setValue("");
+            // this.byId("inputZsanction").setValue("");
             this.byId("inputZinitatedBy").setValue("");
             this.byId("inputZremark").setValue("");
             this.byId("inputZrepeatcount").setValue("");
             this.byId("inputZsysyrepeatcount").setValue("");
             this.byId("dpZincDisDate").setDateValue(null);
-            this.byId("dpZfirstIncDate").setDateValue(null);
-            this.byId("dpZawaitingactionfrom").setDateValue(null);
-            this.byId("dpZlastaction").setDateValue(null);
+            // this.byId("dpZfirstIncDate").setDateValue(null);
+            // this.byId("dpZawaitingactionfrom").setDateValue(null);
+            // this.byId("dpZlastaction").setDateValue(null);
             this.byId("fileUploader").clear();
         },
 
@@ -144,20 +144,20 @@ const localincdiscDate = new Date(
                 // Violation
                 
                 ZincDate: localincDate,
-                ZincCategory: this.byId("inputZincCategory").getValue(),
-                ZincType: this.byId("inputZincType").getValue(),
+                // ZincCategory: this.byId("inputZincCategory").getValue(),
+                // ZincType: this.byId("inputZincType").getValue(),
                 Zaction: "C",
                 Zstatus: "1",
-                Zsanction: this.byId("inputZsanction").getValue(),
+                // Zsanction: this.byId("inputZsanction").getValue(),
                 Zremark: "",
 
                 // Timeline
                 ZincDisDate: localincdiscDate,
                 ZinitatedBy: ODataUtils.getCurrentUserId(),
                 ZinitDate: new Date(),
-                ZfirstIncDate: this.byId("dpZfirstIncDate").getDateValue(),
-                Zawaitingactionfrom: this.byId("dpZawaitingactionfrom").getDateValue(),
-                Zlastaction: this.byId("dpZlastaction").getDateValue(),
+                // ZfirstIncDate: this.byId("dpZfirstIncDate").getDateValue(),
+                // Zawaitingactionfrom: this.byId("dpZawaitingactionfrom").getDateValue(),
+                // Zlastaction: this.byId("dpZlastaction").getDateValue(),
 
                 // Shift times
                 ZschTimeIn: ODataUtils.formatTimeForPayload(this.byId("tpZschTimeIn").getValue()),
@@ -254,7 +254,7 @@ const localincdiscDate = new Date(
             const sServiceUrl = oDataModel.sServiceUrl;
             const sCsrfToken = oDataModel.getSecurityToken ? oDataModel.getSecurityToken() : oDataModel.oHeaders["x-csrf-token"];
 
-            files.forEach((file) => {
+            files.forEach((file,index) => {
                 const sUrl = `${sServiceUrl}/ZHR_SANC_MEDIAUPLOADSet`;
 
                 const oReq = new XMLHttpRequest();
@@ -262,7 +262,7 @@ const localincdiscDate = new Date(
                 oReq.setRequestHeader("Content-Type", file.type || "application/octet-stream");
                 oReq.setRequestHeader("x-csrf-token", sCsrfToken);
                 oReq.setRequestHeader("X-Requested-With", "XMLHttpRequest");
-                oReq.setRequestHeader("slug", encodeURIComponent(file.name) + ";" + encodeURIComponent(zactionRefNo));
+                oReq.setRequestHeader("slug", encodeURIComponent(file.name) + ";" + encodeURIComponent(zactionRefNo) +";" + encodeURIComponent(index) );
                 oReq.onload = () => {
                     if (oReq.status >= 200 && oReq.status < 300) {
                         sap.ui.core.BusyIndicator.hide();

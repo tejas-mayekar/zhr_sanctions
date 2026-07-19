@@ -107,7 +107,6 @@ sap.ui.define([
             this._populateRegularizeModel(record);
             this._openDialog("regularize", "zhrsanctions.view.fragments.RegularizeDialog");
         },
-
         /**
          * Build the regularize model from the violation record.
          * Determines which sections apply (delay / short / both) and
