@@ -7,45 +7,9 @@ sap.ui.define([
     "zhrsanctions/utils/SearchHelpHandler",
     "sap/ui/model/Filter",
     "sap/ui/model/FilterOperator"
-], (BaseController, JSONModel, MessageToast, MessageBox, ODataUtils, SearchHelpHandler, Filter, FilterOperator) => {
+], (BaseController, JSONModel, MessageToast, MessageBox, ODataUtils, SearchHelpHandler) => {
     "use strict";
-    // add near top of HCViolationDetailPage.controller.js, after other helper fns
-    function toTimeStr(edmTime) {
-        return ODataUtils.formatEdmTime(edmTime) || "";
-    }
-    function timeToSec(t) {
-        if (!t) { return 0; }
-        const [h, m, s = "0"] = t.split(":");
-        return (parseInt(h, 10) || 0) * 3600 + (parseInt(m, 10) || 0) * 60 + (parseInt(s, 10) || 0);
-    }
-    function hasTimeDiff(record) {
-        const schIn = toTimeStr(record.ZschTimeIn);
-        const schOut = toTimeStr(record.ZschTimeOut);
-        const pIn = toTimeStr(record.Zpunchintime);
-        const pOut = toTimeStr(record.Zpunchouttime);
-        const delay = schIn && pIn && timeToSec(pIn) > timeToSec(schIn);
-        const short = schOut && pOut && timeToSec(pOut) < timeToSec(schOut);
-        return delay || short;
-    }
-    // ─── Default State ────────────────────────────────────────────────────────
-    function timeStringToSeconds(timeStr) {
-        if (!timeStr) { return 0; }
-        const [hh, mm, ss = "0"] = timeStr.split(":");
-        return (parseInt(hh, 10) || 0) * 3600
-            + (parseInt(mm, 10) || 0) * 60
-            + (parseInt(ss, 10) || 0);
-    }
 
-    /**
-     * Convert total seconds → zero-padded "HH:mm:ss".
-     */
-    function secondsToTimeString(totalSeconds) {
-        if (totalSeconds < 0) { totalSeconds = 0; }
-        const hh = String(Math.floor(totalSeconds / 3600)).padStart(2, "0");
-        const mm = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, "0");
-        const ss = String(totalSeconds % 60).padStart(2, "0");
-        return `${hh}:${mm}:${ss}`;
-    }
     const EMPTY_ACTION_STATE = {
         ZactionRefNo: "",
         ZincCategory: "",
@@ -87,7 +51,7 @@ sap.ui.define([
             }
 
             const violationRec = detailModel?.getData().record;
-            this._loadMediaFiles(violationRec);
+            this.loadMediaFiles(violationRec);
             // Show action buttons only when the record is still open
             const isOpen = detailModel?.getData().record?.Zstatus !== "4";
             this.getView().getModel().setProperty("/isEditOn", isOpen);
@@ -95,63 +59,10 @@ sap.ui.define([
             // Reset action form
             this.getView().getModel("regularize").setData({ ...EMPTY_ACTION_STATE });
         },
-        _loadMediaFiles(violationRec) {
-            if (!violationRec) { return; }
-            const actionRefNo = violationRec.ZactionRefNo || violationRec.ZACTION_REF_NO;
-            if (!actionRefNo) { return; }
-
-            const oDataModel = this.getOwnerComponent().getModel();
-            oDataModel.setUseBatch(false);
-            oDataModel.read("/ZHR_GET_MEDIASet", {
-                filters: [
-                    new Filter("ZactionRefNo", FilterOperator.EQ, actionRefNo)
-                ],
-                success: (data) => {
-                    const media = { results: data.results || [] };
-                    if (!this.getView().getModel("media")) {
-                        this.getView().setModel(new JSONModel(media), "media");
-                    } else {
-                        this.getView().getModel("media").setData(media);
-                    }
-                },
-                error: (err) => {
-                    console.error("ZHR_GET_MEDIASet fetch failed:", err);
-                }
-            });
-        },
-
         onMediaFilePress(oEvent) {
             const ctx = oEvent.getSource().getBindingContext("media");
             if (!ctx) { return; }
-            const item = ctx.getObject();
-
-            const oDataModel = this.getOwnerComponent().getModel();
-            const sServiceUrl = oDataModel.sServiceUrl;
-            const key = `ZactionRefNo='${item.ZactionRefNo}',ZitemNo='${item.ZitemNo}',Filename='${item.Filename}'`;
-            const sUrl = `${sServiceUrl}/ZHR_SANC_MEDIAUPLOADSet(${key})/$value`;
-
-            sap.ui.core.BusyIndicator.show(0);
-            const oReq = new XMLHttpRequest();
-            oReq.open("GET", sUrl, true);
-            oReq.responseType = "blob";
-            oReq.onload = () => {
-                sap.ui.core.BusyIndicator.hide();
-                if (oReq.status >= 200 && oReq.status < 300) {
-                    const blob = oReq.response;
-                    const link = document.createElement("a");
-                    link.href = window.URL.createObjectURL(blob);
-                    link.download = item.Filename;
-                    link.click();
-                    window.URL.revokeObjectURL(link.href);
-                } else {
-                    sap.m.MessageBox.error("Failed to download file: " + item.Filename);
-                }
-            };
-            oReq.onerror = () => {
-                sap.ui.core.BusyIndicator.hide();
-                sap.m.MessageBox.error("Error downloading file: " + item.Filename);
-            };
-            oReq.send();
+            this.downloadMediaFile(ctx.getObject());
         },
         // ── Violation Category Helper ─────────────────────────────────────────
 
@@ -272,7 +183,7 @@ sap.ui.define([
         onTakeNoActionPress() {
             const violationRec = this.getView().getModel("detailData").getData().record;
 
-            if (hasTimeDiff(violationRec) || (parseInt(violationRec.ZunautDays, 10) || 0) > 0) {
+            if (this.hasAttendanceTimeDifference(violationRec) || (parseInt(violationRec.ZunautDays, 10) || 0) > 0) {
                 this._populateRegularizeModel(violationRec);
                 this._openRegularizeDialog();
                 return;
@@ -289,14 +200,14 @@ sap.ui.define([
             this._takeNoActionDialog.open();
         },
         _populateRegularizeModel(record) {
-            const schIn = toTimeStr(record.ZschTimeIn);
-            const schOut = toTimeStr(record.ZschTimeOut);
-            const pIn = toTimeStr(record.Zpunchintime);
-            const pOut = toTimeStr(record.Zpunchouttime);
+            const schIn = this.toTimeString(record.ZschTimeIn);
+            const schOut = this.toTimeString(record.ZschTimeOut);
+            const pIn = this.toTimeString(record.Zpunchintime);
+            const pOut = this.toTimeString(record.Zpunchouttime);
             const unautDays = parseInt(record.ZunautDays, 10) || 0;
             const hasUnauth = unautDays > 0;
-            const hasDelay = schIn && pIn && timeToSec(pIn) > timeToSec(schIn);
-            const hasShort = schOut && pOut && timeToSec(pOut) < timeToSec(schOut);
+            const hasDelay = schIn && pIn && this.timeStringToSeconds(pIn) > this.timeStringToSeconds(schIn);
+            const hasShort = schOut && pOut && this.timeStringToSeconds(pOut) < this.timeStringToSeconds(schOut);
             const hasBoth = hasDelay && hasShort;
             const mode = hasBoth ? "both" : hasDelay ? "delay" : "short";
 
@@ -318,8 +229,8 @@ sap.ui.define([
                 unauthPunchOut: schOut,
                 mode: hasUnauth ? "unauth" : mode,
                 delayFrom: schIn,
-                delayTo: secondsToTimeString(timeStringToSeconds(pIn) - 1),
-                shortFrom: secondsToTimeString(timeStringToSeconds(pOut) + 1),
+                delayTo: this.secondsToTimeString(this.timeStringToSeconds(pIn) - 1),
+                shortFrom: this.secondsToTimeString(this.timeStringToSeconds(pOut) + 1),
                 shortTo: schOut,
                 reason: ""
             };
@@ -399,52 +310,14 @@ sap.ui.define([
                 this.getView().addDependent(this._addRemark);
             }
 
-            const oDataModel = this.getOwnerComponent().getModel();
-
             const violationRec = this.getView().getModel("detailData").getData().record;
-            oDataModel.setUseBatch(false)
-            oDataModel.read("/GET_REMARKSSet", {
-                filters: [
-                    new Filter("ZactionRefNo", FilterOperator.EQ, violationRec.ZactionRefNo)
-                ],
-                success: (data) => {
-                    // Extract the results array from the OData response
-                    const remarks = {
-                        results: data.results || []
-                    };
-
-                    if (!this.getView().getModel("remarks")) {
-                        this.getView().setModel(new JSONModel(remarks), "remarks");
-                    } else {
-                        this.getView().getModel("remarks").setData(remarks);
-                    }
-                    this._addRemark.open();
-                },
-                error: (err) => {
-                    console.error("RemarksSet fetch failed:", err);
-                    MessageBox.error("Failed to load remarks.");
-                }
+            this.loadRemarks(violationRec, this._addRemark).catch((err) => {
+                console.error("RemarksSet fetch failed:", err);
+                MessageBox.error("Failed to load remarks.");
             });
         },
         formatRemarkColor(text) {
-            if (!text) { return ""; }
-            const t = text.toUpperCase();
-            let bg = "transparent";
-            if (t.includes("CEO COMMENTS")) {
-                bg = "#c00";
-                return `<span style="background-color:${bg}; padding:2px 6px; color:#fff; border-radius:3px;">${text}</span>`;
-            } else if (t.includes("EVP COMMENTS")) {
-                bg = "#0070c0";
-                return `<span style="background-color:${bg}; padding:2px 6px; color:#fff; border-radius:3px;">${text}</span>`;
-            } else if (t.includes("HC COMMENTS")) {
-                bg = "#9b7dbe";
-                return `<span style="background-color:${bg}; padding:2px 6px; color:#fff; border-radius:3px;">${text}</span>`;
-            } else if (t.includes("LINE MANAGER COMMENTS")) {
-                bg = "#31c699";
-                return `<span style="background-color:${bg}; padding:2px 6px; color:#fff; border-radius:3px;">${text}</span>`;
-            } else {
-                return `<span style="background-color:${bg}; padding:2px 6px; color:#000; border-radius:3px;">${text}</span>`;
-            }
+            return BaseController.prototype.formatRemarkColor.call(this, text);
         },
         onViewRemarkCancel() {
             this._addRemark.close();
