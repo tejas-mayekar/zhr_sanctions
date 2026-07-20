@@ -31,6 +31,7 @@ sap.ui.define([
             this.getView().setModel(new JSONModel({ isEditOn: false }));
 
             this.getView().setModel(new JSONModel({ ...EMPTY_ACTION_STATE }), "regularize");
+            this.getView().setModel(new JSONModel({ questions: [{ value: "" }] }), "questions");
 
             this.getOwnerComponent()
                 .getRouter()
@@ -162,7 +163,7 @@ sap.ui.define([
             if (this._pendingFiles.length > 0) {
                 sap.ui.core.BusyIndicator.show();
                 this.UploadFiles(this._pendingFiles, violationRec.ZactionRefNo, violationRec, actionData);
-            }else{
+            } else {
                 this._submitHCAction(violationRec, {
                     ZactionRefNo: violationRec.ZactionRefNo,
                     ZincCategory: actionData.ZincCategory,
@@ -494,5 +495,53 @@ sap.ui.define([
             });
             this.clearFileUploadState("hcfileUploader");
         },
+        onOpenQuestionsPress() {
+            if (!this._addQuestionsDialog) {
+                this._addQuestionsDialog = sap.ui.xmlfragment(
+                    this.getView().getId(),
+                    "zhrsanctions.view.fragments.AddQuestionsDialog",
+                    this
+                );
+                this.getView().addDependent(this._addQuestionsDialog);
+            }
+            this.getView().getModel("questions").setData({
+                questions: [{ question: "", answer: "" }]
+            });
+            this._addQuestionsDialog.open();
+        },
+
+        onAddQuestionPress() {
+            const questionsModel = this.getView().getModel("questions");
+            const questions = questionsModel.getProperty("/questions") || [];
+            questions.push({ question: "", answer: "" });
+            questionsModel.setProperty("/questions", questions);
+        },
+
+        onSaveQuestionsPress() {
+            const questions = this.getView().getModel("questions").getProperty("/questions") || [];
+
+            // Validate all fields are filled
+            const hasEmptyFields = questions.some(q => !q.question?.trim() || !q.answer?.trim());
+
+            if (hasEmptyFields) {
+                sap.m.MessageBox.error("Please fill in all question and answer fields before saving.");
+                return;
+            }
+
+            const formattedQuestions = questions.map(q => ({
+                question: q.question?.trim(),
+                answer: q.answer?.trim()
+            }));
+
+            console.log("Questions and Answers:", formattedQuestions);
+            sap.m.MessageBox.success("Questions saved successfully!");
+            this._addQuestionsDialog.close();
+        },
+
+        onCancelQuestionsPress() {
+            this._addQuestionsDialog.close();
+        }
+
+
     });
 });
