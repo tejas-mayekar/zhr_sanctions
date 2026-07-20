@@ -9,8 +9,6 @@ sap.ui.define([
 ], (BaseController, JSONModel, Filter, FilterOperator, ODataUtils, TableUtils, ExportUtils) => {
     "use strict";
 
-    // ─── Column Config ────────────────────────────────────────────────────────
-
     const HC_TABLE_COLUMNS = [
         { label: "Action Ref No", binding: "ZactionRefNo", width: "11rem", sortProperty: "ZactionRefNo", filterProperty: "ZactionRefNo", visible: true },
         { label: "Employee ID", binding: "ZempId", width: "9rem", sortProperty: "ZempId", filterProperty: "ZempId", visible: true },
@@ -55,8 +53,6 @@ sap.ui.define([
         { label: "Standard Weekly Hours", binding: "ZstdWeekHrs", width: "10rem", sortProperty: "ZstdWeekHrs", filterProperty: "ZstdWeekHrs", visible: false },
         { label: "Working Days/Week", binding: "ZwrkDyWeek", width: "10rem", sortProperty: "ZwrkDyWeek", filterProperty: "ZwrkDyWeek", visible: false }
     ];
-    // ─── Controller ───────────────────────────────────────────────────────────
-
     return BaseController.extend("zhrsanctions.controller.HCPortalPage", {
 
         onInit() {
@@ -102,13 +98,9 @@ sap.ui.define([
                 .attachPatternMatched(this._onRouteMatched, this);
         }
         ,
-        // ── Route Handler ─────────────────────────────────────────────────────
-
         _onRouteMatched() {
             this._loadHCViolations();
         },
-
-        // ── Toolbar Actions ───────────────────────────────────────────────────
 
         onSearchHistory(oEvent) {
             TableUtils.applyTableSearch(
@@ -130,8 +122,6 @@ sap.ui.define([
                 this.formatEdmTime.bind(this)
             );
         },
-
-        // ── Navigation ────────────────────────────────────────────────────────
 
         onViewDetails(oEvent) {
             const context = oEvent.getSource().getBindingContext();
@@ -177,8 +167,6 @@ sap.ui.define([
                 actionRefNo: encodeURIComponent(actionRefNo)
             });
         },
-        // ── Data Loading ──────────────────────────────────────────────────────
-
         async _loadHCViolations() {
             try {
                 sap.ui.core.BusyIndicator.show(0);
@@ -260,8 +248,6 @@ sap.ui.define([
             }
         },
 
-        // ── Tab Selection Handler ─────────────────────────────────────────────
-
         onTabSelect(oEvent) {
             const selectedKey = oEvent.getParameter("key");
 
@@ -277,8 +263,6 @@ sap.ui.define([
                     break;
             }
         },
-
-        // ── Toolbar Actions - New Tab ──────────────────────────────────────────
 
         onSearchNew(oEvent) {
             TableUtils.applyTableSearch(
@@ -300,8 +284,6 @@ sap.ui.define([
                 this.formatEdmTime.bind(this)
             );
         },
-
-        // ── Toolbar Actions - Completed Tab ────────────────────────────────────
 
         onSearchCompleted(oEvent) {
             TableUtils.applyTableSearch(

@@ -64,10 +64,6 @@ sap.ui.define([
             return !!value;
         },
 
-        /**
-         * Map Zstatus code (1-4) to a display label.
-         * Falls back to the raw value if it's not a recognized code.
-         */
         formatZstatus(status) {
             if (status === null || status === undefined || status === "") { return ""; }
             const key = String(status).trim();
@@ -102,6 +98,9 @@ sap.ui.define([
             return `<span style="background-color:${bg}; padding:2px 6px; color:${bg === "transparent" ? "#000" : "#fff"}; border-radius:3px;">${text}</span>`;
         },
 
+        /**
+         * Load media items for the active violation and bind them to the view model.
+         */
         loadMediaFiles(violationRec, modelName = "media") {
             if (!violationRec) { return Promise.resolve(); }
             const actionRefNo = violationRec.ZactionRefNo || violationRec.ZACTION_REF_NO;

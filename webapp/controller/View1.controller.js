@@ -9,8 +9,6 @@ sap.ui.define([
 ], (BaseController, JSONModel, Filter, FilterOperator, ODataUtils, TableUtils, ExportUtils) => {
     "use strict";
 
-    // ─── Column Configs ───────────────────────────────────────────────────────
-
     const CURRENT_VIOLATIONS_COLUMNS = [
         { label: "Action Ref No", binding: "ZACTION_REF_NO", width: "11rem", sortProperty: "ZACTION_REF_NO", filterProperty: "ZACTION_REF_NO", visible: true },
         { label: "Employee ID", binding: "ZempId", width: "9rem", sortProperty: "ZempId", filterProperty: "ZempId", visible: true },
@@ -57,8 +55,6 @@ sap.ui.define([
         { label: "LM Action Date", binding: "Zlinemanageractiondate", width: "12rem", sortProperty: "Zlinemanageractiondate", filterProperty: "Zlinemanageractiondate", visible: true, isDate: true },
     ];
 
-    // ─── Controller ───────────────────────────────────────────────────────────
-
     return BaseController.extend("zhrsanctions.controller.View1", {
 
         onInit() {
@@ -86,11 +82,8 @@ sap.ui.define([
                 this.formatZaction.bind(this)
             );
 
-            // Defer until model attaches
             setTimeout(() => this._loadCurrentViolations(), 0);
         },
-
-        // ── Tab Selection ─────────────────────────────────────────────────────
 
         onTabSelect(oEvent) {
             const selectedKey = oEvent.getParameter("key");
@@ -100,8 +93,6 @@ sap.ui.define([
                 this._loadCurrentViolations();
             }
         },
-
-        // ── Data Loading ──────────────────────────────────────────────────────
 
         /**
          * Load current (unresolved) violations for this manager.
@@ -170,12 +161,8 @@ sap.ui.define([
             }
         },
 
-        // ── Refresh Buttons ───────────────────────────────────────────────────
-
         onRefreshCurrent() { this._loadCurrentViolations(); },
         onRefreshHistory() { this._loadHistoryViolations(); },
-
-        // ── Search / Filter ───────────────────────────────────────────────────
 
         onSearchCurrent(oEvent) {
             TableUtils.applyTableSearch(
@@ -192,8 +179,6 @@ sap.ui.define([
                 oEvent.getParameter("newValue")
             );
         },
-
-        // ── Export ────────────────────────────────────────────────────────────
 
         onExportCurrent() {
             ExportUtils.exportTableToExcel(
@@ -212,8 +197,6 @@ sap.ui.define([
                 this.formatEdmTime.bind(this)
             );
         },
-
-        // ── Navigation ────────────────────────────────────────────────────────
 
         onViewDetails(oEvent) {
             const actionRefNo = oEvent.getSource().getBindingContext()?.getProperty("ZACTION_REF_NO");

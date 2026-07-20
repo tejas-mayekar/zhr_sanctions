@@ -22,7 +22,6 @@ sap.ui.define([
                 .getRoute("RouteOldViolationDetailpage")
                 .attachPatternMatched(this._onRouteMatched, this);
 
-            // Now this works because the default model exists
             this.getView()
                 .getModel()
                 .setProperty("/isEditOn", false);
@@ -71,6 +70,5 @@ sap.ui.define([
         onViewRemarkCancel() {
             this._addRemark.close();
         }
-        // onNavBack inherited from BaseController
     });
 });

@@ -30,28 +30,16 @@ sap.ui.define([
 
             this.byId("dpZincDate").setDateValue(null);
             this.byId("inputZempId").setValue("").setEditable(false);
-            // this.byId("inputZincCategory").setValue("");
-            // this.byId("inputZincType").setValue("");
-            // this.byId("inputZaction").setValue("");
-            // this.byId("inputZstatus").setValue("");
-            // this.byId("inputZsanction").setValue("");
             this.byId("inputZinitatedBy").setValue("");
             this.byId("inputZremark").setValue("");
             this.byId("inputZrepeatcount").setValue("");
             this.byId("inputZsysyrepeatcount").setValue("");
             this.byId("dpZincDisDate").setDateValue(null);
-            // this.byId("dpZfirstIncDate").setDateValue(null);
-            // this.byId("dpZawaitingactionfrom").setDateValue(null);
-            // this.byId("dpZlastaction").setDateValue(null);
             this.byId("fileUploader").clear();
             this._pendingFiles = [];
         },
 
 
-        // onIncidentDateChange(oEvent) {
-        //     const hasDate = !!oEvent.getSource().getDateValue();
-        //     this.byId("inputZempId").setEditable(hasDate);
-        // },
         onFileChange(oEvent) {
             const files = oEvent.getParameter("files");
             this._pendingFiles = files ? Array.from(files) : [];
@@ -94,8 +82,6 @@ sap.ui.define([
             }
         },
         onSave() {
-            // Edm.Byte only: ZdelayHrs, ZshortHrs, Zrepeatcount, Zsysyrepeatcount
-            // Zn0-Zn7, ZstdWeekHrs, ZwrkDyWeek = Edm.String in updated metadata
             const p = ODataUtils.parseByte.bind(ODataUtils);
             const selectedEmployee = this._getSelectedEmployeeData();
             const emp = selectedEmployee || {};
@@ -113,7 +99,6 @@ sap.ui.define([
             );
 
             const payload = {
-                // Employee
                 ZempId: emp.ZempId || this.byId("inputZempId").getValue(),
                 ZempName: emp.ZempName || this.byId("inputZempName").getValue(),
                 ZempType: emp.ZempType || this.byId("inputZempType").getValue(),
@@ -132,11 +117,8 @@ sap.ui.define([
                 Zworkschedule: emp.Zworkschedule || this.byId("inputZworkschedule").getValue(),
                 ZlatestNode: emp.ZlatestNode || this.byId("inputZlatestNode").getValue(),
 
-                // Edm.String — pass as-is (no parseByte)
                 ZstdWeekHrs: emp.ZstdWeekHrs || this.byId("inputZstdWeekHrs").getValue(),
                 ZwrkDyWeek: emp.ZwrkDyWeek || this.byId("inputZwrkDyWeek").getValue(),
-
-                // Org indicators — Edm.String in updated metadata
                 Zn0: emp.Zn0 || this.byId("inputZn0").getValue(),
                 Zn1: emp.Zn1 || this.byId("inputZn1").getValue(),
                 Zn2: emp.Zn2 || this.byId("inputZn2").getValue(),
@@ -146,62 +128,45 @@ sap.ui.define([
                 Zn6: emp.Zn6 || this.byId("inputZn6").getValue(),
                 Zn7: emp.Zn7 || this.byId("inputZn7").getValue(),
 
-                // Violation
-
                 ZincDate: localincDate,
-                // ZincCategory: this.byId("inputZincCategory").getValue(),
-                // ZincType: this.byId("inputZincType").getValue(),
                 Zaction: "C",
                 Zstatus: "1",
-                // Zsanction: this.byId("inputZsanction").getValue(),
                 Zremark: "",
 
-                // Timeline
                 ZincDisDate: localincdiscDate,
                 ZinitatedBy: ODataUtils.getCurrentUserId(),
                 ZinitDate: new Date(),
-                // ZfirstIncDate: this.byId("dpZfirstIncDate").getDateValue(),
-                // Zawaitingactionfrom: this.byId("dpZawaitingactionfrom").getDateValue(),
-                // Zlastaction: this.byId("dpZlastaction").getDateValue(),
 
-                // Shift times
                 ZschTimeIn: ODataUtils.formatTimeForPayload(this.byId("tpZschTimeIn").getValue()),
                 ZschTimeOut: ODataUtils.formatTimeForPayload(this.byId("tpZschTimeOut").getValue()),
                 Zpunchintime: ODataUtils.formatTimeForPayload(this.byId("tpZpunchintime").getValue()),
                 Zpunchouttime: ODataUtils.formatTimeForPayload(this.byId("tpZpunchouttime").getValue()),
 
-                // Edm.Byte — only these
                 ZdelayHrs: this.byId("inputZdelayHrs").getValue(),
                 ZshortHrs: this.byId("inputZshortHrs").getValue(),
                 Zrepeatcount: p(this.byId("inputZrepeatcount").getValue()),
                 Zsysyrepeatcount: p(this.byId("inputZsysyrepeatcount").getValue()),
-
-                // Workflow: Line Manager
                 Zlinemanagername: ODataUtils.getCurrentUserName(),
                 ZlmIdName: ODataUtils.getCurrentUserId(),
                 Zlinemanageraction: this.byId("inputZlinemanageraction").getValue(),
                 Zlinemanageractiondate: new Date(),
                 Zlinemanagerremarks: this.byId("inputZremark").getValue(),
 
-                // Workflow: HC Ops
                 Zhcopsname: this.byId("inputZhcopsname").getValue(),
                 Zhcopsaction: this.byId("inputZhcopsaction").getValue(),
                 Zhcopsactiondate: this.byId("dpZhcopsactiondate").getDateValue(),
                 Zhcopsremark: this.byId("inputZhcopsremark").getValue(),
 
-                // Workflow: HC EVP
                 Zhcevpname: this.byId("inputZhcevpname").getValue(),
                 Zhcevpaction: this.byId("inputZhcevpaction").getValue(),
                 Zhcevpactiondate: this.byId("dpZhcevpactiondate").getDateValue(),
                 Zhcevpremark: this.byId("inputZhcevpremark").getValue(),
 
-                // Workflow: Legal
                 Zlegalmembername: this.byId("inputZlegalmembername").getValue(),
                 Zlegalmemberaction: this.byId("inputZlegalmemberaction").getValue(),
                 Zlegalmemberactiondate: this.byId("dpZlegalmemberactiondate").getDateValue(),
                 Zlegalremark: this.byId("inputZlegalremark").getValue(),
 
-                // Workflow: CEO
                 Zceoname: this.byId("inputZceoname").getValue(),
                 Zceoaction: this.byId("inputZceoaction").getValue(),
                 Zceoactiondate: this.byId("dpZceoactiondate").getDateValue(),

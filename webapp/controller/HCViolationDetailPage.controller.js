@@ -25,15 +25,11 @@ sap.ui.define([
         actionOptions: []
     };
 
-    // ─── Controller ───────────────────────────────────────────────────────────
-
     return BaseController.extend("zhrsanctions.controller.HCViolationDetailPage", {
 
         onInit() {
-            // Default model: drive button visibility
             this.getView().setModel(new JSONModel({ isEditOn: false }));
 
-            // regularize model: holds Take Action / Take No Action form state
             this.getView().setModel(new JSONModel({ ...EMPTY_ACTION_STATE }), "regularize");
 
             this.getOwnerComponent()
@@ -43,8 +39,6 @@ sap.ui.define([
             this._pendingFiles = [];
         },
 
-        // ── Route Handler ─────────────────────────────────────────────────────
-
         _onRouteMatched() {
             const detailModel = this.getOwnerComponent().getModel("detailData");
             if (detailModel) {
@@ -52,13 +46,10 @@ sap.ui.define([
             }
             const violationRec = detailModel?.getData().record;
             this.loadMediaFiles(violationRec);
-            // Show action buttons only when Zstatus is 1 or 2
             const zstatus = detailModel?.getData().record?.Zstatus;
             const isOpen = zstatus === "1" || zstatus === "2";
             this.getView().getModel().setProperty("/isEditOn", isOpen);
 
-
-            // Reset action form
             this.getView().getModel("regularize").setData({ ...EMPTY_ACTION_STATE });
             this._pendingFiles = [];
         },
@@ -71,8 +62,6 @@ sap.ui.define([
             if (!ctx) { return; }
             this.downloadMediaFile(ctx.getObject());
         },
-        // ── Violation Category Helper ─────────────────────────────────────────
-
         /**
          * Read the currently selected violation category from the dropdown.
          * Side-effect: writes it into the regularize model.
@@ -86,8 +75,6 @@ sap.ui.define([
             this.getView().getModel("regularize").setProperty("/ZincCategory", selectedKey);
             return selectedKey || null;
         },
-
-        // ── Take Action Dialog ────────────────────────────────────────────────
 
         onTakeActionPress() {
             if (!this._takeActionDialog) {
@@ -116,7 +103,7 @@ sap.ui.define([
             const oInput = oEvent.getSource();
             const newValue = parseInt(oInput.getValue()); // Parse as integer index
 
-            // Validate repeat count
+            // Validate the selected repeat count against the system value.
             if (actionData.Zrepeatcount < newValue) {
                 oInput.setValueState("Error");
                 oInput.setValueStateText("Repeat count cannot be greater than system repeat count");
@@ -125,17 +112,14 @@ sap.ui.define([
                 oInput.setValueState("None");
             }
 
-            // Parse JSON and select by index
             try {
                 const insdescription = JSON.parse(actionData.insdescriptionstring);
                 console.log("Full data:", insdescription);
 
-                // Get value at index
                 const selectedValue = insdescription.ins1[newValue];
                 console.log(`Value at index ${newValue}:`, selectedValue);
 
                 if (selectedValue !== undefined) {
-                    // Set insdescription to the selected value
                     actionData.insdescription = selectedValue;
                     this.getView().getModel("regularize").refresh();
                     console.log("Updated insdescription:", actionData.insdescription);
@@ -180,8 +164,6 @@ sap.ui.define([
 
         },
 
-        // ── Take No Action Dialog ─────────────────────────────────────────────
-        // replace onTakeNoActionPress
         onTakeNoActionPress() {
             const violationRec = this.getView().getModel("detailData").getData().record;
 
@@ -346,8 +328,6 @@ sap.ui.define([
             }, () => this._takeNoActionDialog.close());
         },
 
-        // ── Value Help ────────────────────────────────────────────────────────
-
         onValueHelpRequest(oEvent) {
             const category = this._getSelectedCategory();
             if (!category) {
@@ -387,17 +367,10 @@ sap.ui.define([
                 });
         },
         onValueHelpClose() {
-            // Selection handling is done inside SearchHelpHandler.onConfirm
         },
 
-        // ── Private: Shared Submit ────────────────────────────────────────────
-
         /**
-         * PUT to ITM_STRSet with the given overrides, then close the active dialog.
-         *
-         * @param {object}   violationRecord
-         * @param {object}   overrides        - fields specific to this action
-         * @param {Function} closeDialog      - called on success to close the dialog
+         * Submit a HC action and close the dialog after a successful response.
          */
         _submitHCAction(violationRecord, overrides, closeDialog) {
             const oDataModel = this.getOwnerComponent().getModel();

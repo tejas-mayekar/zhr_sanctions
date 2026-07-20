@@ -20,17 +20,15 @@ sap.ui.define([
     }
 
     /**
-     * Build a display string "dd-MM-yyyy HH:mm:ss" from separate date and time strings.
+     * Build a display string from the incident date and the selected time value.
      */
     function buildDateTimeDisplayString(dateStr, timeStr) {
         if (!dateStr || !timeStr) { return timeStr || ""; }
         return `${dateStr} ${timeStr}`;
     }
 
-    // ─── Regularize Model Flags ───────────────────────────────────────────────
-
     /**
-     * Map regularization mode + available flags to section visibility booleans.
+     * Map the selected regularization mode to the matching section visibility.
      */
     function resolveSectionVisibility(mode, hasDelay, hasShort) {
         return {
@@ -40,15 +38,13 @@ sap.ui.define([
     }
 
     /**
-     * Derive the dialog title from the mode.
+     * Derive the dialog title from the selected regularization mode.
      */
     const MODE_TITLE = {
         delay: "Regularize Delay",
         short: "Regularize Short Hours",
         both: "Regularize Both"
     };
-
-    // ─── Controller ───────────────────────────────────────────────────────────
 
     return BaseController.extend("zhrsanctions.controller.ViolationDetailPage", {
 
@@ -62,7 +58,6 @@ sap.ui.define([
             this._pendingFiles = [];
         },
 
-        // ── Route Handler ─────────────────────────────────────────────────────
 
         _onRouteMatched() {
             const detailModel = this.getOwnerComponent().getModel("detailData");
@@ -82,17 +77,14 @@ sap.ui.define([
             if (!ctx) { return; }
             this.downloadMediaFile(ctx.getObject());
         },
-        // ── Regularize Dialog ─────────────────────────────────────────────────
-
         onRegularizePress() {
             const record = this.getView().getModel("detailData").getProperty("/record");
             this._populateRegularizeModel(record);
             this._openDialog("regularize", "zhrsanctions.view.fragments.RegularizeDialog");
         },
         /**
-         * Build the regularize model from the violation record.
-         * Determines which sections apply (delay / short / both) and
-         * pre-fills the From/To time pickers to close each attendance gap.
+         * Build the regularize model from the current violation record.
+         * It determines which sections are relevant and pre-fills the suggested times.
          */
         _populateRegularizeModel(record) {
             const scheduledIn = this.toTimeString(record.ZschTimeIn);
@@ -101,13 +93,11 @@ sap.ui.define([
             const punchOut = this.toTimeString(record.Zpunchouttime);
             const unautDays = parseInt(record.ZunautDays, 10) || 0;
             const hasUnauth = unautDays > 0;
-            // Detect delay: ZdelayHrs non-zero AND punch-in is later than scheduled-in
             const hasDelay = isNonZeroTime(record.ZdelayHrs) && (
                 !punchIn || !scheduledIn ||
                 this.timeStringToSeconds(punchIn) > this.timeStringToSeconds(scheduledIn)
             );
 
-            // Detect short: ZshortHrs non-zero AND punch-out is earlier than scheduled-out
             const hasShort = isNonZeroTime(record.ZshortHrs) && (
                 !punchOut || !scheduledOut ||
                 this.timeStringToSeconds(punchOut) < this.timeStringToSeconds(scheduledOut)
@@ -173,7 +163,6 @@ sap.ui.define([
             const state = regularizeModel.getData();
             const reason = (state.reason || "").trim();
 
-            // ── Validate ──────────────────────────────────────────────────────
             if (!reason) {
                 MessageBox.warning("Please enter a reason before submitting.");
                 return;
@@ -212,7 +201,6 @@ sap.ui.define([
                 return;
             }
 
-            // ── Derive corrected punch/schedule times by mode ─────────────────
             let correctedSchIn = this.toTimeString(record.ZschTimeIn);
             let correctedPunchIn = this.toTimeString(record.Zpunchintime);
             let correctedPunchOut = this.toTimeString(record.Zpunchouttime);
@@ -223,17 +211,14 @@ sap.ui.define([
                 correctedPunchOut = state.unauthPunchOut;
                 correctedSchOut = state.unauthPunchOut;
             } else if (state.showDelay && !state.showShort) {
-                // DelayFlag = "1": from = ZschTimeIn, to = Zpunchintime
                 correctedSchIn = state.delayFrom;
                 correctedPunchIn = state.delayTo;
 
             } else if (state.showShort && !state.showDelay) {
-                // DelayFlag = "2": from = Zpunchouttime, to = ZschTimeOut
                 correctedPunchOut = state.shortFrom;
                 correctedSchOut = state.shortTo;
 
             } else if (state.showDelay && state.showShort) {
-                // DelayFlag = "3": FM called twice (delay + short)
                 correctedSchIn = state.delayFrom;
                 correctedPunchIn = state.delayTo;
                 correctedPunchOut = state.shortFrom;
@@ -266,7 +251,6 @@ sap.ui.define([
 
             sap.ui.core.BusyIndicator.show(0);
 
-            // Step 1: PUT punch_regularizeSet
             ODataUtils.submitPunchRegularize(oDataModel, record, {
                 ZschTimeIn: correctedSchIn,
                 Zpunchintime: correctedPunchIn,
@@ -275,7 +259,6 @@ sap.ui.define([
                 DelayFlag: delayFlag
             })
                 .then(() => {
-                    // Step 2: POST ITM_STRSet
                     oDataModel.create("/ITM_STRSet", itmPayload, {
                         success: () => {
                             sap.ui.core.BusyIndicator.hide();
@@ -298,8 +281,6 @@ sap.ui.define([
         onRegularizeCancel() {
             this._closeDialog("regularize");
         },
-
-        // ── Report To HC Dialog ───────────────────────────────────────────────
 
         onReportToHCPress() {
             this.getView().getModel("regularize").setData(
@@ -376,8 +357,6 @@ sap.ui.define([
             this._closeDialog("reportToHC");
         },
 
-        // ── Payroll Deduction ─────────────────────────────────────────────────
-
         onPayrollDeductionPress() {
             const record = this.getView().getModel("detailData").getProperty("/record");
             if (!record?.ZACTION_REF_NO) {
@@ -401,10 +380,8 @@ sap.ui.define([
             );
         },
 
-        // ── Generic Dialog Helpers ────────────────────────────────────────────
-
         /**
-         * Fragment cache keys → fragment names mapping.
+         * Map dialog keys to the underlying fragment names.
          */
         _FRAGMENT_MAP: {
             regularize: "zhrsanctions.view.fragments.RegularizeDialog",
@@ -412,8 +389,7 @@ sap.ui.define([
         },
 
         /**
-         * Load (if needed) and open a fragment dialog.
-         * Dialogs are cached on the controller as `_dialog_<key>`.
+         * Load and open a fragment dialog, reusing a cached instance when available.
          */
         _openDialog(dialogKey, fragmentName) {
             const cacheKey = `_dialog_${dialogKey}`;
@@ -441,15 +417,8 @@ sap.ui.define([
             if (dialog) { dialog.close(); }
         },
 
-        // ── Shared OData Create ───────────────────────────────────────────────
-
         /**
-         * POST to ITM_STRSet with a given payload.
-         *
-         * @param {object}   payload       - full ITM_STR entity payload
-         * @param {string}   successMsg    - toast shown on success
-         * @param {Function} onSuccess     - callback invoked after success toast
-         * @param {string}   errorTitle    - MessageBox title on error
+         * Create an ITM_STR record with the provided payload.
          */
         _submitToITMSet(payload, successMsg, onSuccess, errorTitle) {
             const oDataModel = this.getOwnerComponent().getModel()
@@ -477,10 +446,8 @@ sap.ui.define([
             });
         },
 
-        // ── Private Formatters ────────────────────────────────────────────────
-
         /**
-         * Format an OData DateTime value → "dd-MM-yyyy" display string.
+         * Format an OData DateTime value for display.
          */
         _formatIncidentDateDisplay(dateValue) {
             if (!dateValue) { return ""; }
@@ -503,8 +470,7 @@ sap.ui.define([
         },
 
         /**
-         * Convert ZdelayHrs / ZshortHrs to a "H:mm" display string.
-         * Backend may send "00:15", a number (minutes), or an Edm.Time object.
+         * Convert delay or short-hours values to a display-friendly time string.
          */
         _formatHoursDisplay(hoursValue) {
             if (!hoursValue && hoursValue !== 0) { return "0:00"; }
@@ -519,13 +485,12 @@ sap.ui.define([
                 return `${h}:${String(m).padStart(2, "0")}`;
             }
 
-            // Edm.Time object
             const timeStr = this.toTimeString(hoursValue);
             return timeStr ? timeStr.substring(0, 5) : "0:00";
         },
 
         /**
-         * Build an empty regularize model state object.
+         * Build an empty regularize model state.
          */
         _buildEmptyRegularizeState() {
             return {
