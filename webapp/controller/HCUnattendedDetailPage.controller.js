@@ -85,7 +85,6 @@ sap.ui.define([
             if (detailModel) {
                 this.getView().setModel(detailModel, "detailData");
             }
-console.log(detailModel?.getData())
 
             const violationRec = detailModel?.getData().record;
             this._loadMediaFiles(violationRec);
@@ -436,7 +435,6 @@ console.log(detailModel?.getData())
                 return `<span style="background-color:${bg}; padding:2px 6px; color:#fff; border-radius:3px;">${text}</span>`;
             } else if (t.includes("EVP COMMENTS")) {
                 bg = "#0070c0";
-                return `<span style="background-color:${bg}; padding:2px 6px; color:#fff; border-radius:3px;">${text}</span>`;
                 return `<span style="background-color:${bg}; padding:2px 6px; color:#fff; border-radius:3px;">${text}</span>`;
             } else if (t.includes("HC COMMENTS")) {
                 bg = "#9b7dbe";
