@@ -198,7 +198,7 @@ Use the available npm scripts:
 - npm run int-test
 - npm run lint
 
-## 12. Development Notes and Known Considerations
+## 11. Development Notes and Known Considerations
 
 The following points are important for future maintenance or enhancement work:
 
@@ -207,7 +207,7 @@ The following points are important for future maintenance or enhancement work:
 - Development-time user ID handling is currently hardcoded for localhost scenarios.
 - The app relies on runtime backend enforcement for write operations even where metadata appears restrictive.
 
-## 13. Recommended Starting Points for New Developers
+## 12. Recommended Starting Points for New Developers
 
 If you are taking over this application, start with these files in order:
 
@@ -221,7 +221,7 @@ If you are taking over this application, start with these files in order:
 8. webapp/controller/HCViolationDetailPage.controller.js
 9. webapp/utils/ODataUtils.js
 
-## 14. Summary
+## 13. Summary
 
 This application is a business workflow UI for sanctions and violation management. Its main value lies in orchestrating manager actions, HC review, and OData-driven persistence in a single SAPUI5/Fiori experience.
 
