@@ -1,127 +1,228 @@
-# Sanctions and Violations (zhrsanctions)
+﻿# zhr_sanctions
 
-SAPUI5/Fiori app for tracking employee attendance violations, manager actions (regularize / payroll deduction / escalate to HC), and HC (Human Capital) review workflow.
+This document serves as both a knowledge-transfer guide and a technical specification for the SAPUI5/Fiori application in this repository.
 
-## Stack
+## 1. Purpose
 
-- SAPUI5 1.147.0+, `sap.m` + `sap.f` (DynamicPage) + `sap.ui.table` + `sap.ui.layout.form`
-- OData V2, service `ZHR_SACTIONS_APPLICATION_SRV` at `/sap/opu/odata/sap/ZHR_SACTIONS_APPLICATION_SRV/`
-- Routing: `sap.m.routing.Router`, view type XML, root view `App.view.xml` → `<App>` control hosts all pages
-- Local mock data under `webapp/localService/mainService/data/*.json` (used in dev/test against `metadata.xml`)
-- Theme: `sap_horizon`, compact density (`sapUiSizeCompact`)
+The application supports a sanctions and violations workflow for employee attendance and conduct issues. It enables:
 
-## App ID & Bootstrap
+- managers to review current and historical violations
+- managers to create new violation records
+- managers to take actions such as regularization, payroll deduction, or escalation to Human Capital (HC)
+- HC users to review, approve, reject, or close cases
 
-- Component name: `zhrsanctions` (`Component.js`, extends `UIComponent`, `IAsyncContentCreation`)
-- Models set on init: `device` (from `sap.ui.Device`), default `""` model = ODataModel (`mainService`, batch off, JSON, async metadata)
-- `index.html` bootstraps via `data-sap-ui-component`, resource root `zhrsanctions: "./"`
+The solution is implemented as a UI5 application backed by an OData V2 service and uses local mock data for development and testing.
 
-## Routes (manifest.json)
+## 2. Business Context
 
-| Route | Pattern | View | Purpose |
+The app is designed for a business process in which employee attendance or conduct-related issues are captured, reviewed, and acted upon. The workflow typically follows this pattern:
+
+1. A violation is created by a manager.
+2. The violation is visible in the manager’s current/open list.
+3. The manager may regularize, deduct payroll, or escalate the case.
+4. HC users review the case and decide on the final outcome.
+5. The result is persisted through the OData service and reflected in the history view.
+
+## 3. Solution Architecture
+
+### 3.1 Technology Stack
+
+- SAPUI5 / OpenUI5
+- UI5 mobile and foundational libraries: sap.m, sap.f, sap.ui.table, sap.ui.layout
+- OData V2 service
+- XML views, JavaScript controllers
+- QUnit for unit tests and OPA5 for integration tests
+
+### 3.2 Application Entry Points
+
+- Main component: webapp/Component.js
+- Root view: webapp/view/App.view.xml
+- App manifest: webapp/manifest.json
+- Bootstrap page: webapp/index.html
+
+The application is registered as the UI5 component zhrsanctions and uses the manifest for routing, model configuration, and resource declarations.
+
+## 4. Application Structure
+
+### 4.1 Main Folders
+
+- webapp/controller: all controller logic
+- webapp/view: XML views and fragments
+- webapp/model: model-related helpers
+- webapp/utils: shared utility modules for OData, tables, exports, and value help
+- webapp/localService: mock service metadata and data for local development
+- webapp/test: unit and integration tests
+- webapp/i18n: translation resources
+
+### 4.2 Key Files
+
+- webapp/manifest.json: route definitions, data source, model setup
+- webapp/Component.js: component initialization and shared model handling
+- webapp/controller/BaseController.js: shared navigation and formatting helpers
+- webapp/utils/ODataUtils.js: central OData request and payload logic
+- webapp/utils/TableUtils.js: table configuration and search behavior
+- webapp/utils/ExportUtils.js: spreadsheet export wrapper
+- webapp/utils/SearchHelpHandler.js: reusable value-help dialogs
+
+## 5. Navigation and Screens
+
+The app uses a view-based router configured in the manifest.
+
+| Route | Pattern | Screen | Responsibility |
 |---|---|---|---|
-| `RouteView1` | `:?query:` | `View1` | Main landing — Current + History tabs |
-| `RouteViolationDetailPage` | `detail/{actionRefNo}` | `ViolationDetailPage` | Manager detail view, current/open violation |
-| `RouteOldViolationDetailpage` | `prevdetail/{actionRefNo}` | `OldViolationDetailPage` | Read-only detail for history records |
-| `RouteHCViolationDetailpage` | `hcdetail/{actionRefNo}` | `HCViolationDetailPage` | HC reviewer detail + action page |
-| `RouteFileViolation` | `create` | `FileViolation` | Create new violation form |
-| `RouteHCPortal` | `hcportal` | `HCPortalPage` | HC inbox — violations awaiting HC review |
+| RouteView1 | :?query: | View1 | Landing page with current and history views |
+| RouteViolationDetailPage | detail/{actionRefNo} | ViolationDetailPage | Manager detail and action page |
+| RouteOldViolationDetailpage | prevdetail/{actionRefNo} | OldViolationDetailPage | Read-only history detail |
+| RouteHCViolationDetailpage | hcdetail/{actionRefNo} | HCViolationDetailPage | HC review and decision page |
+| RouteFileViolation | create | FileViolation | Create new violation form |
+| RouteHCPortal | hcportal | HCPortalPage | HC inbox and case review |
 
-All targets navigate via `getOwnerComponent().getRouter().navTo(...)`. Detail pages receive their record via a transient `detailData` (or `create`) JSONModel set on the **Component** before navigation — not via OData binding context — so the route param `actionRefNo` is cosmetic/URL-only; actual data passed in-memory.
+Navigation is performed through the component router and uses transient in-memory data for detail views rather than relying solely on OData binding context.
 
-## Entity Model (OData, see `localService/mainService/metadata.xml`)
+## 6. UI and Controller Mapping
 
-| Entity Set | Key | Notes |
+| View | Controller | Purpose |
 |---|---|---|
-| `HDR_STRSet` | `ZempId` + `ZACTION_REF_NO` | Current/open violations header, read-only |
-| `ITM_STRSet` | `ZactionRefNo` + `ZempId` + `ZincDate` | History/action items; also the **create target** for new violations and all manager/HC actions (POST). `ZdelayHrs`, `ZshortHrs`, `Zrepeatcount`, `Zsysyrepeatcount` are `Edm.Byte`; everything else incl. `Zn0–Zn7`, `ZstdWeekHrs`, `ZwrkDyWeek` are `Edm.String` |
-| `EMP_SEARCHHELPSet` | `ZempId` + `ZempName` | Employee value-help (scoped to current manager's reports) |
-| `VIOALATION_SEARCHHELPSet` | `Zviolationcategory` + `Zviolationtype` | Violation-type lookup, 3 categories: A=time/attendance, B=conduct/work-org, C=misconduct |
-| `FIST_INC_DATESet` | `ZempId` + `ZincDate` + `ZincCategory` + `ZincType` | Repeat-offense lookup — first incident date + repeat counts |
-| `punch_regularizeSet` | `ZempId` + `ZincDate` + `ZactionRefNo` + `DelayFlag` | PUT-only target for attendance regularization (no GET in app) |
-| `GET_REMARKSSet` | `ZactionRefNo` | Free-text remarks/comments log, read via filter |
+| App.view.xml | App.controller.js | Shell container |
+| View1.view.xml | View1.controller.js | Main landing page with current/history tabs |
+| FileViolation.view.xml | FileViolation.controller.js | Violation creation screen |
+| ViolationDetailPage.view.xml | ViolationDetailPage.controller.js | Manager action workflow |
+| OldViolationDetailPage.view.xml | OldViolationDetailPage.controller.js | Read-only historical detail |
+| HCPortalPage.view.xml | HCPortalPage.controller.js | HC inbox view |
+| HCViolationDetailPage.view.xml | HCViolationDetailPage.controller.js | HC resolution workflow |
 
-All properties marked `sap:creatable="false" sap:updatable="false"` in metadata — writes go through `update()`/`create()` calls that bypass these restrictions at runtime (backend presumably enforces via custom handler, not standard CRUD flags).
+BaseController provides shared behavior including navigation back and formatting helpers used by the views.
 
-## View → Controller Map
+## 7. Data Model and OData Integration
 
-```
-App.view.xml              → App.controller.js              (shell, empty onInit)
-View1.view.xml             → View1.controller.js            (landing: Current/History tabs)
-FileViolation.view.xml      → FileViolation.controller.js    (create form)
-ViolationDetailPage.view.xml→ ViolationDetailPage.controller.js (manager actions: Regularize/Payroll/Report-to-HC)
-OldViolationDetailPage.view.xml → OldViolationDetailPage.controller.js (read-only history detail)
-HCPortalPage.view.xml       → HCPortalPage.controller.js     (HC inbox table)
-HCViolationDetailPage.view.xml→ HCViolationDetailPage.controller.js (HC Take Action / Take No Action)
-```
+The application connects to the OData service defined in the manifest:
 
-`BaseController.js` — shared base, all controllers extend it:
-- `formatEdmTime(edmTime)` — proxy to `ODataUtils.formatEdmTime`, used as XML formatter `.formatEdmTime`
-- `onNavBack()` — browser history back, falls back to `RouteView1`
+- Service: /sap/opu/odata/sap/ZHR_ACTIONS_APPLICATION_SRV/
+- Local metadata: webapp/localService/mainService/metadata.xml
+- Local mock data: webapp/localService/mainService/data
 
-## Utils (`webapp/utils/`)
+### 7.1 Main Entity Sets
 
-**`ODataUtils.js`** — central data-shape layer.
-- `getCurrentUserId()` — returns SAPUI hardcoded `DACO_EAMV04` on localhost, else `sap.ushell.Container...UserInfo` in production
-- `fetchOData(model, path, filters)` — promisified `read()`
-- `formatEdmTime` / `formatTimeForPayload` / `formatDateTimeForPayload` / `formatTimeDurationForPayload` / `formatDateTimeForEntityKey` — Edm.Time/DateTime ↔ JS conversions (Edm.Time as `{ms, __edmType:"Edm.Time"}`, durations as ISO-8601 `PnDTnHnMnS`)
-- `buildITMPayload(record, overrides)` — canonical ITM_STRSet payload builder; enforces Edm.Byte parsing on the 4 byte fields, string-safe trim on rest
-- `submitHCAction(model, record, overrides)` — PUT to `ITM_STRSet(...)` by composite key
-- `submitPunchRegularize(model, record, overrides)` — PUT to `punch_regularizeSet(...)`, `DelayFlag` semantics: `"1"`=delay only, `"2"`=short only, `"3"`=both
-- `handleODataError(error, title)` — parses OData error body → `MessageBox.error`
+| Entity Set | Role |
+|---|---|
+| HDR_STRSet | Current/open violation header data |
+| ITM_STRSet | Main transaction entity for violation records and actions |
+| EMP_SEARCHHELPSet | Employee value-help data |
+| VIOALATION_SEARCHHELPSet | Violation-type lookup data |
+| FIST_INC_DATESet | Repeat offense and first incident lookup |
+| punch_regularizeSet | Punch regularization update target |
+| GET_REMARKSSet | Remarks/comment retrieval |
 
-**`TableUtils.js`** — dynamic `sap.ui.table.Table` column builder from declarative config arrays (see `CURRENT_VIOLATIONS_COLUMNS` / `HISTORY_VIOLATIONS_COLUMNS` in `View1.controller.js`, `HC_TABLE_COLUMNS` in `HCPortalPage.controller.js`). Also drives client-side OR-filter search (`applyTableSearch`).
+### 7.2 Important Implementation Notes
 
-**`ExportUtils.js`** — `sap.ui.export.Spreadsheet` wrapper; exports current table binding (post-filter) to `.xlsx`, pre-formats time/date columns.
+- The metadata marks many properties as non-creatable and non-updatable, but the app uses create and update calls at runtime.
+- The backend is expected to enforce business rules even when metadata does not reflect them.
+- The app uses composite keys and explicit payload construction rather than relying on generic CRUD defaults.
 
-**`SearchHelpHandler.js`** — generic `SelectDialog` value-help framework. `FIELD_CONFIG` maps input IDs (`inputZempId`, `dIpZincType`) to entity set + key/desc fields + default filters. Used by FileViolation (employee picker, scoped by `ZincDate`) and HCViolationDetailPage (violation-type picker, scoped by category). On confirm for HC violation-type selection, triggers `loadRepeatInfo` → reads `FIST_INC_DATESet` to populate repeat-count/first-incident-date.
+## 8. Core Business Workflows
 
-## Key Workflows
+### 8.1 Manager Creates a Violation
 
-**1. Manager — view & action current violation** (`ViolationDetailPage`)
-- Loaded from `HDR_STRSet`, three header actions: Regularize, Payroll Deduction, Raise Issue to HC
-- **Regularize**: auto-detects delay (`punchIn > scheduledIn`) and/or short (`punchOut < scheduledOut`) from `ZdelayHrs`/`ZshortHrs`; pre-fills From/To time gaps; mode selector shown only if both apply; submits via 2-step chain — PUT `punch_regularizeSet` (corrected times) → POST `ITM_STRSet` (action record, `Zaction="Regularized"`, `Zstatus="COMPLETED"`)
-- **Payroll Deduction** / **Raise to HC**: single POST to `ITM_STRSet` with `Zaction` set accordingly; HC path requires reason via `ReportToHCDialog` fragment
+The FileViolation flow collects the violation information, uses a value-help dialog for employee selection, and submits a new record through ITM_STRSet.
 
-**2. Manager — create violation** (`FileViolation`)
-- Employee picked via value-help (gated on Incident Date being set first — `onIncidentDateChange` toggles editability)
-- Selected employee snapshot stored in transient `SHData` model, bound read-only across the form (employee/position/indicator fields `Zn0–Zn7`)
-- `onSave` assembles full payload — most fields read directly off form controls by `byId`, falls back to `SHData` snapshot; mandatory: `ZempId`, `ZincDate`; POST `ITM_STRSet`
+Key behavior:
 
-**3. HC reviewer** (`HCPortalPage` → `HCViolationDetailPage`)
-- Inbox filtered `ZlmIdName = currentUser AND ZIsHc = true`
-- Detail page action buttons (`isEditOn`) visible only while `Zstatus !== "COMPLETED"`
-- **Take Action**: opens `TakeActionDialog` — pick category (A/B/C radio-backed Select) + violation type (value-help, scoped by category) → triggers repeat-count lookup → submit PUTs `ITM_STRSet` with `Zstatus="COMPLETED"`
-- **Take No Action**: simpler reason-only dialog, same submit path, no category/type required
-- **View Remarks**: reads `GET_REMARKSSet` filtered by `ZactionRefNo`, lists `Tdline` entries in read-only dialog
+- Incident date must be selected first before the employee picker becomes active.
+- Employee data is cached in a transient model for display in the form.
+- The save action assembles the payload from form controls and helper values.
 
-## Fragments (`webapp/view/fragments/`)
+### 8.2 Manager Reviews and Acts on a Violation
 
-| Fragment | Used by | Purpose |
-|---|---|---|
-| `RegularizeDialog` | ViolationDetailPage | Delay/Short time-gap correction form |
-| `ReportToHCDialog` | ViolationDetailPage | Reason capture for HC escalation |
-| `TakeActionDialog` | HCViolationDetailPage | Category + type + reason, HC resolution-with-action |
-| `TakeNoActionDialog` | HCViolationDetailPage | Reason-only, HC resolution-without-action |
-| `AddRemarkDialog` | HCViolationDetailPage | Read-only remarks list |
+The ViolationDetailPage workflow supports:
 
-## Known Inconsistencies (carry these in mind when extending)
+- regularization of attendance gaps
+- payroll deduction action
+- escalation to HC
 
-- `HDR_STRSet` uses `Zishc` (lowercase), `ITM_STRSet` uses `ZIsHc` — different casing for conceptually same flag across entities
-- `View1.controller.js` filters current violations on `Zishc` but `ITM_STRSet`/HC portal use `ZIsHc` — verify correct property per entity when adding filters
-- `ODataUtils.buildITMPayload` reads `Zstatus` off `r.Zstatus || r.Status` — `HDR_STRSet` actually exposes `Zstatus`, comment in code flags `r.Status` fallback as legacy/wrong
-- Entity metadata marks nearly all properties non-creatable/non-updatable, yet app performs `create()`/`update()` against them — backend-enforced, not reflected in metadata
-- `SearchHelpHandler` has deprecated aliases (`liveSearchValueHelpDialog`, `searchValueHelpDialog`, `closeValueHelpDialog`, `fetchGLData`) kept for backward compat — prefer canonical names (`onLiveSearch`, `onConfirm`, `fetchEntitySet`) in new code
-- `ODataUtils.getCurrentUserId()` hardcodes `DACO_EAMV04` for `localhost`/`127.0.0.1` — dev-only stub, must not ship to prod build
+Regularization is handled through a two-step process:
 
-## Testing
+1. a punch regularization request is sent
+2. an item/action record is posted to complete the workflow
 
-- Unit: QUnit, `webapp/test/unit/` — currently only `View1.controller` smoke test (`onInit` doesn't throw)
-- Integration: OPA5, `webapp/test/integration/` — single journey, asserts App + View1 page render on startup
-- Run via `webapp/test/testsuite.qunit.html` (loads both suites)
+### 8.3 HC Review Flow
 
-## i18n
+The HC portal displays cases assigned to the current user. The HC detail page supports:
 
-`webapp/i18n/i18n.properties` — minimal, only `appTitle`, `appDescription`, `title` defined. Bulk of UI text (labels, button text, messages) is hardcoded in XML views and JS `MessageToast`/`MessageBox` calls — not externalized. Flag for future i18n pass if multi-language support needed.
+- taking action on a case
+- taking no action
+- viewing remarks and supporting comments
 
-test 
+These interactions are driven by dialogs and payload submission to ITM_STRSet.
+
+## 9. Supporting Utilities
+
+### ODataUtils
+
+This is the central utility layer for OData interactions. It handles:
+
+- user ID resolution
+- read requests with filters
+- time/date payload conversion
+- payload construction for ITM_STRSet and punch regularize operations
+- error handling and message display
+
+### TableUtils
+
+Used to build table columns dynamically and to support client-side filtering and search across different views.
+
+### ExportUtils
+
+Wraps spreadsheet export logic for table data and prepares values for export in a user-friendly format.
+
+### SearchHelpHandler
+
+Provides reusable select-dialog value-help behavior for employee and violation-type selection.
+
+## 10. User Experience and Localization
+
+The current implementation uses a mix of:
+
+- XML view definitions
+- hardcoded labels and messages in JavaScript/XML
+- i18n resource bundles for basic app metadata
+
+The localization coverage is still incomplete, and several UI texts remain hardcoded. This should be considered when extending the app for broader language support.
+
+
+### How to Run
+
+Use the available npm scripts:
+
+- npm run start-local
+- npm run unit-test
+- npm run int-test
+- npm run lint
+
+## 12. Development Notes and Known Considerations
+
+The following points are important for future maintenance or enhancement work:
+
+- There are naming inconsistencies between entity properties such as Zishc and ZIsHc.
+- Some business logic is implemented in the UI layer rather than in a separate service layer.
+- Development-time user ID handling is currently hardcoded for localhost scenarios.
+- The app relies on runtime backend enforcement for write operations even where metadata appears restrictive.
+
+## 13. Recommended Starting Points for New Developers
+
+If you are taking over this application, start with these files in order:
+
+1. webapp/manifest.json
+2. webapp/Component.js
+3. webapp/controller/BaseController.js
+4. webapp/controller/View1.controller.js
+5. webapp/controller/ViolationDetailPage.controller.js
+6. webapp/controller/FileViolation.controller.js
+7. webapp/controller/HCPortalPage.controller.js
+8. webapp/controller/HCViolationDetailPage.controller.js
+9. webapp/utils/ODataUtils.js
+
+## 14. Summary
+
+This application is a business workflow UI for sanctions and violation management. Its main value lies in orchestrating manager actions, HC review, and OData-driven persistence in a single SAPUI5/Fiori experience.
+
+The current codebase is structured clearly enough to support ongoing maintenance, but future work should focus on standardizing payload handling, improving localization, and reducing UI-level business logic where possible.
