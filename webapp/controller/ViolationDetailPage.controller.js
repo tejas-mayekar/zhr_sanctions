@@ -7,62 +7,28 @@ sap.ui.define([
     "zhrsanctions/utils/ODataUtils",
     "sap/ui/model/Filter",
     "sap/ui/model/FilterOperator"
-], (BaseController, Fragment, JSONModel, MessageToast, MessageBox, ODataUtils, Filter, FilterOperator) => {
+], (BaseController, Fragment, JSONModel, MessageToast, MessageBox, ODataUtils) => {
     "use strict";
-
-    // ─── Time Helpers ─────────────────────────────────────────────────────────
-
-    /**
-     * Convert an OData Edm.Time value (or "HH:mm:ss" string) to "HH:mm:ss".
-     * Returns "" for null / undefined.
-     */
-    function toTimeString(edmTime) {
-        return ODataUtils.formatEdmTime(edmTime) || "";
-    }
-
-    /**
-     * Parse "HH:mm:ss" → total seconds. Returns 0 on bad input.
-     */
-    function timeStringToSeconds(timeStr) {
-        if (!timeStr) { return 0; }
-        const [hh, mm, ss = "0"] = timeStr.split(":");
-        return (parseInt(hh, 10) || 0) * 3600
-            + (parseInt(mm, 10) || 0) * 60
-            + (parseInt(ss, 10) || 0);
-    }
-
-    /**
-     * Convert total seconds → zero-padded "HH:mm:ss".
-     */
-    function secondsToTimeString(totalSeconds) {
-        if (totalSeconds < 0) { totalSeconds = 0; }
-        const hh = String(Math.floor(totalSeconds / 3600)).padStart(2, "0");
-        const mm = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, "0");
-        const ss = String(totalSeconds % 60).padStart(2, "0");
-        return `${hh}:${mm}:${ss}`;
-    }
 
     /**
      * Return true when an OData time field contains a non-zero value.
      */
     function isNonZeroTime(edmTime) {
         if (!edmTime) { return false; }
-        const s = toTimeString(edmTime);
+        const s = BaseController.prototype.toTimeString.call({ formatEdmTime: ODataUtils.formatEdmTime }, edmTime);
         return s !== "" && s !== "00:00:00";
     }
 
     /**
-     * Build a display string "dd-MM-yyyy HH:mm:ss" from separate date and time strings.
+     * Build a display string from the incident date and the selected time value.
      */
     function buildDateTimeDisplayString(dateStr, timeStr) {
         if (!dateStr || !timeStr) { return timeStr || ""; }
         return `${dateStr} ${timeStr}`;
     }
 
-    // ─── Regularize Model Flags ───────────────────────────────────────────────
-
     /**
-     * Map regularization mode + available flags to section visibility booleans.
+     * Map the selected regularization mode to the matching section visibility.
      */
     function resolveSectionVisibility(mode, hasDelay, hasShort) {
         return {
@@ -72,15 +38,13 @@ sap.ui.define([
     }
 
     /**
-     * Derive the dialog title from the mode.
+     * Derive the dialog title from the selected regularization mode.
      */
     const MODE_TITLE = {
         delay: "Regularize Delay",
         short: "Regularize Short Hours",
         both: "Regularize Both"
     };
-
-    // ─── Controller ───────────────────────────────────────────────────────────
 
     return BaseController.extend("zhrsanctions.controller.ViolationDetailPage", {
 
@@ -94,7 +58,6 @@ sap.ui.define([
             this._pendingFiles = [];
         },
 
-        // ── Route Handler ─────────────────────────────────────────────────────
 
         _onRouteMatched() {
             const detailModel = this.getOwnerComponent().getModel("detailData");
@@ -103,31 +66,7 @@ sap.ui.define([
             }
             const violationRec = detailModel?.getData().record;
             this._pendingFiles = [];
-            this._loadMediaFiles(violationRec);
-        },
-        _loadMediaFiles(violationRec) {
-            if (!violationRec) { return; }
-            const actionRefNo = violationRec.ZactionRefNo || violationRec.ZACTION_REF_NO;
-            if (!actionRefNo) { return; }
-
-            const oDataModel = this.getOwnerComponent().getModel();
-            oDataModel.setUseBatch(false);
-            oDataModel.read("/ZHR_GET_MEDIASet", {
-                filters: [
-                    new Filter("ZactionRefNo", FilterOperator.EQ, actionRefNo)
-                ],
-                success: (data) => {
-                    const media = { results: data.results || [] };
-                    if (!this.getView().getModel("media")) {
-                        this.getView().setModel(new JSONModel(media), "media");
-                    } else {
-                        this.getView().getModel("media").setData(media);
-                    }
-                },
-                error: (err) => {
-                    console.error("ZHR_GET_MEDIASet fetch failed:", err);
-                }
-            });
+            this.loadMediaFiles(violationRec);
         },
         onFileChange(oEvent) {
             const files = oEvent.getParameter("files");
@@ -136,65 +75,32 @@ sap.ui.define([
         onMediaFilePress(oEvent) {
             const ctx = oEvent.getSource().getBindingContext("media");
             if (!ctx) { return; }
-            const item = ctx.getObject();
-
-            const oDataModel = this.getOwnerComponent().getModel();
-            const sServiceUrl = oDataModel.sServiceUrl;
-            const key = `ZactionRefNo='${item.ZactionRefNo}',ZitemNo='${item.ZitemNo}',Filename='${item.Filename}'`;
-            const sUrl = `${sServiceUrl}/ZHR_SANC_MEDIAUPLOADSet(${key})/$value`;
-
-            sap.ui.core.BusyIndicator.show(0);
-            const oReq = new XMLHttpRequest();
-            oReq.open("GET", sUrl, true);
-            oReq.responseType = "blob";
-            oReq.onload = () => {
-                sap.ui.core.BusyIndicator.hide();
-                if (oReq.status >= 200 && oReq.status < 300) {
-                    const blob = oReq.response;
-                    const link = document.createElement("a");
-                    link.href = window.URL.createObjectURL(blob);
-                    link.download = item.Filename;
-                    link.click();
-                    window.URL.revokeObjectURL(link.href);
-                } else {
-                    sap.m.MessageBox.error("Failed to download file: " + item.Filename);
-                }
-            };
-            oReq.onerror = () => {
-                sap.ui.core.BusyIndicator.hide();
-                sap.m.MessageBox.error("Error downloading file: " + item.Filename);
-            };
-            oReq.send();
+            this.downloadMediaFile(ctx.getObject());
         },
-        // ── Regularize Dialog ─────────────────────────────────────────────────
-
         onRegularizePress() {
             const record = this.getView().getModel("detailData").getProperty("/record");
             this._populateRegularizeModel(record);
             this._openDialog("regularize", "zhrsanctions.view.fragments.RegularizeDialog");
         },
         /**
-         * Build the regularize model from the violation record.
-         * Determines which sections apply (delay / short / both) and
-         * pre-fills the From/To time pickers to close each attendance gap.
+         * Build the regularize model from the current violation record.
+         * It determines which sections are relevant and pre-fills the suggested times.
          */
         _populateRegularizeModel(record) {
-            const scheduledIn = toTimeString(record.ZschTimeIn);
-            const scheduledOut = toTimeString(record.ZschTimeOut);
-            const punchIn = toTimeString(record.Zpunchintime);
-            const punchOut = toTimeString(record.Zpunchouttime);
+            const scheduledIn = this.toTimeString(record.ZschTimeIn);
+            const scheduledOut = this.toTimeString(record.ZschTimeOut);
+            const punchIn = this.toTimeString(record.Zpunchintime);
+            const punchOut = this.toTimeString(record.Zpunchouttime);
             const unautDays = parseInt(record.ZunautDays, 10) || 0;
             const hasUnauth = unautDays > 0;
-            // Detect delay: ZdelayHrs non-zero AND punch-in is later than scheduled-in
             const hasDelay = isNonZeroTime(record.ZdelayHrs) && (
                 !punchIn || !scheduledIn ||
-                timeStringToSeconds(punchIn) > timeStringToSeconds(scheduledIn)
+                this.timeStringToSeconds(punchIn) > this.timeStringToSeconds(scheduledIn)
             );
 
-            // Detect short: ZshortHrs non-zero AND punch-out is earlier than scheduled-out
             const hasShort = isNonZeroTime(record.ZshortHrs) && (
                 !punchOut || !scheduledOut ||
-                timeStringToSeconds(punchOut) < timeStringToSeconds(scheduledOut)
+                this.timeStringToSeconds(punchOut) < this.timeStringToSeconds(scheduledOut)
             );
 
             const hasBoth = hasDelay && hasShort;
@@ -221,8 +127,8 @@ sap.ui.define([
                 unauthPunchOut: scheduledOut,
 
                 delayFrom: scheduledIn,
-                delayTo: secondsToTimeString(timeStringToSeconds(punchIn) - 1),
-                shortFrom: secondsToTimeString(timeStringToSeconds(punchOut) + 1),
+                delayTo: this.secondsToTimeString(this.timeStringToSeconds(punchIn) - 1),
+                shortFrom: this.secondsToTimeString(this.timeStringToSeconds(punchOut) + 1),
                 shortTo: scheduledOut,
 
                 reason: ""
@@ -257,7 +163,6 @@ sap.ui.define([
             const state = regularizeModel.getData();
             const reason = (state.reason || "").trim();
 
-            // ── Validate ──────────────────────────────────────────────────────
             if (!reason) {
                 MessageBox.warning("Please enter a reason before submitting.");
                 return;
@@ -268,7 +173,7 @@ sap.ui.define([
                     MessageBox.warning("Please fill in both Delay From and To times.");
                     return;
                 }
-                if (timeStringToSeconds(state.delayTo) <= timeStringToSeconds(state.delayFrom)) {
+                if (this.timeStringToSeconds(state.delayTo) <= this.timeStringToSeconds(state.delayFrom)) {
                     MessageBox.warning("Delay 'To Time' must be later than 'From Time'.");
                     return;
                 }
@@ -279,7 +184,7 @@ sap.ui.define([
                     MessageBox.warning("Please fill in both Short Hours From and To times.");
                     return;
                 }
-                if (timeStringToSeconds(state.shortTo) <= timeStringToSeconds(state.shortFrom)) {
+                if (this.timeStringToSeconds(state.shortTo) <= this.timeStringToSeconds(state.shortFrom)) {
                     MessageBox.warning("Short Hours 'To Time' must be later than 'From Time'.");
                     return;
                 }
@@ -296,28 +201,24 @@ sap.ui.define([
                 return;
             }
 
-            // ── Derive corrected punch/schedule times by mode ─────────────────
-            let correctedSchIn = toTimeString(record.ZschTimeIn);
-            let correctedPunchIn = toTimeString(record.Zpunchintime);
-            let correctedPunchOut = toTimeString(record.Zpunchouttime);
-            let correctedSchOut = toTimeString(record.ZschTimeOut);
+            let correctedSchIn = this.toTimeString(record.ZschTimeIn);
+            let correctedPunchIn = this.toTimeString(record.Zpunchintime);
+            let correctedPunchOut = this.toTimeString(record.Zpunchouttime);
+            let correctedSchOut = this.toTimeString(record.ZschTimeOut);
             if (state.showUnauth) {
                 correctedSchIn = state.unauthPunchIn;
                 correctedPunchIn = state.unauthPunchIn;
                 correctedPunchOut = state.unauthPunchOut;
                 correctedSchOut = state.unauthPunchOut;
             } else if (state.showDelay && !state.showShort) {
-                // DelayFlag = "1": from = ZschTimeIn, to = Zpunchintime
                 correctedSchIn = state.delayFrom;
                 correctedPunchIn = state.delayTo;
 
             } else if (state.showShort && !state.showDelay) {
-                // DelayFlag = "2": from = Zpunchouttime, to = ZschTimeOut
                 correctedPunchOut = state.shortFrom;
                 correctedSchOut = state.shortTo;
 
             } else if (state.showDelay && state.showShort) {
-                // DelayFlag = "3": FM called twice (delay + short)
                 correctedSchIn = state.delayFrom;
                 correctedPunchIn = state.delayTo;
                 correctedPunchOut = state.shortFrom;
@@ -350,7 +251,6 @@ sap.ui.define([
 
             sap.ui.core.BusyIndicator.show(0);
 
-            // Step 1: PUT punch_regularizeSet
             ODataUtils.submitPunchRegularize(oDataModel, record, {
                 ZschTimeIn: correctedSchIn,
                 Zpunchintime: correctedPunchIn,
@@ -359,7 +259,6 @@ sap.ui.define([
                 DelayFlag: delayFlag
             })
                 .then(() => {
-                    // Step 2: POST ITM_STRSet
                     oDataModel.create("/ITM_STRSet", itmPayload, {
                         success: () => {
                             sap.ui.core.BusyIndicator.hide();
@@ -382,8 +281,6 @@ sap.ui.define([
         onRegularizeCancel() {
             this._closeDialog("regularize");
         },
-
-        // ── Report To HC Dialog ───────────────────────────────────────────────
 
         onReportToHCPress() {
             this.getView().getModel("regularize").setData(
@@ -460,8 +357,6 @@ sap.ui.define([
             this._closeDialog("reportToHC");
         },
 
-        // ── Payroll Deduction ─────────────────────────────────────────────────
-
         onPayrollDeductionPress() {
             const record = this.getView().getModel("detailData").getProperty("/record");
             if (!record?.ZACTION_REF_NO) {
@@ -485,10 +380,8 @@ sap.ui.define([
             );
         },
 
-        // ── Generic Dialog Helpers ────────────────────────────────────────────
-
         /**
-         * Fragment cache keys → fragment names mapping.
+         * Map dialog keys to the underlying fragment names.
          */
         _FRAGMENT_MAP: {
             regularize: "zhrsanctions.view.fragments.RegularizeDialog",
@@ -496,8 +389,7 @@ sap.ui.define([
         },
 
         /**
-         * Load (if needed) and open a fragment dialog.
-         * Dialogs are cached on the controller as `_dialog_<key>`.
+         * Load and open a fragment dialog, reusing a cached instance when available.
          */
         _openDialog(dialogKey, fragmentName) {
             const cacheKey = `_dialog_${dialogKey}`;
@@ -525,15 +417,8 @@ sap.ui.define([
             if (dialog) { dialog.close(); }
         },
 
-        // ── Shared OData Create ───────────────────────────────────────────────
-
         /**
-         * POST to ITM_STRSet with a given payload.
-         *
-         * @param {object}   payload       - full ITM_STR entity payload
-         * @param {string}   successMsg    - toast shown on success
-         * @param {Function} onSuccess     - callback invoked after success toast
-         * @param {string}   errorTitle    - MessageBox title on error
+         * Create an ITM_STR record with the provided payload.
          */
         _submitToITMSet(payload, successMsg, onSuccess, errorTitle) {
             const oDataModel = this.getOwnerComponent().getModel()
@@ -561,10 +446,8 @@ sap.ui.define([
             });
         },
 
-        // ── Private Formatters ────────────────────────────────────────────────
-
         /**
-         * Format an OData DateTime value → "dd-MM-yyyy" display string.
+         * Format an OData DateTime value for display.
          */
         _formatIncidentDateDisplay(dateValue) {
             if (!dateValue) { return ""; }
@@ -587,8 +470,7 @@ sap.ui.define([
         },
 
         /**
-         * Convert ZdelayHrs / ZshortHrs to a "H:mm" display string.
-         * Backend may send "00:15", a number (minutes), or an Edm.Time object.
+         * Convert delay or short-hours values to a display-friendly time string.
          */
         _formatHoursDisplay(hoursValue) {
             if (!hoursValue && hoursValue !== 0) { return "0:00"; }
@@ -603,13 +485,12 @@ sap.ui.define([
                 return `${h}:${String(m).padStart(2, "0")}`;
             }
 
-            // Edm.Time object
-            const timeStr = toTimeString(hoursValue);
+            const timeStr = this.toTimeString(hoursValue);
             return timeStr ? timeStr.substring(0, 5) : "0:00";
         },
 
         /**
-         * Build an empty regularize model state object.
+         * Build an empty regularize model state.
          */
         _buildEmptyRegularizeState() {
             return {
