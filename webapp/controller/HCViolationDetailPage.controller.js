@@ -561,14 +561,28 @@ sap.ui.define([
                         Zhcopsactiondate: new Date(),
                         Zhcopsname: ODataUtils.getCurrentUserName()
                     }).then(() => {
-                            sap.ui.core.BusyIndicator.hide();
-                            MessageToast.show("Case re-opened successfully.");
-                            this.getView().getModel().setProperty("/isEditOn", true);
-                            this.onNavBack();
-                        }).catch((error) => {
-                            sap.ui.core.BusyIndicator.hide();
-                            console.error("HCViolationDetailPage: appeal failed:", error);
+                        return new Promise((resolve, reject) => {
+                            const sEntityPath = `/CASE_REOPENSet(ZactionRefNo='${violationRec.ZactionRefNo}',Reopen='X')`;
+                            oDataModel.read(sEntityPath, {
+                                success: (data) => {
+                                    console.log("CASE_REOPEN entity fetched successfully:", data);
+                                    resolve(data);
+                                },
+                                error: (err) => {
+                                    console.error("CASE_REOPEN entity fetch failed:", err);
+                                    reject(err);
+                                }
+                            });
                         });
+                    }).then(() => {
+                        sap.ui.core.BusyIndicator.hide();
+                        MessageToast.show("Case re-opened successfully.");
+                        this.getView().getModel().setProperty("/isEditOn", true);
+                        this.onNavBack();
+                    }).catch((error) => {
+                        sap.ui.core.BusyIndicator.hide();
+                        console.error("HCViolationDetailPage: appeal failed:", error);
+                    });
                 }
             });
         },
