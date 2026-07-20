@@ -132,7 +132,7 @@
                         <Button
                             id="btnAppeal"
                             text="Appeal"
-                            type="Negative"
+                            type="Emphasized"
                             width="10rem"
                             visible="{= ${detailData>/record/Zstatus} === '4' }"
                             press=".onAppealPress"

@@ -553,23 +553,20 @@ sap.ui.define([
                 title: "Appeal Case",
                 onClose: (action) => {
                     if (action !== MessageBox.Action.OK) { return; }
-
                     const oDataModel = this.getOwnerComponent().getModel();
                     oDataModel.setUseBatch(false);
-
                     sap.ui.core.BusyIndicator.show(0);
                     ODataUtils.submitHCAction(oDataModel, violationRec, {
                         Zaction: "C",
                         Zstatus: "1",
                         Zhcopsactiondate: new Date(),
                         Zhcopsname: ODataUtils.getCurrentUserName()
-                    })
-                        .then(() => {
+                    }).then(() => {
                             sap.ui.core.BusyIndicator.hide();
                             MessageToast.show("Case re-opened successfully.");
                             this.getView().getModel().setProperty("/isEditOn", true);
-                        })
-                        .catch((error) => {
+                            this.onNavBack();
+                        }).catch((error) => {
                             sap.ui.core.BusyIndicator.hide();
                             console.error("HCViolationDetailPage: appeal failed:", error);
                         });
