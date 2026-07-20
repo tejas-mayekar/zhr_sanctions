@@ -129,6 +129,14 @@
                                 press=".onPayrollDeductionPress"
                             />
                         </HBox>
+                        <Button
+                            id="btnAppeal"
+                            text="Appeal"
+                            type="Negative"
+                            width="10rem"
+                            visible="{= ${detailData>/record/Zstatus} === '4' }"
+                            press=".onAppealPress"
+                        />
                     </VBox>
                 </HBox>
             </f:DynamicPageHeader>
@@ -220,17 +228,21 @@
                                 text="{detailData>/record/Zn0}"
                             />
 
-                            <Label id="_IDGenLabel134" 
+                            <Label
+                                id="_IDGenLabel134"
                                 text="Business Unit"
                             />
-                            <Text id="_IDGenText120" 
+                            <Text
+                                id="_IDGenText120"
                                 text="{detailData>/record/Zn1}"
                             />
 
-                            <Label id="_IDGenLabel135"
+                            <Label
+                                id="_IDGenLabel135"
                                 text="Division"
                             />
-                            <Text id="_IDGenText118"
+                            <Text
+                                id="_IDGenText118"
                                 text="{detailData>/record/Zn2}"
                             />
 
@@ -525,18 +537,21 @@
                         </form:content>
                     </form:SimpleForm>
                 </Panel>
-                                                <!-- ── Section 4: Attached Media ── -->
-                <Panel id="_IDGenPanel9" 
+                <!-- ── Section 4: Attached Media ── -->
+                <Panel
+                    id="_IDGenPanel9"
                     headerText="Attached Files"
                     expandable="true"
                     expanded="true"
                     class="sapUiSmallMarginTop"
                 >
-                    <List id="_IDGenList1"
+                    <List
+                        id="_IDGenList1"
                         items="{media>/results}"
                         noDataText="No files found"
                     >
-                        <StandardListItem id="_IDGenStandardListItem2"
+                        <StandardListItem
+                            id="_IDGenStandardListItem2"
                             title="{media>Filename}"
                             icon="sap-icon://attachment"
                             type="Active"

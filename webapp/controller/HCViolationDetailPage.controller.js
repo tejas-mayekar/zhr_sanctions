@@ -88,9 +88,11 @@ sap.ui.define([
             }
             const violationRec = detailModel?.getData().record;
             this._loadMediaFiles(violationRec);
-            // Show action buttons only when the record is still open
-            const isOpen = detailModel?.getData().record?.Zstatus !== "4";
+            // Show action buttons only when Zstatus is 1 or 2
+            const zstatus = detailModel?.getData().record?.Zstatus;
+            const isOpen = zstatus === "1" || zstatus === "2";
             this.getView().getModel().setProperty("/isEditOn", isOpen);
+
 
             // Reset action form
             this.getView().getModel("regularize").setData({ ...EMPTY_ACTION_STATE });
@@ -540,7 +542,40 @@ sap.ui.define([
                     console.error("HCViolationDetailPage: failed to submit action:", error);
                 });
         },
+        onAppealPress() {
+            const violationRec = this.getView().getModel("detailData").getData().record;
+            if (!violationRec?.ZactionRefNo) {
+                MessageBox.error("No violation record loaded. Cannot appeal.");
+                return;
+            }
 
+            MessageBox.confirm("Do you want to re-open this case?", {
+                title: "Appeal Case",
+                onClose: (action) => {
+                    if (action !== MessageBox.Action.OK) { return; }
+
+                    const oDataModel = this.getOwnerComponent().getModel();
+                    oDataModel.setUseBatch(false);
+
+                    sap.ui.core.BusyIndicator.show(0);
+                    ODataUtils.submitHCAction(oDataModel, violationRec, {
+                        Zaction: "C",
+                        Zstatus: "1",
+                        Zhcopsactiondate: new Date(),
+                        Zhcopsname: ODataUtils.getCurrentUserName()
+                    })
+                        .then(() => {
+                            sap.ui.core.BusyIndicator.hide();
+                            MessageToast.show("Case re-opened successfully.");
+                            this.getView().getModel().setProperty("/isEditOn", true);
+                        })
+                        .catch((error) => {
+                            sap.ui.core.BusyIndicator.hide();
+                            console.error("HCViolationDetailPage: appeal failed:", error);
+                        });
+                }
+            });
+        },
         UploadFiles(files, zactionRefNo, violationRec, actionData) {
             const oDataModel = this.getOwnerComponent().getModel() || this.getView().getModel("mainService");
             const sServiceUrl = oDataModel.sServiceUrl;
