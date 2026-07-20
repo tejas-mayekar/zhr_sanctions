@@ -162,6 +162,18 @@ sap.ui.define([
             if (this._pendingFiles.length > 0) {
                 sap.ui.core.BusyIndicator.show();
                 this.UploadFiles(this._pendingFiles, violationRec.ZactionRefNo, violationRec, actionData);
+            }else{
+                this._submitHCAction(violationRec, {
+                    ZactionRefNo: violationRec.ZactionRefNo,
+                    ZincCategory: actionData.ZincCategory,
+                    ZincType: actionData.ZincType,
+                    Zhcopsremark: actionData.reason,
+                    Zhcevpactiondate: new Date(),
+                    Zstatus: "5",
+                    Zsysyrepeatcount: parseInt(actionData.Zsysrepeatcount),
+                    ZlmIdName: ODataUtils.getCurrentUserId(),
+                    Zhcopsname: ODataUtils.getCurrentUserName(),
+                }, () => this._takeActionDialog.close());
             }
 
             this.clearFileUploadState("hcfileUploader");
