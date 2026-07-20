@@ -173,16 +173,6 @@ sap.ui.define([], () => {
             }
             return isNaN(date.getTime()) ? null : `/Date(${date.getTime()})/`;
         },
-        async HCPortalSetter() {
-            var userid = this.getCurrentUserId();
-            const records = await this.fetchOData(
-                this.getView().getModel("mainService"),
-                `/ZHR_IS_HCSet(Zempid='${userid}')`,
-            );
-            debugger;
-            return true;
-
-        },
         formatTimeDurationForPayload(timeValue) {
             if (timeValue === null || timeValue === undefined || timeValue === "") { return null; }
             let ms;

@@ -125,7 +125,6 @@ sap.ui.define([
                     "/HDR_STRSet",
                     filters
                 );
-                console.log("User",ODataUtils.getCurrentUserName())
                 const isHC = await ODataUtils.fetchODataEntity(
                     this.getView().getModel("mainService"),
                     `/ZHR_IS_HCSet(Zempid='${ODataUtils.getCurrentUserId()}')`
