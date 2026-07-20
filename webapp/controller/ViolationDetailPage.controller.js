@@ -59,14 +59,36 @@ sap.ui.define([
         },
 
 
-        _onRouteMatched() {
+        _onRouteMatched(oEvent) {
+            const actionRefNo = decodeURIComponent(oEvent.getParameter("arguments").actionRefNo || "");
             const detailModel = this.getOwnerComponent().getModel("detailData");
-            if (detailModel) {
+            const existingRec = detailModel?.getData().record;
+
+            // Data still in memory (normal nav) — use it
+            if (existingRec && (existingRec.ZACTION_REF_NO === actionRefNo || existingRec.ZactionRefNo === actionRefNo)) {
                 this.getView().setModel(detailModel, "detailData");
+                this._pendingFiles = [];
+                this.loadMediaFiles(existingRec);
+                return;
             }
-            const violationRec = detailModel?.getData().record;
-            this._pendingFiles = [];
-            this.loadMediaFiles(violationRec);
+
+            // Reload / deep-link — data gone, fetch fresh
+            const oDataModel = this.getOwnerComponent().getModel();
+            sap.ui.core.BusyIndicator.show(0);
+
+            ODataUtils.fetchODataEntity(oDataModel, `/HDR_STRSet(ZACTION_REF_NO='${actionRefNo}',ZempId='${ODataUtils.getCurrentUserId()}')`)
+                .then((record) => {
+                    const freshModel = new JSONModel({ record: record || {}, source: "current" });
+                    this.getOwnerComponent().setModel(freshModel, "detailData");
+                    this.getView().setModel(freshModel, "detailData");
+                    this._pendingFiles = [];
+                    this.loadMediaFiles(record);
+                })
+                .catch((err) => {
+                    console.error("ViolationDetailPage: reload fetch failed:", err);
+                    MessageBox.error("Could not reload violation record.");
+                })
+                .finally(() => sap.ui.core.BusyIndicator.hide());
         },
         onFileChange(oEvent) {
             const files = oEvent.getParameter("files");
