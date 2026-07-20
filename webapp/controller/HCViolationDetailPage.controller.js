@@ -85,6 +85,7 @@ sap.ui.define([
                 );
                 this.getView().addDependent(this._takeActionDialog);
             }
+            this.clearFileUploadState("hcfileUploader");
             const regularizeModel = this.getView().getModel("regularize");
             regularizeModel.setProperty("/Zrepeatcount", 0);
             regularizeModel.setProperty("/ZfirstIncDate", 0);
@@ -95,6 +96,7 @@ sap.ui.define([
         },
 
         onCloseTakeActionDialog() {
+            this.clearFileUploadState("hcfileUploader");
             this._takeActionDialog.close();
         },
         onRepeatCountChange(oEvent) {
@@ -162,6 +164,7 @@ sap.ui.define([
                 this.UploadFiles(this._pendingFiles, violationRec.ZactionRefNo, violationRec, actionData);
             }
 
+            this.clearFileUploadState("hcfileUploader");
         },
 
         onTakeNoActionPress() {
@@ -282,6 +285,7 @@ sap.ui.define([
 
 
         onCloseTakeNoActionDialog() {
+            this.clearFileUploadState("hcfileUploader");
             this._takeNoActionDialog.close();
         },
         onViewRemarkPress() {
@@ -304,6 +308,7 @@ sap.ui.define([
             return this.getOwnerComponent().getControllerInstance ? this.getOwnerComponent().getControllerInstance().formatRemarkColor(text) : BaseController.prototype.formatRemarkColor.call(this, text);
         },
         onViewRemarkCancel() {
+            this.clearFileUploadState("hcfileUploader");
             this._addRemark.close();
         },
         onSubmitTakeNoAction() {
@@ -475,6 +480,7 @@ sap.ui.define([
                 }, () => this._takeActionDialog.close());
                 this._pendingFiles = [];
             });
+            this.clearFileUploadState("hcfileUploader");
         },
     });
 });

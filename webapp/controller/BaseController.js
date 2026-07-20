@@ -135,6 +135,19 @@ sap.ui.define([
             });
         },
 
+        clearFileUploadState(uploaderId) {
+            if (this._pendingFiles) {
+                this._pendingFiles = [];
+            }
+
+            if (uploaderId) {
+                const uploader = this.byId(uploaderId);
+                if (uploader && typeof uploader.clear === "function") {
+                    uploader.clear();
+                }
+            }
+        },
+
         downloadMediaFile(item) {
             if (!item) { return; }
 

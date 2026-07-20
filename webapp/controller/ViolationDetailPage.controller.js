@@ -279,10 +279,12 @@ sap.ui.define([
         },
 
         onRegularizeCancel() {
+            this.clearFileUploadState("reportToHCFileUploader");
             this._closeDialog("regularize");
         },
 
         onReportToHCPress() {
+            this.clearFileUploadState("reportToHCFileUploader");
             this.getView().getModel("regularize").setData(
                 Object.assign(this._buildEmptyRegularizeState(), { reason: "" })
             );
@@ -354,6 +356,7 @@ sap.ui.define([
             });
         },
         onReportToHCCancel() {
+            this.clearFileUploadState("reportToHCFileUploader");
             this._closeDialog("reportToHC");
         },
 
@@ -415,6 +418,9 @@ sap.ui.define([
         _closeDialog(dialogKey) {
             const dialog = this[`_dialog_${dialogKey}`];
             if (dialog) { dialog.close(); }
+            if (dialogKey === "reportToHC") {
+                this.clearFileUploadState("reportToHCFileUploader");
+            }
         },
 
         /**
