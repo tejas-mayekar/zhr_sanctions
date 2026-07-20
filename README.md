@@ -123,3 +123,5 @@ HCViolationDetailPage.view.xml→ HCViolationDetailPage.controller.js (HC Take A
 ## i18n
 
 `webapp/i18n/i18n.properties` — minimal, only `appTitle`, `appDescription`, `title` defined. Bulk of UI text (labels, button text, messages) is hardcoded in XML views and JS `MessageToast`/`MessageBox` calls — not externalized. Flag for future i18n pass if multi-language support needed.
+
+test 
