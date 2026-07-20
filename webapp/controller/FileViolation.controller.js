@@ -15,6 +15,7 @@ sap.ui.define([
                 .getRouter()
                 .getRoute("RouteFileViolation")
                 .attachPatternMatched(this._onRouteMatched, this);
+            this._pendingFiles = [];
         },
 
         _onRouteMatched() {
@@ -43,6 +44,7 @@ sap.ui.define([
             // this.byId("dpZawaitingactionfrom").setDateValue(null);
             // this.byId("dpZlastaction").setDateValue(null);
             this.byId("fileUploader").clear();
+            this._pendingFiles = [];
         },
 
 
@@ -50,7 +52,10 @@ sap.ui.define([
         //     const hasDate = !!oEvent.getSource().getDateValue();
         //     this.byId("inputZempId").setEditable(hasDate);
         // },
-
+        onFileChange(oEvent) {
+            const files = oEvent.getParameter("files");
+            this._pendingFiles = files ? Array.from(files) : [];
+        },
         onValueHelpRequest(oEvent) {
             const incidentDate = this.byId("dpZincDate").getDateValue();
             if (!incidentDate) {
@@ -95,17 +100,17 @@ sap.ui.define([
             const selectedEmployee = this._getSelectedEmployeeData();
             const emp = selectedEmployee || {};
             const dateInput = this.byId("dpZincDate").getDateValue();
-const localincDate = new Date(
-    dateInput.getFullYear(),
-    dateInput.getMonth(),
-    dateInput.getDate()
-);
+            const localincDate = new Date(
+                dateInput.getFullYear(),
+                dateInput.getMonth(),
+                dateInput.getDate()
+            );
             const datediscInput = this.byId("dpZincDisDate").getDateValue();
-const localincdiscDate = new Date(
-    datediscInput.getFullYear(),
-    datediscInput.getMonth(),
-    datediscInput.getDate()
-);
+            const localincdiscDate = new Date(
+                datediscInput.getFullYear(),
+                datediscInput.getMonth(),
+                datediscInput.getDate()
+            );
 
             const payload = {
                 // Employee
@@ -142,7 +147,7 @@ const localincdiscDate = new Date(
                 Zn7: emp.Zn7 || this.byId("inputZn7").getValue(),
 
                 // Violation
-                
+
                 ZincDate: localincDate,
                 // ZincCategory: this.byId("inputZincCategory").getValue(),
                 // ZincType: this.byId("inputZincType").getValue(),
@@ -175,7 +180,7 @@ const localincdiscDate = new Date(
                 Zlinemanagername: ODataUtils.getCurrentUserName(),
                 ZlmIdName: ODataUtils.getCurrentUserId(),
                 Zlinemanageraction: this.byId("inputZlinemanageraction").getValue(),
-                Zlinemanageractiondate:new Date(),
+                Zlinemanageractiondate: new Date(),
                 Zlinemanagerremarks: this.byId("inputZremark").getValue(),
 
                 // Workflow: HC Ops
@@ -231,16 +236,10 @@ const localincdiscDate = new Date(
                     sap.ui.core.BusyIndicator.hide();
                     const zactionRefNo = data.ZactionRefNo;
                     MessageToast.show("Violation record created successfully.");
-                    console.log("Action Reference No: " + zactionRefNo);
-                    const fileUploader = this.byId("fileUploader");
-                    const domRef = fileUploader.getFocusDomRef(); // <input type=file>
-                    const files = domRef && domRef.files ? Array.from(domRef.files) : [];
 
-                    if (files.length > 0) {
+                    if (this._pendingFiles.length > 0) {
                         sap.ui.core.BusyIndicator.show();
-                        this.UploadFiles(files, zactionRefNo);
-                    } else {
-                        MessageToast.show("Violation record created successfully.");
+                        this.UploadFiles(this._pendingFiles, zactionRefNo);
                     }
                 },
                 error: (error) => {
@@ -254,7 +253,7 @@ const localincdiscDate = new Date(
             const sServiceUrl = oDataModel.sServiceUrl;
             const sCsrfToken = oDataModel.getSecurityToken ? oDataModel.getSecurityToken() : oDataModel.oHeaders["x-csrf-token"];
 
-            files.forEach((file,index) => {
+            files.forEach((file, index) => {
                 const sUrl = `${sServiceUrl}/ZHR_SANC_MEDIAUPLOADSet`;
 
                 const oReq = new XMLHttpRequest();
@@ -262,7 +261,7 @@ const localincdiscDate = new Date(
                 oReq.setRequestHeader("Content-Type", file.type || "application/octet-stream");
                 oReq.setRequestHeader("x-csrf-token", sCsrfToken);
                 oReq.setRequestHeader("X-Requested-With", "XMLHttpRequest");
-                oReq.setRequestHeader("slug", encodeURIComponent(file.name) + ";" + encodeURIComponent(zactionRefNo) +";" + encodeURIComponent(index) );
+                oReq.setRequestHeader("slug", encodeURIComponent(file.name) + ";" + encodeURIComponent(zactionRefNo) + ";" + encodeURIComponent(index));
                 oReq.onload = () => {
                     if (oReq.status >= 200 && oReq.status < 300) {
                         sap.ui.core.BusyIndicator.hide();

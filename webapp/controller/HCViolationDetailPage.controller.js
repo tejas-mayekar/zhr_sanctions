@@ -76,6 +76,7 @@ sap.ui.define([
                 .getRouter()
                 .getRoute("RouteHCViolationDetailpage")
                 .attachPatternMatched(this._onRouteMatched, this);
+            this._pendingFiles = [];
         },
 
         // ── Route Handler ─────────────────────────────────────────────────────
@@ -93,6 +94,11 @@ sap.ui.define([
 
             // Reset action form
             this.getView().getModel("regularize").setData({ ...EMPTY_ACTION_STATE });
+            this._pendingFiles = [];
+        },
+        onFileChange(oEvent) {
+            const files = oEvent.getParameter("files");
+            this._pendingFiles = files ? Array.from(files) : [];
         },
         _loadMediaFiles(violationRec) {
             if (!violationRec) { return; }
@@ -253,26 +259,12 @@ sap.ui.define([
                 MessageBox.error("Please provide a reason for taking action");
                 return;
             }
-            const zactionRefNo = violationRec.ZactionRefNo;
-            const fileUploader = this.byId("hcfileUploader");
-            const domRef = fileUploader.getFocusDomRef(); // <input type=file>
-            const files = domRef && domRef.files ? Array.from(domRef.files) : [];
 
-            if (files.length > 0) {
+            if (this._pendingFiles.length > 0) {
                 sap.ui.core.BusyIndicator.show();
-                this.UploadFiles(files, zactionRefNo);
+                this.UploadFiles(this._pendingFiles, violationRec.ZactionRefNo, violationRec, actionData);
             }
-            this._submitHCAction(violationRec, {
-                ZactionRefNo: violationRec.ZactionRefNo,
-                ZincCategory: actionData.ZincCategory,
-                ZincType: actionData.ZincType,
-                Zhcopsremark: actionData.reason,
-                Zhcevpactiondate: new Date(),
-                Zstatus: "5",
-                Zsysyrepeatcount: parseInt(actionData.Zsysrepeatcount),
-                ZlmIdName: ODataUtils.getCurrentUserId(),
-                Zhcopsname: ODataUtils.getCurrentUserName(),
-            }, () => this._takeActionDialog.close());
+
         },
 
         // ── Take No Action Dialog ─────────────────────────────────────────────
@@ -549,7 +541,7 @@ sap.ui.define([
                 });
         },
 
-        UploadFiles(files, zactionRefNo) {
+        UploadFiles(files, zactionRefNo, violationRec, actionData) {
             const oDataModel = this.getOwnerComponent().getModel() || this.getView().getModel("mainService");
             const sServiceUrl = oDataModel.sServiceUrl;
             const sCsrfToken = oDataModel.getSecurityToken ? oDataModel.getSecurityToken() : oDataModel.oHeaders["x-csrf-token"];
@@ -579,6 +571,18 @@ sap.ui.define([
                     MessageToast.show("Upload error: " + file.name);
                 }
                 oReq.send(file);
+                this._submitHCAction(violationRec, {
+                    ZactionRefNo: violationRec.ZactionRefNo,
+                    ZincCategory: actionData.ZincCategory,
+                    ZincType: actionData.ZincType,
+                    Zhcopsremark: actionData.reason,
+                    Zhcevpactiondate: new Date(),
+                    Zstatus: "5",
+                    Zsysyrepeatcount: parseInt(actionData.Zsysrepeatcount),
+                    ZlmIdName: ODataUtils.getCurrentUserId(),
+                    Zhcopsname: ODataUtils.getCurrentUserName(),
+                }, () => this._takeActionDialog.close());
+                this._pendingFiles = [];
             });
         },
     });
