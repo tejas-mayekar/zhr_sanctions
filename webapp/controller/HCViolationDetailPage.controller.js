@@ -262,19 +262,9 @@ sap.ui.define([
 
             if (this._pendingFiles.length > 0) {
                 sap.ui.core.BusyIndicator.show();
-                this.UploadFiles(this._pendingFiles, violationRec.ZactionRefNo);
+                this.UploadFiles(this._pendingFiles, violationRec.ZactionRefNo, violationRec, actionData);
             }
-            this._submitHCAction(violationRec, {
-                ZactionRefNo: violationRec.ZactionRefNo,
-                ZincCategory: actionData.ZincCategory,
-                ZincType: actionData.ZincType,
-                Zhcopsremark: actionData.reason,
-                Zhcevpactiondate: new Date(),
-                Zstatus: "5",
-                Zsysyrepeatcount: parseInt(actionData.Zsysrepeatcount),
-                ZlmIdName: ODataUtils.getCurrentUserId(),
-                Zhcopsname: ODataUtils.getCurrentUserName(),
-            }, () => this._takeActionDialog.close());
+
         },
 
         // ── Take No Action Dialog ─────────────────────────────────────────────
@@ -551,7 +541,7 @@ sap.ui.define([
                 });
         },
 
-        UploadFiles(files, zactionRefNo) {
+        UploadFiles(files, zactionRefNo, violationRec, actionData) {
             const oDataModel = this.getOwnerComponent().getModel() || this.getView().getModel("mainService");
             const sServiceUrl = oDataModel.sServiceUrl;
             const sCsrfToken = oDataModel.getSecurityToken ? oDataModel.getSecurityToken() : oDataModel.oHeaders["x-csrf-token"];
@@ -581,6 +571,18 @@ sap.ui.define([
                     MessageToast.show("Upload error: " + file.name);
                 }
                 oReq.send(file);
+                this._submitHCAction(violationRec, {
+                    ZactionRefNo: violationRec.ZactionRefNo,
+                    ZincCategory: actionData.ZincCategory,
+                    ZincType: actionData.ZincType,
+                    Zhcopsremark: actionData.reason,
+                    Zhcevpactiondate: new Date(),
+                    Zstatus: "5",
+                    Zsysyrepeatcount: parseInt(actionData.Zsysrepeatcount),
+                    ZlmIdName: ODataUtils.getCurrentUserId(),
+                    Zhcopsname: ODataUtils.getCurrentUserName(),
+                }, () => this._takeActionDialog.close());
+                this._pendingFiles = [];
             });
         },
     });
