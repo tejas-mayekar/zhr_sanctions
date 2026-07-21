@@ -163,12 +163,6 @@
                             />
                             <ToolbarSpacer id="_IDGenToolbarSpacer3" />
                             <Button
-                                id="btnAddQuestions"
-                                icon="sap-icon://add-activity"
-                                text="Add Questions"
-                                press=".onOpenQuestionsPress"
-                            />
-                            <Button
                                 id="_IDGenButton19"
                                 icon="sap-icon://comment"
                                 text="View Remarks"
