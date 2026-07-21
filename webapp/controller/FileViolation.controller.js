@@ -116,7 +116,9 @@ sap.ui.define([
                 Zlocationgroup: emp.ZlocGroup || this.byId("inputZlocationgroup").getValue(),
                 Zworkschedule: emp.Zworkschedule || this.byId("inputZworkschedule").getValue(),
                 ZlatestNode: emp.ZlatestNode || this.byId("inputZlatestNode").getValue(),
+                Zlmemail:emp.ZlmEmail,
 
+                ZempEmail: emp.ZempMail,
                 ZstdWeekHrs: emp.ZstdWeekHrs || this.byId("inputZstdWeekHrs").getValue(),
                 ZwrkDyWeek: emp.ZwrkDyWeek || this.byId("inputZwrkDyWeek").getValue(),
                 Zn0: emp.Zn0 || this.byId("inputZn0").getValue(),
