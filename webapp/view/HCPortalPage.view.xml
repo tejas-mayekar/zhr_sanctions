@@ -379,6 +379,106 @@
                         </t:Table>
                     </IconTabFilter>
                 </items>
+                <items>
+                 <IconTabFilter 
+                        id="_IDGenIconTabFilter1"
+                        text="Report"
+                        icon="sap-icon://bullet-text"
+                        iconDensityAware="false"
+                        design="Horizontal"
+                        class="sapUiResponsiveContentPadding custom-tab-filter"
+                        key="new"
+                    >
+                    <t:Table
+                            id="HcReportTable"
+                            selectionMode="None"
+                            enableSelectAll="false"
+                            rows="{path: '/ITM_NEW_SET'}"
+                            threshold="15"
+                            scrollThreshold="50"
+                            enableBusyIndicator="true"
+                            rowMode="Auto"
+                        >
+                            <t:noData>
+                                <VBox id="_IDGenVBox20"
+                                    alignItems="Center"
+                                    justifyContent="Center"
+                                    class="sapUiMediumMargin"
+                                >
+                                    <core:Icon id="_IDGenIcon10"
+                                        src="sap-icon://inbox"
+                                        size="3rem"
+                                        color="sapContent_NonInteractiveIconColor"
+                                        class="sapUiSmallMarginBottom"
+                                    />
+                                    <Text id="_IDGenText124"
+                                        text="No data available"
+                                    />
+                                </VBox>
+                            </t:noData>
+
+                            <t:columns>
+                                <t:Column id="_IDGenColumn1"
+                                    width="8rem"
+                                    hAlign="Center"
+                                >
+                                    <Label id="_IDGenLabel140"
+                                        text="Actions"
+                                    />
+                                    <t:template>
+                                        <Button id="_IDGenButton30"
+                                            icon="sap-icon://detail-view"
+                                            text="Details"
+                                            type="Transparent"
+                                            press=".onViewNewDetails"
+                                        />
+                                    </t:template>
+                                </t:Column>
+                            </t:columns>
+
+                            <t:extension>
+                                <OverflowToolbar id="_IDGenOverflowToolbar12"
+                                    style="Standard"
+                                >
+                                    <HBox id="_IDGenHBox18"
+                                        alignItems="Center"
+                                        columnGap="0.5rem"
+                                    >
+                                        <core:Icon id="_IDGenIcon11"
+                                            src="sap-icon://search"
+                                        />
+                                        <Input id="_IDGenInput6"
+                                            showClearIcon="true"
+                                            width="25rem"
+                                            placeholder="Search..."
+                                            liveChange=".onSearchNew"
+                                        />
+                                    </HBox>
+                                    <ToolbarSpacer id="_IDGenToolbarSpacer7" />
+                                    <Button id="_IDGenButton31"
+                                        icon="sap-icon://refresh"
+                                        tooltip="Refresh"
+                                        press=".onRefreshNew"
+                                    />
+                                    <Button id="_IDGenButton32"
+                                        icon="sap-icon://excel-attachment"
+                                        tooltip="Export to Excel"
+                                        press=".onExportNew"
+                                    />
+                                </OverflowToolbar>
+                            </t:extension>
+
+                            <t:footer>
+                                <OverflowToolbar id="_IDGenOverflowToolbar13" >
+                                    <Label id="_IDGenLabel141"
+                                        visible="{= ${/newCount} > 0 }"
+                                        text="Number of Records: {/newCount}"
+                                    />
+                                </OverflowToolbar>
+                            </t:footer>
+                        </t:Table>
+                    </IconTabFilter>
+                </items>
             </IconTabBar>
         </f:content>
     </f:DynamicPage>
