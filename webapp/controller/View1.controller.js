@@ -66,22 +66,17 @@ sap.ui.define([
                 isHC: false
             }));
             TableUtils.buildTableColumns(
-                this.byId("currentTable"),
-                CURRENT_VIOLATIONS_COLUMNS,
-                this.formatEdmTime.bind(this),
-                this.displaydateFormatter.bind(this),
-                this.formatZstatus.bind(this),
-                this.formatZaction.bind(this)
+                this.byId("currentTable"), CURRENT_VIOLATIONS_COLUMNS,
+                this.formatEdmTime.bind(this), this.displaydateFormatter.bind(this),
+                this.formatZstatus.bind(this), this.formatZaction.bind(this),
+                "mainService"
             );
             TableUtils.buildTableColumns(
-                this.byId("historyTable"),
-                HISTORY_VIOLATIONS_COLUMNS,
-                this.formatEdmTime.bind(this),
-                this.displaydateFormatter.bind(this),
-                this.formatZstatus.bind(this),
-                this.formatZaction.bind(this)
+                this.byId("historyTable"), HISTORY_VIOLATIONS_COLUMNS,
+                this.formatEdmTime.bind(this), this.displaydateFormatter.bind(this),
+                this.formatZstatus.bind(this), this.formatZaction.bind(this),
+                "mainService"
             );
-
             setTimeout(() => this._loadCurrentViolations(), 0);
         },
 
@@ -103,62 +98,42 @@ sap.ui.define([
         },
 
         async _loadCurrentViolations() {
-            try {
-                sap.ui.core.BusyIndicator.show(0);
+            const isHC = await ODataUtils.fetchODataEntity(
+                this.getView().getModel("mainService"),
+                `/ZHR_IS_HCSet(Zempid='${ODataUtils.getCurrentUserId()}')`
+            ).catch(() => ({ Zishc: '' }));
 
-                const filters = [
+            this.getView().getModel().setProperty("/isHC", isHC.Zishc === 'X');
+
+            const table = this.byId("currentTable");
+            table.bindRows({
+                path: "mainService>/HDR_STRSet",
+                filters: [
                     new Filter("ZlmIdName", FilterOperator.EQ, ODataUtils.getCurrentUserId()),
                     new Filter("Zishc", FilterOperator.EQ, false)
-                ];
-
-                const records = await ODataUtils.fetchOData(
-                    this.getView().getModel("mainService"),
-                    "/HDR_STRSet",
-                    filters
-                );
-                const isHC = await ODataUtils.fetchODataEntity(
-                    this.getView().getModel("mainService"),
-                    `/ZHR_IS_HCSet(Zempid='${ODataUtils.getCurrentUserId()}')`
-                );
-                const uiModel = this.getView().getModel();
-                uiModel.setProperty("/HDR_STRSet", records || []);
-                uiModel.setProperty("/currentCount", (records || []).length);
-                uiModel.setProperty("/isHC",
-                    isHC.Zishc === 'X' ? true : false
-                );
-
-
-            } catch (error) {
-                ODataUtils.handleODataError(error, "Failed to load violations.");
-            } finally {
-                sap.ui.core.BusyIndicator.hide();
-            }
+                ],
+                events: {
+                    dataReceived: () => {
+                        this.getView().getModel().setProperty("/currentCount", table.getBinding("rows").getLength());
+                    }
+                }
+            });
         },
 
-        async _loadHistoryViolations() {
-            try {
-                sap.ui.core.BusyIndicator.show(0);
-
-                const filters = [
+        _loadHistoryViolations() {
+            const table = this.byId("historyTable");
+            table.bindRows({
+                path: "mainService>/ITM_STRSet",
+                filters: [
                     new Filter("ZlmIdName", FilterOperator.EQ, ODataUtils.getCurrentUserId()),
                     new Filter("ZIsHc", FilterOperator.EQ, false)
-                ];
-
-                const records = await ODataUtils.fetchOData(
-                    this.getView().getModel("mainService"),
-                    "/ITM_STRSet",
-                    filters
-                );
-
-                const uiModel = this.getView().getModel();
-                uiModel.setProperty("/ITM_STRSet", records || []);
-                uiModel.setProperty("/historyCount", (records || []).length);
-
-            } catch (error) {
-                ODataUtils.handleODataError(error, "Failed to load history.");
-            } finally {
-                sap.ui.core.BusyIndicator.hide();
-            }
+                ],
+                events: {
+                    dataReceived: () => {
+                        this.getView().getModel().setProperty("/historyCount", table.getBinding("rows").getLength());
+                    }
+                }
+            });
         },
 
         onRefreshCurrent() { this._loadCurrentViolations(); },
@@ -199,13 +174,15 @@ sap.ui.define([
         },
 
         onViewDetails(oEvent) {
-            const actionRefNo = oEvent.getSource().getBindingContext()?.getProperty("ZACTION_REF_NO");
-            this._navigateToDetailPage(actionRefNo, "current");
+            const context = oEvent.getSource().getBindingContext("mainService");
+            if (!context) { return; }
+            this._navigateToDetailPage(context.getObject(), "current");
         },
 
         onViewDetailsHistory(oEvent) {
-            const actionRefNo = oEvent.getSource().getBindingContext()?.getProperty("ZactionRefNo");
-            this._navigateToDetailPage(actionRefNo, "prevdetail");
+            const context = oEvent.getSource().getBindingContext("mainService");
+            if (!context) { return; }
+            this._navigateToDetailPage(context.getObject(), "prevdetail");
         },
 
         /**
@@ -214,22 +191,15 @@ sap.ui.define([
          * @param {string} actionRefNo  - violation reference number
          * @param {string} sourceContext - "current" | "prevdetail"
          */
-        _navigateToDetailPage(actionRefNo, sourceContext) {
+        _navigateToDetailPage(record, sourceContext) {
+            const actionRefNo = record?.ZACTION_REF_NO || record?.ZactionRefNo;
             if (!actionRefNo) {
                 sap.m.MessageToast.show("Cannot open details: record has no Action Ref No.");
                 return;
             }
 
-            const uiModel = this.getView().getModel();
-            const dataSetKey = sourceContext === "prevdetail" ? "ITM_STRSet" : "HDR_STRSet";
-            const allRecords = uiModel.getProperty(`/${dataSetKey}`) || [];
-
-            const selectedRecord = allRecords.find(
-                rec => (rec.ZACTION_REF_NO || rec.ZactionRefNo) === actionRefNo
-            );
-
             this.getOwnerComponent().setModel(
-                new JSONModel({ record: selectedRecord || {}, source: sourceContext }),
+                new JSONModel({ record, source: sourceContext }),
                 "detailData"
             );
 
