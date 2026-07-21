@@ -54,13 +54,23 @@ sap.ui.define([
         { label: "Line Manager Name", binding: "Zlinemanagername", width: "14rem", sortProperty: "Zlinemanagername", filterProperty: "Zlinemanagername", visible: true },
         { label: "LM Action Date", binding: "Zlinemanageractiondate", width: "12rem", sortProperty: "Zlinemanageractiondate", filterProperty: "Zlinemanageractiondate", visible: true, isDate: true },
     ];
-
+    const MISS_PUNCH_COLUMNS = [
+        { label: "Employee ID", binding: "ZempId", width: "9rem", sortProperty: "ZempId", filterProperty: "ZempId", visible: true },
+        { label: "Employee Name", binding: "ZempName", width: "14rem", sortProperty: "ZempName", filterProperty: "ZempName", visible: true },
+        { label: "Incident Date", binding: "ZincDate", width: "10rem", sortProperty: "ZincDate", filterProperty: "ZincDate", visible: true, isDate: true },
+        { label: "Punch In Time", binding: "Zpunchintime", width: "12rem", sortProperty: "Zpunchintime", filterProperty: "Zpunchintime", visible: true, isTime: true },
+        { label: "Punch Out Time", binding: "Zpunchouttime", width: "12rem", sortProperty: "Zpunchouttime", filterProperty: "Zpunchouttime", visible: true, isTime: true },
+        { label: "Department", binding: "Zn3", width: "14rem", sortProperty: "Zn3", filterProperty: "Zn3", visible: true },
+        { label: "Manager ID", binding: "ZlmIdName", width: "10rem", sortProperty: "ZlmIdName", filterProperty: "ZlmIdName", visible: false }
+    ];
     return BaseController.extend("zhrsanctions.controller.View1", {
 
         onInit() {
             this.getView().setModel(new JSONModel({
                 currentCount: 0,
                 historyCount: 0,
+                missPunchCount: 0,
+                MissPunchSet: [],
                 HDR_STRSet: [],
                 ITM_STRSet: [],
                 isHC: false
@@ -77,6 +87,12 @@ sap.ui.define([
                 this.formatZstatus.bind(this), this.formatZaction.bind(this),
                 "mainService"
             );
+            TableUtils.buildTableColumns(
+                this.byId("missPunchTable"), MISS_PUNCH_COLUMNS,
+                this.formatEdmTime.bind(this), this.displaydateFormatter.bind(this),
+                this.formatZstatus.bind(this), this.formatZaction.bind(this),
+                "mainService"
+            );
             setTimeout(() => this._loadCurrentViolations(), 0);
         },
 
@@ -86,6 +102,8 @@ sap.ui.define([
                 this._loadHistoryViolations();
             } else if (selectedKey === "current") {
                 this._loadCurrentViolations();
+            } else if (selectedKey === "missPunch") {
+                this._loadMissPunch();
             }
         },
 
@@ -218,6 +236,43 @@ sap.ui.define([
 
         onHCPortal() {
             this.getOwnerComponent().getRouter().navTo("RouteHCPortal");
-        }
+        },
+        _loadMissPunch() {
+            const table = this.byId("missPunchTable");
+            table.bindRows({
+                path: "mainService>/MissPunchSet",
+                filters: [
+                ],
+                events: {
+                    dataReceived: () => {
+                        this.getView().getModel().setProperty("/missPunchCount", table.getBinding("rows").getLength());
+                    }
+                }
+            });
+        },
+        onRefreshMissPunch() { this._loadMissPunch(); },
+
+        onSearchMissPunch(oEvent) {
+            TableUtils.applyTableSearch(
+                this.byId("missPunchTable"),
+                MISS_PUNCH_COLUMNS,
+                oEvent.getParameter("newValue")
+            );
+        },
+
+        onExportMissPunch() {
+            ExportUtils.exportTableToExcel(
+                this.byId("missPunchTable"),
+                MISS_PUNCH_COLUMNS,
+                "Miss_Punch",
+                this.formatEdmTime.bind(this)
+            );
+        },
+
+        onViewMissPunchDetails(oEvent) {
+            const context = oEvent.getSource().getBindingContext("mainService");
+            if (!context) { return; }
+            this._navigateToDetailPage(context.getObject(), "current");
+        },
     });
 });

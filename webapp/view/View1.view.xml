@@ -273,6 +273,118 @@
                         </t:Table>
                     </IconTabFilter>
                 </items>
+                <items>
+                <!-- ─── MISS PUNCH TAB ─── -->
+                    <IconTabFilter
+                        id="tabMissPunch"
+                        text="Miss Punch"
+                        icon="sap-icon://synchronize"
+                        iconDensityAware="false"
+                        design="Horizontal"
+                        key="missPunch"
+                    >
+                        <t:Table
+                            id="missPunchTable"
+                            selectionMode="MultiToggle"
+                            enableSelectAll="false"
+                            rows="{path: 'mainService>/MissPunchSet'}"
+                            threshold="15"
+                            scrollThreshold="50"
+                            enableBusyIndicator="true"
+                            rowMode="Auto"
+                        >
+                            <t:noData>
+                                <VBox
+                                    id="_IDGenVBoxMP"
+                                    alignItems="Center"
+                                    justifyContent="Center"
+                                    class="sapUiMediumMargin"
+                                >
+                                    <core:Icon
+                                        id="_IDGenIconMP"
+                                        src="sap-icon://inbox"
+                                        size="3rem"
+                                        color="sapContent_NonInteractiveIconColor"
+                                        class="sapUiSmallMarginBottom"
+                                    />
+                                    <Text
+                                        id="_IDGenTextMP"
+                                        text="No miss punch records available"
+                                    />
+                                </VBox>
+                            </t:noData>
+                            <t:columns>
+                                <t:Column
+                                    id="missPunchActionsCol"
+                                    width="8rem"
+                                    hAlign="Center"
+                                >
+                                    <Label
+                                        id="_IDGenLabelMP"
+                                        text="Actions"
+                                    />
+                                    <t:template>
+                                        <!-- <Button
+                                            id="_IDGenButtonMP"
+                                            icon="sap-icon://detail-view"
+                                            text="Details"
+                                            type="Transparent"
+                                            press=".onViewMissPunchDetails"
+                                        /> -->
+                                    </t:template>
+                                </t:Column>
+                            </t:columns>
+
+                            <t:extension>
+                                <OverflowToolbar
+                                    id="_IDGenOverflowToolbarMP"
+                                    style="Standard"
+                                >
+                                    <HBox
+                                        id="_IDGenHBoxMP"
+                                        alignItems="Center"
+                                        columnGap="0.5rem"
+                                    >
+                                        <core:Icon
+                                            id="_IDGenIconMP2"
+                                            src="sap-icon://search"
+                                        />
+                                        <Input
+                                            id="missPunchSearch"
+                                            showClearIcon="true"
+                                            width="25rem"
+                                            placeholder="Search..."
+                                            liveChange=".onSearchMissPunch"
+                                        />
+                                    </HBox>
+                                    <ToolbarSpacer id="_IDGenToolbarSpacerMP" />
+                                    <Button
+                                        id="_IDGenButtonMP2"
+                                        icon="sap-icon://refresh"
+                                        tooltip="Refresh"
+                                        press=".onRefreshMissPunch"
+                                    />
+                                    <Button
+                                        id="_IDGenButtonExportMissPunch"
+                                        icon="sap-icon://excel-attachment"
+                                        tooltip="Export to Excel"
+                                        press=".onExportMissPunch"
+                                    />
+                                </OverflowToolbar>
+                            </t:extension>
+
+                            <t:footer>
+                                <OverflowToolbar id="_IDGenOverflowToolbarMP2">
+                                    <Label
+                                        id="_IDGenLabelMP2"
+                                        visible="{= ${/missPunchCount} > 0 }"
+                                        text="Number of Records: {/missPunchCount}"
+                                    />
+                                </OverflowToolbar>
+                            </t:footer>
+                        </t:Table>
+                    </IconTabFilter>
+                </items>
             </IconTabBar>
         </f:content>
     </f:DynamicPage>
