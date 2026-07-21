@@ -83,28 +83,23 @@ sap.ui.define([
             TableUtils.buildTableColumns(
                 this.byId("HcTable"),
                 HC_TABLE_COLUMNS,
-                this.formatEdmTime.bind(this),
-                this.displaydateFormatter.bind(this),
-                this.formatZstatus.bind(this),
-                this.formatZaction.bind(this)
+                this.formatEdmTime.bind(this), this.displaydateFormatter.bind(this),
+                this.formatZstatus.bind(this), this.formatZaction.bind(this),
+                "mainService"
             );
-
             TableUtils.buildTableColumns(
                 this.byId("HcNewTable"),
                 NEW_VIOLATIONS,
-                this.formatEdmTime.bind(this),
-                this.displaydateFormatter.bind(this),
-                this.formatZstatus.bind(this),
-                this.formatZaction.bind(this)
+                this.formatEdmTime.bind(this), this.displaydateFormatter.bind(this),
+                this.formatZstatus.bind(this), this.formatZaction.bind(this),
+                "mainService"
             );
-
             TableUtils.buildTableColumns(
                 this.byId("HcCompletedTable"),
                 HC_TABLE_COLUMNS,
-                this.formatEdmTime.bind(this),
-                this.displaydateFormatter.bind(this),
-                this.formatZstatus.bind(this),
-                this.formatZaction.bind(this)
+                this.formatEdmTime.bind(this), this.displaydateFormatter.bind(this),
+                this.formatZstatus.bind(this), this.formatZaction.bind(this),
+                "mainService"
             );
             TableUtils.buildTableColumns(
                 this.byId("HcReportTable"),
@@ -148,128 +143,86 @@ sap.ui.define([
         },
 
         onViewDetails(oEvent) {
-            const context = oEvent.getSource().getBindingContext();
+            const context = oEvent.getSource().getBindingContext("mainService");
             if (!context) { return; }
-
             const actionRefNo = context.getProperty("ZactionRefNo");
             if (!actionRefNo) {
                 sap.m.MessageToast.show("Cannot open details: record has no Action Ref No.");
                 return;
             }
-
-            const allRecords = this.getView().getModel().getProperty("/ITM_STRSet") || [];
-            const selectedRecord = allRecords.find(rec => rec.ZactionRefNo === actionRefNo);
-
             this.getOwnerComponent().setModel(
-                new JSONModel({ record: selectedRecord || {}, source: "hcdetail" }),
+                new JSONModel({ record: context.getObject(), source: "hcdetail" }),
                 "detailData"
             );
-
             this.getOwnerComponent().getRouter().navTo("RouteHCViolationDetailpage", {
                 actionRefNo: encodeURIComponent(actionRefNo)
             });
         },
+
         onViewCompletedDetails(oEvent) {
-            const context = oEvent.getSource().getBindingContext();
+            const context = oEvent.getSource().getBindingContext("mainService");
             if (!context) { return; }
-
             const actionRefNo = context.getProperty("ZactionRefNo");
             if (!actionRefNo) {
                 sap.m.MessageToast.show("Cannot open details: record has no Action Ref No.");
                 return;
             }
-
-            const allRecords = this.getView().getModel().getProperty("/ITM_COMPLETED_SET") || [];
-            const selectedRecord = allRecords.find(rec => rec.ZactionRefNo === actionRefNo);
-
             this.getOwnerComponent().setModel(
-                new JSONModel({ record: selectedRecord || {}, source: "hcdetail" }),
+                new JSONModel({ record: context.getObject(), source: "hcdetail" }),
                 "detailData"
             );
-
             this.getOwnerComponent().getRouter().navTo("RouteHCViolationDetailpage", {
                 actionRefNo: encodeURIComponent(actionRefNo)
             });
         },
-        async _loadHCViolations() {
-            try {
-                sap.ui.core.BusyIndicator.show(0);
-
-                const filters = [
+        _loadHCViolations() {
+            const table = this.byId("HcTable");
+            table.bindRows({
+                path: "mainService>/ITM_STRSet",
+                filters: [
                     new Filter("ZlmIdName", FilterOperator.EQ, ODataUtils.getCurrentUserId()),
                     new Filter("ZIsHc", FilterOperator.EQ, true),
-
                     new Filter("Zstatus", FilterOperator.EQ, "1")
-                ];
-
-                const records = await ODataUtils.fetchOData(
-                    this.getView().getModel("mainService"),
-                    "/ITM_STRSet",
-                    filters
-                );
-
-                const uiModel = this.getView().getModel();
-                uiModel.setProperty("/ITM_STRSet", records || []);
-                uiModel.setProperty("/historyCount", (records || []).length);
-
-            } catch (error) {
-                ODataUtils.handleODataError(error, "Failed to load HC violations.");
-            } finally {
-                sap.ui.core.BusyIndicator.hide();
-            }
+                ],
+                events: {
+                    dataReceived: () => {
+                        this.getView().getModel().setProperty("/historyCount", table.getBinding("rows").getLength());
+                    }
+                }
+            });
         },
 
-        async _loadHCNew() {
-            try {
-                sap.ui.core.BusyIndicator.show(0);
-
-                const filters = [
+        _loadHCNew() {
+            const table = this.byId("HcNewTable");
+            table.bindRows({
+                path: "mainService>/HDR_STRSet",
+                filters: [
                     new Filter("ZlmIdName", FilterOperator.EQ, ODataUtils.getCurrentUserId()),
                     new Filter("Zishc", FilterOperator.EQ, true)
-                ];
-
-                const records = await ODataUtils.fetchOData(
-                    this.getView().getModel("mainService"),
-                    "/HDR_STRSet",
-                    filters
-                );
-
-                const uiModel = this.getView().getModel();
-                uiModel.setProperty("/ITM_NEW_SET", records || []);
-                uiModel.setProperty("/newCount", (records || []).length);
-
-            } catch (error) {
-                ODataUtils.handleODataError(error, "Failed to load new HC violations.");
-            } finally {
-                sap.ui.core.BusyIndicator.hide();
-            }
+                ],
+                events: {
+                    dataReceived: () => {
+                        this.getView().getModel().setProperty("/newCount", table.getBinding("rows").getLength());
+                    }
+                }
+            });
         },
 
-        async _loadHCCompleted() {
-            try {
-                sap.ui.core.BusyIndicator.show(0);
-
-                const filters = [
+        _loadHCCompleted() {
+            const table = this.byId("HcCompletedTable");
+            table.bindRows({
+                path: "mainService>/ITM_STRSet",
+                filters: [
                     new Filter("ZlmIdName", FilterOperator.EQ, ODataUtils.getCurrentUserId()),
                     new Filter("ZIsHc", FilterOperator.EQ, true),
                     new Filter("Zstatus", FilterOperator.EQ, "4")
-                ];
-
-                const records = await ODataUtils.fetchOData(
-                    this.getView().getModel("mainService"),
-                    "/ITM_STRSet",
-                    filters
-                );
-
-                const uiModel = this.getView().getModel();
-                uiModel.setProperty("/ITM_COMPLETED_SET", records || []);
-                uiModel.setProperty("/completedCount", (records || []).length);
-
-            } catch (error) {
-                ODataUtils.handleODataError(error, "Failed to load completed HC violations.");
-            } finally {
-                sap.ui.core.BusyIndicator.hide();
-            }
+                ],
+                events: {
+                    dataReceived: () => {
+                        this.getView().getModel().setProperty("/completedCount", table.getBinding("rows").getLength());
+                    }
+                }
+            });
         },
 
         onTabSelect(oEvent) {
@@ -324,23 +277,17 @@ sap.ui.define([
             this._loadHCCompleted();
         },
         onViewNewDetails(oEvent) {
-            const context = oEvent.getSource().getBindingContext();
+            const context = oEvent.getSource().getBindingContext("mainService");
             if (!context) { return; }
-
             const actionRefNo = context.getProperty("ZACTION_REF_NO");
             if (!actionRefNo) {
                 sap.m.MessageToast.show("Cannot open details: record has no Action Ref No.");
                 return;
             }
-
-            const allRecords = this.getView().getModel().getProperty("/ITM_NEW_SET") || [];
-            const selectedRecord = allRecords.find(rec => rec.ZACTION_REF_NO === actionRefNo);
-
             this.getOwnerComponent().setModel(
-                new JSONModel({ record: selectedRecord || {}, source: "hcunattendeddetail" }),
+                new JSONModel({ record: context.getObject(), source: "hcunattendeddetail" }),
                 "detailData"
             );
-
             this.getOwnerComponent().getRouter().navTo("RouteHCUnattendedDetailpage", {
                 actionRefNo: encodeURIComponent(actionRefNo)
             });
@@ -389,23 +336,17 @@ sap.ui.define([
         },
 
         onViewReportDetails(oEvent) {
-            const context = oEvent.getSource().getBindingContext();
+            const context = oEvent.getSource().getBindingContext("mainService");
             if (!context) { return; }
-
             const actionRefNo = context.getProperty("ZactionRefNo");
             if (!actionRefNo) {
                 sap.m.MessageToast.show("Cannot open details: record has no Action Ref No.");
                 return;
             }
-
-            const allRecords = this.getView().getModel().getProperty("/ITM_REPORT_SET") || [];
-            const selectedRecord = allRecords.find(rec => rec.ZactionRefNo === actionRefNo);
-
             this.getOwnerComponent().setModel(
-                new JSONModel({ record: selectedRecord || {}, source: "hcdetail" }),
+                new JSONModel({ record: context.getObject(), source: "hcdetail" }),
                 "detailData"
             );
-
             this.getOwnerComponent().getRouter().navTo("RouteHCViolationDetailpage", {
                 actionRefNo: encodeURIComponent(actionRefNo)
             });
