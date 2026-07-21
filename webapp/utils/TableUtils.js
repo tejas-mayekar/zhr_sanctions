@@ -19,8 +19,9 @@ sap.ui.define([
          * @param {Function}           [dateFormatter] - optional formatter for isDate columns
          * @param {Function}           [statusFormatter] - optional formatter for isStatus columns
          */
-        buildTableColumns(table, columnConfigs, timeFormatter, dateFormatter, statusFormatter, actionFormatter) {
+        buildTableColumns(table, columnConfigs, timeFormatter, dateFormatter, statusFormatter, actionFormatter, modelPrefix) {
             const formatTime = timeFormatter || ODataUtils.formatEdmTime.bind(ODataUtils);
+            const prefix = modelPrefix ? `${modelPrefix}>` : "";
 
             columnConfigs
                 .filter(col => col.visible)
@@ -28,15 +29,15 @@ sap.ui.define([
                     let cellBindingInfo;
 
                     if (col.isTime) {
-                        cellBindingInfo = { path: col.binding, formatter: formatTime };
+                        cellBindingInfo = { path: `${prefix}${col.binding}`, formatter: formatTime };
                     } else if (col.isDate && dateFormatter) {
-                        cellBindingInfo = { path: col.binding, formatter: dateFormatter };
+                        cellBindingInfo = { path: `${prefix}${col.binding}`, formatter: dateFormatter };
                     } else if (col.isStatus && statusFormatter) {
-                        cellBindingInfo = { path: col.binding, formatter: statusFormatter };
+                        cellBindingInfo = { path: `${prefix}${col.binding}`, formatter: statusFormatter };
                     } else if (col.isAction && actionFormatter) {
-                        cellBindingInfo = { path: col.binding, formatter: actionFormatter };
+                        cellBindingInfo = { path: `${prefix}${col.binding}`, formatter: actionFormatter };
                     } else {
-                        cellBindingInfo = `{${col.binding}}`;
+                        cellBindingInfo = `{${prefix}${col.binding}}`;
                     }
 
                     table.addColumn(new Column({

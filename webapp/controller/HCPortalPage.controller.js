@@ -77,7 +77,7 @@ sap.ui.define([
                 ITM_STRSet: [],
                 ITM_NEW_SET: [],
                 ITM_COMPLETED_SET: [],
-                ITM_REPORT_SET : []
+                ITM_REPORT_SET: []
             }));
 
             TableUtils.buildTableColumns(
@@ -112,7 +112,8 @@ sap.ui.define([
                 this.formatEdmTime.bind(this),
                 this.displaydateFormatter.bind(this),
                 this.formatZstatus.bind(this),
-                this.formatZaction.bind(this)
+                this.formatZaction.bind(this),
+                "mainService"
             );
 
             this.getOwnerComponent()

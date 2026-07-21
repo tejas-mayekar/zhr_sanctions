@@ -393,7 +393,7 @@
                             id="HcReportTable"
                             selectionMode="None"
                             enableSelectAll="false"
-                            rows="{path: '/ITM_REPORT_SET'}"
+                            rows="{path: 'mainService>/HC_REPORTSet'}"
                             threshold="15"
                             scrollThreshold="50"
                             enableBusyIndicator="true"
