@@ -23,6 +23,20 @@ sap.ui.define([
         { label: "Line Manager", binding: "Zlinemanagername", width: "14rem", sortProperty: "Zlinemanagername", filterProperty: "Zlinemanagername", visible: true },
         { label: "LM Action Date", binding: "Zlinemanageractiondate", width: "12rem", sortProperty: "Zlinemanageractiondate", filterProperty: "Zlinemanageractiondate", visible: true, isDate: true },
     ];
+    const HC_REPORT_COLUMNS = [
+        { label: "Action Ref No", binding: "ZactionRefNo", width: "11rem", sortProperty: "ZactionRefNo", filterProperty: "ZactionRefNo", visible: true },
+        { label: "Employee ID", binding: "ZempId", width: "9rem", sortProperty: "ZempId", filterProperty: "ZempId", visible: true },
+        { label: "Employee Name", binding: "ZempName", width: "14rem", sortProperty: "ZempName", filterProperty: "ZempName", visible: true },
+        { label: "Incident Date", binding: "ZincDate", width: "10rem", sortProperty: "ZincDate", filterProperty: "ZincDate", visible: true, isDate: true },
+        { label: "Incident Discovery Date", binding: "ZincDisDate", width: "10rem", sortProperty: "ZincDisDate", filterProperty: "ZincDisDate", visible: true, isDate: true },
+        { label: "Action", binding: "Zaction", width: "14rem", sortProperty: "Zaction", filterProperty: "Zaction", visible: true, isAction: true },
+        { label: "Status", binding: "Zstatus", width: "10rem", sortProperty: "Zstatus", filterProperty: "Zstatus", visible: true, isStatus: true },
+        { label: "Sanction", binding: "Zsanction", width: "14rem", sortProperty: "Zsanction", filterProperty: "Zsanction", visible: true },
+        { label: "Initiated By", binding: "ZinitatedBy", width: "14rem", sortProperty: "ZinitatedBy", filterProperty: "ZinitatedBy", visible: true },
+        { label: "Initiated Date", binding: "ZinitDate", width: "12rem", sortProperty: "ZinitDate", filterProperty: "ZinitDate", visible: true, isDate: true },
+        { label: "Line Manager", binding: "Zlinemanagername", width: "14rem", sortProperty: "Zlinemanagername", filterProperty: "Zlinemanagername", visible: true },
+        { label: "LM Action Date", binding: "Zlinemanageractiondate", width: "12rem", sortProperty: "Zlinemanageractiondate", filterProperty: "Zlinemanageractiondate", visible: true, isDate: true },
+    ];
     const NEW_VIOLATIONS = [
         { label: "Action Ref No", binding: "ZACTION_REF_NO", width: "11rem", sortProperty: "ZACTION_REF_NO", filterProperty: "ZACTION_REF_NO", visible: true },
         { label: "Employee ID", binding: "ZempId", width: "9rem", sortProperty: "ZempId", filterProperty: "ZempId", visible: true },
@@ -62,7 +76,8 @@ sap.ui.define([
                 completedCount: 0,
                 ITM_STRSet: [],
                 ITM_NEW_SET: [],
-                ITM_COMPLETED_SET: []
+                ITM_COMPLETED_SET: [],
+                ITM_REPORT_SET : []
             }));
 
             TableUtils.buildTableColumns(
@@ -86,6 +101,14 @@ sap.ui.define([
             TableUtils.buildTableColumns(
                 this.byId("HcCompletedTable"),
                 HC_TABLE_COLUMNS,
+                this.formatEdmTime.bind(this),
+                this.displaydateFormatter.bind(this),
+                this.formatZstatus.bind(this),
+                this.formatZaction.bind(this)
+            );
+            TableUtils.buildTableColumns(
+                this.byId("HcReportTable"),
+                HC_REPORT_COLUMNS,
                 this.formatEdmTime.bind(this),
                 this.displaydateFormatter.bind(this),
                 this.formatZstatus.bind(this),
@@ -261,6 +284,9 @@ sap.ui.define([
                 case "completed":
                     this._loadHCCompleted();
                     break;
+                case "report":
+                    this._loadHCReport();
+                    break;
             }
         },
 
@@ -325,7 +351,64 @@ sap.ui.define([
                 "HC_Completed_Violations",
                 this.formatEdmTime.bind(this)
             );
-        }
+        },
+        _loadHCReport() {
+            const table = this.byId("HcReportTable");
+
+            table.bindRows({
+                path: "mainService>/HC_REPORTSet",
+                events: {
+                    dataReceived: () => {
+                        const count = table.getBinding("rows").getLength();
+                        this.getView().getModel().setProperty("/reportCount", count);
+                    }
+                }
+            });
+        },
+
+        onSearchReport(oEvent) {
+            TableUtils.applyTableSearch(
+                this.byId("HcReportTable"),
+                HC_REPORT_COLUMNS,
+                oEvent.getParameter("newValue")
+            );
+        },
+
+        onRefreshReport() {
+            this._loadHCReport();
+        },
+
+        onExportReport() {
+            ExportUtils.exportTableToExcel(
+                this.byId("HcReportTable"),
+                HC_REPORT_COLUMNS,
+                "HC_Report",
+                this.formatEdmTime.bind(this)
+            );
+        },
+
+        onViewReportDetails(oEvent) {
+            const context = oEvent.getSource().getBindingContext();
+            if (!context) { return; }
+
+            const actionRefNo = context.getProperty("ZactionRefNo");
+            if (!actionRefNo) {
+                sap.m.MessageToast.show("Cannot open details: record has no Action Ref No.");
+                return;
+            }
+
+            const allRecords = this.getView().getModel().getProperty("/ITM_REPORT_SET") || [];
+            const selectedRecord = allRecords.find(rec => rec.ZactionRefNo === actionRefNo);
+
+            this.getOwnerComponent().setModel(
+                new JSONModel({ record: selectedRecord || {}, source: "hcdetail" }),
+                "detailData"
+            );
+
+            this.getOwnerComponent().getRouter().navTo("RouteHCViolationDetailpage", {
+                actionRefNo: encodeURIComponent(actionRefNo)
+            });
+        },
 
     });
 });
