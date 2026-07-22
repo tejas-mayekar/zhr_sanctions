@@ -55,14 +55,14 @@ sap.ui.define([
         { label: "LM Action Date", binding: "Zlinemanageractiondate", width: "12rem", sortProperty: "Zlinemanageractiondate", filterProperty: "Zlinemanageractiondate", visible: true, isDate: true },
     ];
     const MISS_PUNCH_COLUMNS = [
-        { label: "Employee ID", binding: "ZempId", width: "9rem", sortProperty: "ZempId", filterProperty: "ZempId", visible: true },
+        { label: "Employee ID", binding: "ZempId", width: "6rem", sortProperty: "ZempId", filterProperty: "ZempId", visible: true },
         { label: "Employee Name", binding: "ZempName", width: "14rem", sortProperty: "ZempName", filterProperty: "ZempName", visible: true },
-        { label: "Incident Date", binding: "ZincDate", width: "10rem", sortProperty: "ZincDate", filterProperty: "ZincDate", visible: true, isDate: true },
         { label: "Scheduled In", binding: "ZschTimeIn", width: "12rem", sortProperty: "ZschTimeIn", filterProperty: "ZschTimeIn", visible: true, isTime: true },
         { label: "Scheduled Out", binding: "ZschTimeOut", width: "12rem", sortProperty: "ZschTimeOut", filterProperty: "ZschTimeOut", visible: true, isTime: true },
         { label: "Punch In Time", binding: "Zpunchintime", width: "12rem", sortProperty: "Zpunchintime", filterProperty: "Zpunchintime", visible: true, isTime: true },
         { label: "Punch Out Time", binding: "Zpunchouttime", width: "12rem", sortProperty: "Zpunchouttime", filterProperty: "Zpunchouttime", visible: true, isTime: true },
-        { label: "Manager ID", binding: "ZlmIdName", width: "10rem", sortProperty: "ZlmIdName", filterProperty: "ZlmIdName", visible: true }
+        { label: "Manager ID", binding: "ZmanagerId", width: "10rem", sortProperty: "ZmanagerId", filterProperty: "ZmanagerId", visible: true },
+        { label: "Manager Name", binding: "ZmanagerName", width: "20rem", sortProperty: "ZmanagerName", filterProperty: "ZmanagerName", visible: true }
     ];
     return BaseController.extend("zhrsanctions.controller.View1", {
 
@@ -259,6 +259,7 @@ sap.ui.define([
             table.bindRows({
                 path: "mainService>/MissPunchSet",
                 filters: [
+                    new Filter("ZmanagerId", FilterOperator.EQ, ODataUtils.getCurrentUserId()),
                 ],
                 events: {
                     dataReceived: () => {
