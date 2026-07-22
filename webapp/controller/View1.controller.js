@@ -62,8 +62,7 @@ sap.ui.define([
         { label: "Scheduled Out", binding: "ZschTimeOut", width: "12rem", sortProperty: "ZschTimeOut", filterProperty: "ZschTimeOut", visible: true, isTime: true },
         { label: "Punch In Time", binding: "Zpunchintime", width: "12rem", sortProperty: "Zpunchintime", filterProperty: "Zpunchintime", visible: true, isTime: true },
         { label: "Punch Out Time", binding: "Zpunchouttime", width: "12rem", sortProperty: "Zpunchouttime", filterProperty: "Zpunchouttime", visible: true, isTime: true },
-        { label: "Department", binding: "Zn3", width: "14rem", sortProperty: "Zn3", filterProperty: "Zn3", visible: true },
-        { label: "Manager ID", binding: "ZlmIdName", width: "10rem", sortProperty: "ZlmIdName", filterProperty: "ZlmIdName", visible: false }
+        { label: "Manager ID", binding: "ZlmIdName", width: "10rem", sortProperty: "ZlmIdName", filterProperty: "ZlmIdName", visible: true }
     ];
     return BaseController.extend("zhrsanctions.controller.View1", {
 
@@ -115,22 +114,13 @@ sap.ui.define([
                 table.getSelectedIndices().length > 0
             );
         },
-
-        onSelectAllMissPunch() {
-            const table = this.byId("missPunchTable");
-            table.selectAll();
-            this.getView().getModel().setProperty(
-                "/hasMissPunchSelection",
-                table.getSelectedIndices().length > 0
-            );
-        },
-
         onSubmitMissPunch() {
             const table = this.byId("missPunchTable");
             const selectedRecords = table.getSelectedIndices()
                 .map(i => table.getContextByIndex(i).getObject());
             // TODO: wire selectedRecords into miss-punch submit OData call
             sap.m.MessageToast.show(selectedRecords.length + " record(s) selected for submit");
+            console.log(selectedRecords)
             table.clearSelection();
             this.getView().getModel().setProperty("/hasMissPunchSelection", false);
         },

@@ -286,12 +286,13 @@
                         <t:Table
                             id="missPunchTable"
                             selectionMode="MultiToggle"
-                            enableSelectAll="false"
+                            enableSelectAll="true"
                             rows="{path: 'mainService>/MissPunchSet'}"
                             threshold="15"
                             scrollThreshold="50"
                             enableBusyIndicator="true"
                             rowMode="Auto"
+                            rowSelectionChange=".onMissPunchSelectionChange"
                         >
                             <t:noData>
                                 <VBox
@@ -358,11 +359,7 @@
                                         />
                                     </HBox>
                                     <ToolbarSpacer id="_IDGenToolbarSpacerMP" />
-                                    <Button
-                                        id="btnSelectAllMissPunch"
-                                        text="Select All"
-                                        press=".onSelectAllMissPunch"
-                                    />
+
                                     <Button
                                         id="btnSubmitMissPunch"
                                         text="Submit"
