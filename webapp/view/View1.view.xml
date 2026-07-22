@@ -274,7 +274,7 @@
                     </IconTabFilter>
                 </items>
                 <items>
-                <!-- ─── MISS PUNCH TAB ─── -->
+                    <!-- ─── MISS PUNCH TAB ─── -->
                     <IconTabFilter
                         id="tabMissPunch"
                         text="Miss Punch"
@@ -358,6 +358,18 @@
                                         />
                                     </HBox>
                                     <ToolbarSpacer id="_IDGenToolbarSpacerMP" />
+                                    <Button
+                                        id="btnSelectAllMissPunch"
+                                        text="Select All"
+                                        press=".onSelectAllMissPunch"
+                                    />
+                                    <Button
+                                        id="btnSubmitMissPunch"
+                                        text="Submit"
+                                        type="Emphasized"
+                                        enabled="{= ${/hasMissPunchSelection} }"
+                                        press=".onSubmitMissPunch"
+                                    />
                                     <Button
                                         id="_IDGenButtonMP2"
                                         icon="sap-icon://refresh"

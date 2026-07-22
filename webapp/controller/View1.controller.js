@@ -108,7 +108,32 @@ sap.ui.define([
                 this._loadMissPunch();
             }
         },
+        onMissPunchSelectionChange(oEvent) {
+            const table = oEvent.getSource();
+            this.getView().getModel().setProperty(
+                "/hasMissPunchSelection",
+                table.getSelectedIndices().length > 0
+            );
+        },
 
+        onSelectAllMissPunch() {
+            const table = this.byId("missPunchTable");
+            table.selectAll();
+            this.getView().getModel().setProperty(
+                "/hasMissPunchSelection",
+                table.getSelectedIndices().length > 0
+            );
+        },
+
+        onSubmitMissPunch() {
+            const table = this.byId("missPunchTable");
+            const selectedRecords = table.getSelectedIndices()
+                .map(i => table.getContextByIndex(i).getObject());
+            // TODO: wire selectedRecords into miss-punch submit OData call
+            sap.m.MessageToast.show(selectedRecords.length + " record(s) selected for submit");
+            table.clearSelection();
+            this.getView().getModel().setProperty("/hasMissPunchSelection", false);
+        },
         /**
          * Load current (unresolved) violations for this manager.
          * Also updates the isHC flag from the first record.
