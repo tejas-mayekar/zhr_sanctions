@@ -16,6 +16,7 @@ sap.ui.define([
         "4": "Completed",
         "5": "Sent to EVP",
         "6": "Sent to CEO",
+        "R": "Regularised in SF",
     };
     const ZACTION_MAP = {
         "A": "Regularized",
