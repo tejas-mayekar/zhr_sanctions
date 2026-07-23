@@ -447,6 +447,22 @@ sap.ui.define([], () => {
                     error: (e) => { console.error("submitPunchRegularize: error", e); this.handleODataError(e, "Failed to submit regularization"); reject(e); }
                 });
             });
+        },
+        submitSFRegularize(oDataModel, violationRecord, overrides) {
+            if (!oDataModel) {
+                return Promise.reject(new Error("ODataUtils.submitPunchRegularize: oDataModel is null."));
+            }
+            const keyDate1 = this.formatDateTimeForEntityKey(violationRecord.ZschDateIn)
+            const keyDate2 = this.formatDateTimeForEntityKey(violationRecord.ZschDateOut)
+            const entityPath = `/UPDATE_MISS_PUNCHSet(ZempNumber='${violationRecord.ZempId}',ZschDateIn=datetime'${keyDate1}',ZschDateOut=datetime'${keyDate2}')`;
+            oDataModel.setUseBatch(false);
+            return new Promise((resolve, reject) => {
+                oDataModel.update(entityPath, overrides, {
+                    bMerge: false,
+                    success: (r) => { console.log("submitPunchRegularize: success", r); resolve(r); },
+                    error: (e) => { console.error("submitPunchRegularize: error", e); this.handleODataError(e, "Failed to submit regularization"); reject(e); }
+                });
+            });
         }
     };
 

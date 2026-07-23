@@ -51,9 +51,17 @@ sap.ui.define([
                 this.byId("dpZincDate").focus();
                 return;
             }
-            SearchHelpHandler.openValueHelpDialog(this, oEvent, incidentDate);
-        },
 
+            const incidentDateString = this._formatDateToString(incidentDate);
+            SearchHelpHandler.openValueHelpDialog(this, oEvent, incidentDateString);
+        },
+        _formatDateToString(date) {
+            if (!date) return null;
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        },
         onValueHelpLiveSearch(oEvent) {
             SearchHelpHandler.onLiveSearch(oEvent);
         },
@@ -116,7 +124,7 @@ sap.ui.define([
                 Zlocationgroup: emp.ZlocGroup || this.byId("inputZlocationgroup").getValue(),
                 Zworkschedule: emp.Zworkschedule || this.byId("inputZworkschedule").getValue(),
                 ZlatestNode: emp.ZlatestNode || this.byId("inputZlatestNode").getValue(),
-                Zlmemail:emp.ZlmEmail,
+                Zlmemail: emp.ZlmEmail,
 
                 ZempEmail: emp.ZempMail,
                 ZstdWeekHrs: emp.ZstdWeekHrs || this.byId("inputZstdWeekHrs").getValue(),
