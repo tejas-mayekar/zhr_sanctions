@@ -59,8 +59,14 @@ sap.ui.define([
         { label: "Employee Name", binding: "ZempName", width: "14rem", sortProperty: "ZempName", filterProperty: "ZempName", visible: true },
         { label: "Scheduled In", binding: "ZschTimeIn", width: "12rem", sortProperty: "ZschTimeIn", filterProperty: "ZschTimeIn", visible: true, isTime: true },
         { label: "Scheduled Out", binding: "ZschTimeOut", width: "12rem", sortProperty: "ZschTimeOut", filterProperty: "ZschTimeOut", visible: true, isTime: true },
-        { label: "Punch In Time", binding: "Zpunchintime", width: "12rem", sortProperty: "Zpunchintime", filterProperty: "Zpunchintime", visible: true, isTime: true },
-        { label: "Punch Out Time", binding: "Zpunchouttime", width: "12rem", sortProperty: "Zpunchouttime", filterProperty: "Zpunchouttime", visible: true, isTime: true },
+        {
+            label: "Punch In Time", binding: "Zpunchintime", width: "12rem", sortProperty: "Zpunchintime", filterProperty: "Zpunchintime", visible: true, isTime: true,
+            editableConfig: { dependsOn: "Zpunchouttime", formatter: null, onChange: null }
+        },
+        {
+            label: "Punch Out Time", binding: "Zpunchouttime", width: "12rem", sortProperty: "Zpunchouttime", filterProperty: "Zpunchouttime", visible: true, isTime: true,
+            editableConfig: { dependsOn: "Zpunchintime", formatter: null, onChange: null }
+        },
         { label: "Manager ID", binding: "ZmanagerId", width: "10rem", sortProperty: "ZmanagerId", filterProperty: "ZmanagerId", visible: true },
         { label: "Manager Name", binding: "ZmanagerName", width: "20rem", sortProperty: "ZmanagerName", filterProperty: "ZmanagerName", visible: true }
     ];
@@ -88,6 +94,13 @@ sap.ui.define([
                 this.formatZstatus.bind(this), this.formatZaction.bind(this),
                 "mainService"
             );
+            const inCol = MISS_PUNCH_COLUMNS.find(c => c.binding === "Zpunchintime");
+            inCol.editableConfig.formatter = this.isPunchInEditable.bind(this);
+            inCol.editableConfig.onChange = this.onMissPunchTimeChange.bind(this);
+
+            const outCol = MISS_PUNCH_COLUMNS.find(c => c.binding === "Zpunchouttime");
+            outCol.editableConfig.formatter = this.isPunchOutEditable.bind(this);
+            outCol.editableConfig.onChange = this.onMissPunchTimeChange.bind(this);
             TableUtils.buildTableColumns(
                 this.byId("missPunchTable"), MISS_PUNCH_COLUMNS,
                 this.formatEdmTime.bind(this), this.displaydateFormatter.bind(this),
@@ -114,15 +127,62 @@ sap.ui.define([
                 table.getSelectedIndices().length > 0
             );
         },
-        onSubmitMissPunch() {
+        isPunchOutEditable(punchIn, punchOut) {
+            const inStr = ODataUtils.formatEdmTime(punchIn);
+            const outStr = ODataUtils.formatEdmTime(punchOut);
+            const hasIn = !!inStr && inStr !== "00:00:00";
+            const isMissingOut = !outStr || outStr === "00:00:00";
+            // Editable if punchOut is missing (regardless of punchIn state)
+            return isMissingOut || !hasIn;
+        },
+
+        isPunchInEditable(punchIn, punchOut) {
+            const inStr = ODataUtils.formatEdmTime(punchIn);
+            const outStr = ODataUtils.formatEdmTime(punchOut);
+            const hasOut = !!outStr && outStr !== "00:00:00";
+            const isMissingIn = !inStr || inStr === "00:00:00";
+            // Editable if punchIn is missing OR punchOut is missing
+            return isMissingIn || !hasOut;
+        },
+        onMissPunchTimeChange(oEvent) {
+            const picker = oEvent.getSource();
+            const newVal = oEvent.getParameter("value"); // "HH:mm:ss"
+            const ctx = picker.getBindingContext("mainService");
+            if (!ctx) { return; }
+            const propName = picker.getBinding("value").getPath(); // e.g. Zpunchintime
+            const edmTime = ODataUtils.formatTimeForPayload(newVal);
+            ctx.getModel().setProperty(ctx.getPath() + "/" + propName, edmTime);
+        },
+        async onSubmitMissPunch() {
             const table = this.byId("missPunchTable");
             const selectedRecords = table.getSelectedIndices()
                 .map(i => table.getContextByIndex(i).getObject());
             // TODO: wire selectedRecords into miss-punch submit OData call
             sap.m.MessageToast.show(selectedRecords.length + " record(s) selected for submit");
             console.log(selectedRecords)
+            const oDataModel = this.getOwnerComponent().getModel()
+                || this.getView().getModel("mainService");
+            if (!oDataModel) {
+                MessageBox.warning("No active OData service connected.");
+                return;
+            }
+            selectedRecords.map(
+                record => {
+                    ODataUtils.submitSFRegularize(oDataModel, record, {
+                        "ZempNumber": record.ZempId,
+                        "ZschDateIn": "\/Date(1784160000000)\/",
+                        "ZschDateOut": "\/Date(1784160000000)\/",
+                        "Zpunchindate": null,
+                        "Zpunchintime": record.Zpunchintime,
+                        "Zpunchoutdate": null,
+                        "Zpunchouttime": record.Zpunchouttime
+                    }
+                    )
+                }
+            )
             table.clearSelection();
             this.getView().getModel().setProperty("/hasMissPunchSelection", false);
+            this._loadMissPunch();
         },
         /**
          * Load current (unresolved) violations for this manager.

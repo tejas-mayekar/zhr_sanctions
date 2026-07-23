@@ -2,23 +2,15 @@ sap.ui.define([
     "sap/ui/table/Column",
     "sap/m/Label",
     "sap/m/Text",
+    "sap/m/TimePicker",
     "sap/ui/model/Filter",
     "sap/ui/model/FilterOperator",
     "zhrsanctions/utils/ODataUtils"
-], (Column, Label, Text, Filter, FilterOperator, ODataUtils) => {
+], (Column, Label, Text, TimePicker, Filter, FilterOperator, ODataUtils) => {
     "use strict";
 
     const TableUtils = {
 
-        /**
-         * Dynamically add columns to a sap.ui.table.Table from a column config array.
-         *
-         * @param {sap.ui.table.Table} table          - target table
-         * @param {Array}              columnConfigs   - array of column descriptor objects
-         * @param {Function}           [timeFormatter] - optional formatter for isTime columns
-         * @param {Function}           [dateFormatter] - optional formatter for isDate columns
-         * @param {Function}           [statusFormatter] - optional formatter for isStatus columns
-         */
         buildTableColumns(table, columnConfigs, timeFormatter, dateFormatter, statusFormatter, actionFormatter, modelPrefix) {
             const formatTime = timeFormatter || ODataUtils.formatEdmTime.bind(ODataUtils);
             const prefix = modelPrefix ? `${modelPrefix}>` : "";
@@ -40,9 +32,30 @@ sap.ui.define([
                         cellBindingInfo = `{${prefix}${col.binding}}`;
                     }
 
+                    let template;
+                    if (col.editableConfig) {
+                        const ec = col.editableConfig; // { dependsOn, formatter, onChange, binding }
+                        template = new TimePicker({
+                            value: { path: `${prefix}${col.binding}`, formatter: formatTime },
+                            valueFormat: "HH:mm:ss",
+                            displayFormat: "HH:mm:ss",
+                            editable: {
+                                parts: [
+                                    { path: `${prefix}${ec.dependsOn}` },
+                                    { path: `${prefix}${col.binding}` }
+                                ],
+                                formatter: ec.formatter
+                            },
+
+                            change: ec.onChange
+                        });
+                    } else {
+                        template = new Text({ text: cellBindingInfo, wrapping: false });
+                    }
+
                     table.addColumn(new Column({
                         label: new Label({ text: col.label }),
-                        template: new Text({ text: cellBindingInfo, wrapping: false }),
+                        template: template,
                         sortProperty: col.sortProperty,
                         filterProperty: col.filterProperty,
                         autoResizable: true,
