@@ -99,7 +99,7 @@
                         <HBox
                             id="_IDGenHBox7"
                             justifyContent="SpaceBetween"
-                            width="31rem"
+                            width="41rem"
                         >
                             <Button
                                 id="_IDGenButton15"
@@ -128,6 +128,15 @@
                                 enabled="{= ${/isEditOn} }"
                                 press=".onPayrollDeductionPress"
                             />
+                            <Button
+    id="_IDGenButton33"
+    text="Send Back to LM"
+    type="Ghost"
+    width="10rem"
+    visible="{= ${/isEditOn} }"
+    enabled="{= ${/isEditOn} }"
+    press=".onSendBackToLMPress"
+/>
                         </HBox>
                         <Button
                             id="btnAppeal"
