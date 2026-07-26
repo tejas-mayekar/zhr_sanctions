@@ -495,5 +495,29 @@ sap.ui.define([
             });
             this.clearFileUploadState("hcfileUploader");
         },
+        onSendBackToLMPress() {
+            const violationRec = this.getView().getModel("detailData").getData().record;
+            if (!violationRec?.ZactionRefNo) {
+                MessageBox.error("No violation record loaded. Cannot send back to LM.");
+                return;
+            }
+
+            const oDataModel = this.getOwnerComponent().getModel();
+            oDataModel.setUseBatch(false);
+
+            sap.ui.core.BusyIndicator.show(0);
+            ODataUtils.submitHCAction(oDataModel, violationRec, {
+                Zstatus: "3"
+            })
+                .then(() => {
+                    sap.ui.core.BusyIndicator.hide();
+                    MessageToast.show("Sent back to Line Manager successfully.");
+                    this.onNavBack();
+                })
+                .catch((error) => {
+                    sap.ui.core.BusyIndicator.hide();
+                    console.error("HCViolationDetailPage: send back to LM failed:", error);
+                });
+        },
     });
 });
