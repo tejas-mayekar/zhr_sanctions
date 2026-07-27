@@ -107,9 +107,30 @@ sap.ui.define([
                 this.formatZstatus.bind(this), this.formatZaction.bind(this),
                 "mainService"
             );
+            this.byId("currentTable").attachFilter(this._onColumnFilter.bind(this, "current"));
+            this.byId("historyTable").attachFilter(this._onColumnFilter.bind(this, "history"));
+            this.byId("missPunchTable").attachFilter(this._onColumnFilter.bind(this, "missPunch"));
             setTimeout(() => this._loadCurrentViolations(), 0);
         },
+        _onColumnFilter(context, oEvent) {
+            oEvent.preventDefault();
 
+            const column = oEvent.getParameter("column");
+            const value = oEvent.getParameter("value");
+            const table = this.byId(
+                context === "current" ? "currentTable"
+                    : context === "history" ? "historyTable"
+                        : "missPunchTable"
+            );
+
+            const colFilter = value
+                ? [new Filter(column.getFilterProperty(), FilterOperator.EQ, value)]
+                : [];
+
+            // Application-type base filters (set at bindRows) already persist automatically.
+            // Only send Control-type filter here — do NOT resend base filters.
+            table.getBinding("rows").filter(colFilter, sap.ui.model.FilterType.Control);
+        },
         onTabSelect(oEvent) {
             const selectedKey = oEvent.getParameter("key");
             if (selectedKey === "history") {
