@@ -124,7 +124,7 @@ sap.ui.define([
             );
 
             const colFilter = value
-                ? [new Filter(column.getFilterProperty(), FilterOperator.EQ, value)]
+                ? [new Filter(column.getFilterProperty(), FilterOperator.Contains, value)]
                 : [];
 
             // Application-type base filters (set at bindRows) already persist automatically.
