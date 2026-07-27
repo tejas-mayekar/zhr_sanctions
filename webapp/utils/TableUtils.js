@@ -74,11 +74,21 @@ sap.ui.define([
                     .map(col => new Filter(col.filterProperty, FilterOperator.Contains, searchQuery))
                 : [];
 
-            binding.filter(
-                columnFilters.length
-                    ? [new Filter({ filters: columnFilters, and: false })]
-                    : []
-            );
+            const filters = columnFilters.length
+                ? [new Filter({ filters: columnFilters, and: false })]
+                : [];
+
+            try {
+                binding.filter(filters);
+            } catch (error) {
+                console.error("TableUtils.applyTableSearch: server-side filter failed, falling back to client-side filter", error);
+                try {
+                    binding.filter(filters, sap.ui.model.FilterType.Application);
+                } catch (fallbackError) {
+                    console.error("TableUtils.applyTableSearch: client-side filter also failed", fallbackError);
+                    sap.m.MessageToast.show("Search failed. Please try again.");
+                }
+            }
         }
     };
 

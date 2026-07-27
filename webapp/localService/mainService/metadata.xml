@@ -8,50 +8,50 @@
                     <PropertyRef Name="ZempId"/>
                     <PropertyRef Name="ZACTION_REF_NO"/>
                 </Key>
-                <Property Name="Zishc" Type="Edm.Boolean" Nullable="false" sap:unicode="false" sap:label="Is Hc" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZempEmail" Type="Edm.String" Nullable="false" MaxLength="241" sap:unicode="false" sap:label="Emp Email" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zstatus" Type="Edm.String" Nullable="false" MaxLength="1" sap:unicode="false" sap:label="Status for Sanctions" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZempId" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Employee ID" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZACTION_REF_NO" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Action Reference ID" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZempDoj" Type="Edm.DateTime" Precision="7" sap:unicode="false" sap:label="Date of joining" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZincDate" Type="Edm.DateTime" Precision="7" sap:unicode="false" sap:label="Incident date" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZempName" Type="Edm.String" MaxLength="50" sap:unicode="false" sap:label="Employee Name" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZschTimeIn" Type="Edm.Time" Precision="0" sap:unicode="false" sap:label="Start Time" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZschTimeOut" Type="Edm.Time" Precision="0" sap:unicode="false" sap:label="End Time" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zpunchintime" Type="Edm.Time" Precision="0" sap:unicode="false" sap:label="Punch In Time" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zpunchouttime" Type="Edm.Time" Precision="0" sap:unicode="false" sap:label="Punch Out Time" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZdelayHrs" Type="Edm.String" MaxLength="10" sap:unicode="false" sap:label="delay hours" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZshortHrs" Type="Edm.String" MaxLength="10" sap:unicode="false" sap:label="Short_hrs" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZunautDays" Type="Edm.String" MaxLength="10" sap:unicode="false" sap:label="Unauthorized absence date" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZempType" Type="Edm.String" MaxLength="20" sap:unicode="false" sap:label="Employment type" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZempTypeDesc" Type="Edm.String" MaxLength="50" sap:unicode="false" sap:label="Employment type Description" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZempClass" Type="Edm.String" MaxLength="20" sap:unicode="false" sap:label="Employee class" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZempClassDesc" Type="Edm.String" MaxLength="50" sap:unicode="false" sap:label="Employee class Description" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zcompany" Type="Edm.String" MaxLength="20" sap:unicode="false" sap:label="Company" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zn0" Type="Edm.String" MaxLength="20" sap:unicode="false" sap:label="Custom string" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zn1" Type="Edm.String" MaxLength="128" sap:unicode="false" sap:label="Business Unit" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zn2" Type="Edm.String" MaxLength="128" sap:unicode="false" sap:label="Division" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zn3" Type="Edm.String" MaxLength="128" sap:unicode="false" sap:label="department" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zn4" Type="Edm.String" MaxLength="128" sap:unicode="false" sap:label="Custom string" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zn5" Type="Edm.String" MaxLength="128" sap:unicode="false" sap:label="Custom string" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zn6" Type="Edm.String" MaxLength="128" sap:unicode="false" sap:label="Custom string" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zn7" Type="Edm.String" MaxLength="128" sap:unicode="false" sap:label="Custom string" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZlatestNode" Type="Edm.String" MaxLength="128" sap:unicode="false" sap:label="Latest Node" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zposition" Type="Edm.String" MaxLength="100" sap:unicode="false" sap:label="position" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZstdWeekHrs" Type="Edm.String" MaxLength="10" sap:unicode="false" sap:label="Standard weekly Hours" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZwrkDyWeek" Type="Edm.String" MaxLength="10" sap:unicode="false" sap:label="Working day per week" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zworkschedule" Type="Edm.String" MaxLength="80" sap:unicode="false" sap:label="Workschedule" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZlmIdName" Type="Edm.String" MaxLength="50" sap:unicode="false" sap:label="Line manager ID" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZlmIdAction" Type="Edm.String" MaxLength="10" sap:unicode="false" sap:label="Line Manager Action" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZlmIdActionDate" Type="Edm.DateTime" Precision="7" sap:unicode="false" sap:label="Line Manager Action" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZjobTitle" Type="Edm.String" MaxLength="80" sap:unicode="false" sap:label="Job Code" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZjobClass" Type="Edm.String" MaxLength="80" sap:unicode="false" sap:label="Job Classification" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZpayGrade" Type="Edm.String" MaxLength="80" sap:unicode="false" sap:label="Pay Grade" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZhireDate" Type="Edm.DateTime" Precision="7" sap:unicode="false" sap:label="Hire Date" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Znationality" Type="Edm.String" MaxLength="25" sap:unicode="false" sap:label="Nationality" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZlocGroup" Type="Edm.String" MaxLength="25" sap:unicode="false" sap:label="Location Group" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zlocation" Type="Edm.String" MaxLength="20" sap:unicode="false" sap:label="Location" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="last_changed_at" Type="Edm.DateTime" Precision="7" sap:unicode="false" sap:label="Last Changed" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Zishc" Type="Edm.Boolean" Nullable="false" sap:unicode="false" sap:label="Is Hc" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZempEmail" Type="Edm.String" Nullable="false" MaxLength="241" sap:unicode="false" sap:label="Emp Email" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zstatus" Type="Edm.String" Nullable="false" MaxLength="1" sap:unicode="false" sap:label="Status for Sanctions" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZempId" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Employee ID" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZACTION_REF_NO" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Action Reference ID" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZempDoj" Type="Edm.DateTime" Precision="7" sap:unicode="false" sap:label="Date of joining" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZincDate" Type="Edm.DateTime" Precision="7" sap:unicode="false" sap:label="Incident date" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZempName" Type="Edm.String" MaxLength="50" sap:unicode="false" sap:label="Employee Name" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZschTimeIn" Type="Edm.Time" Precision="0" sap:unicode="false" sap:label="Start Time" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZschTimeOut" Type="Edm.Time" Precision="0" sap:unicode="false" sap:label="End Time" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zpunchintime" Type="Edm.Time" Precision="0" sap:unicode="false" sap:label="Punch In Time" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zpunchouttime" Type="Edm.Time" Precision="0" sap:unicode="false" sap:label="Punch Out Time" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZdelayHrs" Type="Edm.String" MaxLength="10" sap:unicode="false" sap:label="delay hours" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZshortHrs" Type="Edm.String" MaxLength="10" sap:unicode="false" sap:label="Short_hrs" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZunautDays" Type="Edm.String" MaxLength="10" sap:unicode="false" sap:label="Unauthorized absence date" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZempType" Type="Edm.String" MaxLength="20" sap:unicode="false" sap:label="Employment type" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZempTypeDesc" Type="Edm.String" MaxLength="50" sap:unicode="false" sap:label="Employment type Description" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZempClass" Type="Edm.String" MaxLength="20" sap:unicode="false" sap:label="Employee class" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZempClassDesc" Type="Edm.String" MaxLength="50" sap:unicode="false" sap:label="Employee class Description" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zcompany" Type="Edm.String" MaxLength="20" sap:unicode="false" sap:label="Company" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zn0" Type="Edm.String" MaxLength="20" sap:unicode="false" sap:label="Custom string" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zn1" Type="Edm.String" MaxLength="128" sap:unicode="false" sap:label="Business Unit" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zn2" Type="Edm.String" MaxLength="128" sap:unicode="false" sap:label="Division" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zn3" Type="Edm.String" MaxLength="128" sap:unicode="false" sap:label="department" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zn4" Type="Edm.String" MaxLength="128" sap:unicode="false" sap:label="Custom string" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zn5" Type="Edm.String" MaxLength="128" sap:unicode="false" sap:label="Custom string" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zn6" Type="Edm.String" MaxLength="128" sap:unicode="false" sap:label="Custom string" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zn7" Type="Edm.String" MaxLength="128" sap:unicode="false" sap:label="Custom string" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZlatestNode" Type="Edm.String" MaxLength="128" sap:unicode="false" sap:label="Latest Node" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zposition" Type="Edm.String" MaxLength="100" sap:unicode="false" sap:label="position" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZstdWeekHrs" Type="Edm.String" MaxLength="10" sap:unicode="false" sap:label="Standard weekly Hours" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZwrkDyWeek" Type="Edm.String" MaxLength="10" sap:unicode="false" sap:label="Working day per week" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zworkschedule" Type="Edm.String" MaxLength="80" sap:unicode="false" sap:label="Workschedule" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZlmIdName" Type="Edm.String" MaxLength="50" sap:unicode="false" sap:label="Line manager ID" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZlmIdAction" Type="Edm.String" MaxLength="10" sap:unicode="false" sap:label="Line Manager Action" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZlmIdActionDate" Type="Edm.DateTime" Precision="7" sap:unicode="false" sap:label="Line Manager Action" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZjobTitle" Type="Edm.String" MaxLength="80" sap:unicode="false" sap:label="Job Code" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZjobClass" Type="Edm.String" MaxLength="80" sap:unicode="false" sap:label="Job Classification" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZpayGrade" Type="Edm.String" MaxLength="80" sap:unicode="false" sap:label="Pay Grade" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZhireDate" Type="Edm.DateTime" Precision="7" sap:unicode="false" sap:label="Hire Date" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Znationality" Type="Edm.String" MaxLength="25" sap:unicode="false" sap:label="Nationality" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZlocGroup" Type="Edm.String" MaxLength="25" sap:unicode="false" sap:label="Location Group" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zlocation" Type="Edm.String" MaxLength="20" sap:unicode="false" sap:label="Location" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="last_changed_at" Type="Edm.DateTime" Precision="7" sap:unicode="false" sap:label="Last Changed" sap:creatable="false" sap:updatable="false"/>
             </EntityType>
             <EntityType Name="ITM_STR" sap:content-version="1">
                 <Key>
@@ -59,80 +59,80 @@
                     <PropertyRef Name="ZempId"/>
                     <PropertyRef Name="ZincDate"/>
                 </Key>
-                <Property Name="Zlmemail" Type="Edm.String" Nullable="false" MaxLength="241" sap:unicode="false" sap:label="Emp Email" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZempEmail" Type="Edm.String" Nullable="false" MaxLength="241" sap:unicode="false" sap:label="Emp Email" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZIsHc" Type="Edm.Boolean" Nullable="false" sap:unicode="false" sap:label="Is HC" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZunautDays" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Unauthorized absence date" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZlmIdName" Type="Edm.String" Nullable="false" MaxLength="50" sap:unicode="false" sap:label="LM Id" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZactionRefNo" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Action reference Num" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZempId" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Employee ID" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZincDate" Type="Edm.DateTime" Nullable="false" Precision="7" sap:unicode="false" sap:label="Incident date" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZempName" Type="Edm.String" MaxLength="60" sap:unicode="false" sap:label="Logical System" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zaction" Type="Edm.String" MaxLength="50" sap:unicode="false" sap:label="Action" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zstatus" Type="Edm.String" MaxLength="50" sap:unicode="false" sap:label="Status" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zremark" Type="Edm.String" MaxLength="60" sap:unicode="false" sap:label="Logical System" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZincDisDate" Type="Edm.DateTime" Precision="7" sap:unicode="false" sap:label="Incident Disc. date" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZinitatedBy" Type="Edm.String" MaxLength="50" sap:unicode="false" sap:label="Initated By" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZinitDate" Type="Edm.DateTime" Precision="7" sap:unicode="false" sap:label="Date" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZfirstIncDate" Type="Edm.DateTime" Precision="7" sap:unicode="false" sap:label="Date" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZschTimeIn" Type="Edm.Time" Precision="0" sap:unicode="false" sap:label="Start Time" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZschTimeOut" Type="Edm.Time" Precision="0" sap:unicode="false" sap:label="End Time" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zpunchintime" Type="Edm.Time" Precision="0" sap:unicode="false" sap:label="Punch In Time" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zpunchouttime" Type="Edm.Time" Precision="0" sap:unicode="false" sap:label="Punch Out Time" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZdelayHrs" Type="Edm.String" MaxLength="10" sap:unicode="false" sap:label="Delay Hours" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZshortHrs" Type="Edm.String" MaxLength="10" sap:unicode="false" sap:label="Short Hours" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZempType" Type="Edm.String" MaxLength="60" sap:unicode="false" sap:label="Employee Type" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZempTypeDesc" Type="Edm.String" MaxLength="100" sap:unicode="false" sap:label="Employee Type Desc." sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZempClass" Type="Edm.String" MaxLength="60" sap:unicode="false" sap:label="Employee Class" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZempClassDesc" Type="Edm.String" MaxLength="100" sap:unicode="false" sap:label="Emp. Class Desc." sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zcompany" Type="Edm.String" MaxLength="60" sap:unicode="false" sap:label="Company" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zn0" Type="Edm.String" MaxLength="128" sap:unicode="false" sap:label="Num" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zn1" Type="Edm.String" MaxLength="128" sap:unicode="false" sap:label="Num" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zn2" Type="Edm.String" MaxLength="128" sap:unicode="false" sap:label="Num" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zn3" Type="Edm.String" MaxLength="128" sap:unicode="false" sap:label="Num" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zn4" Type="Edm.String" MaxLength="128" sap:unicode="false" sap:label="Num" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zn5" Type="Edm.String" MaxLength="128" sap:unicode="false" sap:label="Num" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zn6" Type="Edm.String" MaxLength="128" sap:unicode="false" sap:label="Num" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zn7" Type="Edm.String" MaxLength="128" sap:unicode="false" sap:label="Num" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZlatestNode" Type="Edm.String" MaxLength="128" sap:unicode="false" sap:label="Latest Node" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zposition" Type="Edm.String" MaxLength="80" sap:unicode="false" sap:label="Position" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZstdWeekHrs" Type="Edm.String" MaxLength="20" sap:unicode="false" sap:label="ZSTD_WEEK_HRS" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZwrkDyWeek" Type="Edm.String" MaxLength="10" sap:unicode="false" sap:label="Work day week" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZincCategory" Type="Edm.String" MaxLength="60" sap:unicode="false" sap:label="Incident Category" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZincType" Type="Edm.String" MaxLength="10" sap:unicode="false" sap:label="Incident Type" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zrepeatcount" Type="Edm.Byte" sap:unicode="false" sap:label="Repeat Count" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zsysyrepeatcount" Type="Edm.Byte" sap:unicode="false" sap:label="Repeat Count" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zsanction" Type="Edm.String" MaxLength="60" sap:unicode="false" sap:label="Sanction" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zawaitingactionfrom" Type="Edm.DateTime" Precision="7" sap:unicode="false" sap:label="Date" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zlastaction" Type="Edm.DateTime" Precision="7" sap:unicode="false" sap:label="Date" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zjobtitle" Type="Edm.String" MaxLength="80" sap:unicode="false" sap:label="c" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zjobclassification" Type="Edm.String" MaxLength="80" sap:unicode="false" sap:label="30 Characters" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zpaygrade" Type="Edm.String" MaxLength="80" sap:unicode="false" sap:label="Pay Grade" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zhiredate" Type="Edm.DateTime" Precision="8" sap:unicode="false" sap:label="Date" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Znationality" Type="Edm.String" MaxLength="60" sap:unicode="false" sap:label="Logical System" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zlocationgroup" Type="Edm.String" MaxLength="60" sap:unicode="false" sap:label="Logical System" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zlocation" Type="Edm.String" MaxLength="60" sap:unicode="false" sap:label="Logical System" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zworkschedule" Type="Edm.String" MaxLength="60" sap:unicode="false" sap:label="Logical System" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zlinemanagername" Type="Edm.String" MaxLength="60" sap:unicode="false" sap:label="Logical System" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zlinemanageraction" Type="Edm.String" MaxLength="60" sap:unicode="false" sap:label="Logical System" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zlinemanageractiondate" Type="Edm.DateTime" Precision="7" sap:unicode="false" sap:label="Date" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zlinemanagerremarks" Type="Edm.String" MaxLength="255" sap:unicode="false" sap:label="Logical System" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zhcopsname" Type="Edm.String" MaxLength="60" sap:unicode="false" sap:label="Logical System" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zhcopsaction" Type="Edm.String" MaxLength="60" sap:unicode="false" sap:label="Logical System" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zhcopsactiondate" Type="Edm.DateTime" Precision="7" sap:unicode="false" sap:label="Date" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zhcopsremark" Type="Edm.String" MaxLength="255" sap:unicode="false" sap:label="Logical System" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zhcevpname" Type="Edm.String" MaxLength="60" sap:unicode="false" sap:label="Logical System" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zhcevpaction" Type="Edm.String" MaxLength="60" sap:unicode="false" sap:label="Logical System" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zhcevpactiondate" Type="Edm.DateTime" Precision="7" sap:unicode="false" sap:label="Date" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zhcevpremark" Type="Edm.String" MaxLength="255" sap:unicode="false" sap:label="Logical System" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zlegalmembername" Type="Edm.String" MaxLength="60" sap:unicode="false" sap:label="Logical System" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zlegalmemberaction" Type="Edm.String" MaxLength="60" sap:unicode="false" sap:label="Logical System" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zlegalmemberactiondate" Type="Edm.DateTime" Precision="7" sap:unicode="false" sap:label="Date" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zlegalremark" Type="Edm.String" MaxLength="255" sap:unicode="false" sap:label="Logical System" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zceoname" Type="Edm.String" MaxLength="60" sap:unicode="false" sap:label="Logical System" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zceoaction" Type="Edm.String" MaxLength="60" sap:unicode="false" sap:label="Logical System" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zceoactiondate" Type="Edm.DateTime" Precision="7" sap:unicode="false" sap:label="Date" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zceoactionremark" Type="Edm.String" MaxLength="255" sap:unicode="false" sap:label="Logical System" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="ZIsHc" Type="Edm.Boolean" Nullable="false" sap:unicode="false" sap:label="Is HC" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZempEmail" Type="Edm.String" Nullable="false" MaxLength="241" sap:unicode="false" sap:label="Emp Email" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zlmemail" Type="Edm.String" Nullable="false" MaxLength="241" sap:unicode="false" sap:label="Emp Email" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZlmIdName" Type="Edm.String" Nullable="false" MaxLength="50" sap:unicode="false" sap:label="LM Id" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZunautDays" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Unauthorized absence date" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZactionRefNo" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Action reference Num" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZempId" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Employee ID" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZincDate" Type="Edm.DateTime" Nullable="false" Precision="7" sap:unicode="false" sap:label="Incident date" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZempName" Type="Edm.String" MaxLength="60" sap:unicode="false" sap:label="Logical System" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zaction" Type="Edm.String" MaxLength="50" sap:unicode="false" sap:label="Action" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zstatus" Type="Edm.String" MaxLength="50" sap:unicode="false" sap:label="Status" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zremark" Type="Edm.String" MaxLength="60" sap:unicode="false" sap:label="Logical System" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZincDisDate" Type="Edm.DateTime" Precision="7" sap:unicode="false" sap:label="Incident Disc. date" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZinitatedBy" Type="Edm.String" MaxLength="50" sap:unicode="false" sap:label="Initated By" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZinitDate" Type="Edm.DateTime" Precision="7" sap:unicode="false" sap:label="Date" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZfirstIncDate" Type="Edm.DateTime" Precision="7" sap:unicode="false" sap:label="Date" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZschTimeIn" Type="Edm.Time" Precision="0" sap:unicode="false" sap:label="Start Time" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZschTimeOut" Type="Edm.Time" Precision="0" sap:unicode="false" sap:label="End Time" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zpunchintime" Type="Edm.Time" Precision="0" sap:unicode="false" sap:label="Punch In Time" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zpunchouttime" Type="Edm.Time" Precision="0" sap:unicode="false" sap:label="Punch Out Time" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZdelayHrs" Type="Edm.String" MaxLength="10" sap:unicode="false" sap:label="Delay Hours" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZshortHrs" Type="Edm.String" MaxLength="10" sap:unicode="false" sap:label="Short Hours" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZempType" Type="Edm.String" MaxLength="60" sap:unicode="false" sap:label="Employee Type" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZempTypeDesc" Type="Edm.String" MaxLength="100" sap:unicode="false" sap:label="Employee Type Desc." sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZempClass" Type="Edm.String" MaxLength="60" sap:unicode="false" sap:label="Employee Class" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZempClassDesc" Type="Edm.String" MaxLength="100" sap:unicode="false" sap:label="Emp. Class Desc." sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zcompany" Type="Edm.String" MaxLength="60" sap:unicode="false" sap:label="Company" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zn0" Type="Edm.String" MaxLength="128" sap:unicode="false" sap:label="Num" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zn1" Type="Edm.String" MaxLength="128" sap:unicode="false" sap:label="Num" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zn2" Type="Edm.String" MaxLength="128" sap:unicode="false" sap:label="Num" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zn3" Type="Edm.String" MaxLength="128" sap:unicode="false" sap:label="Num" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zn4" Type="Edm.String" MaxLength="128" sap:unicode="false" sap:label="Num" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zn5" Type="Edm.String" MaxLength="128" sap:unicode="false" sap:label="Num" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zn6" Type="Edm.String" MaxLength="128" sap:unicode="false" sap:label="Num" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zn7" Type="Edm.String" MaxLength="128" sap:unicode="false" sap:label="Num" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZlatestNode" Type="Edm.String" MaxLength="128" sap:unicode="false" sap:label="Latest Node" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zposition" Type="Edm.String" MaxLength="80" sap:unicode="false" sap:label="Position" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZstdWeekHrs" Type="Edm.String" MaxLength="20" sap:unicode="false" sap:label="ZSTD_WEEK_HRS" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZwrkDyWeek" Type="Edm.String" MaxLength="10" sap:unicode="false" sap:label="Work day week" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZincCategory" Type="Edm.String" MaxLength="60" sap:unicode="false" sap:label="Incident Category" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZincType" Type="Edm.String" MaxLength="10" sap:unicode="false" sap:label="Incident Type" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zrepeatcount" Type="Edm.Byte" sap:unicode="false" sap:label="Repeat Count" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zsysyrepeatcount" Type="Edm.Byte" sap:unicode="false" sap:label="Repeat Count" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zsanction" Type="Edm.String" MaxLength="60" sap:unicode="false" sap:label="Sanction" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zawaitingactionfrom" Type="Edm.DateTime" Precision="7" sap:unicode="false" sap:label="Date" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zlastaction" Type="Edm.DateTime" Precision="7" sap:unicode="false" sap:label="Date" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zjobtitle" Type="Edm.String" MaxLength="80" sap:unicode="false" sap:label="c" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zjobclassification" Type="Edm.String" MaxLength="80" sap:unicode="false" sap:label="30 Characters" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zpaygrade" Type="Edm.String" MaxLength="80" sap:unicode="false" sap:label="Pay Grade" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zhiredate" Type="Edm.DateTime" Precision="8" sap:unicode="false" sap:label="Date" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Znationality" Type="Edm.String" MaxLength="60" sap:unicode="false" sap:label="Logical System" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zlocationgroup" Type="Edm.String" MaxLength="60" sap:unicode="false" sap:label="Logical System" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zlocation" Type="Edm.String" MaxLength="60" sap:unicode="false" sap:label="Logical System" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zworkschedule" Type="Edm.String" MaxLength="60" sap:unicode="false" sap:label="Logical System" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zlinemanagername" Type="Edm.String" MaxLength="60" sap:unicode="false" sap:label="Logical System" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zlinemanageraction" Type="Edm.String" MaxLength="60" sap:unicode="false" sap:label="Logical System" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zlinemanageractiondate" Type="Edm.DateTime" Precision="7" sap:unicode="false" sap:label="Date" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zlinemanagerremarks" Type="Edm.String" MaxLength="255" sap:unicode="false" sap:label="Logical System" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zhcopsname" Type="Edm.String" MaxLength="60" sap:unicode="false" sap:label="Logical System" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zhcopsaction" Type="Edm.String" MaxLength="60" sap:unicode="false" sap:label="Logical System" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zhcopsactiondate" Type="Edm.DateTime" Precision="7" sap:unicode="false" sap:label="Date" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zhcopsremark" Type="Edm.String" MaxLength="255" sap:unicode="false" sap:label="Logical System" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zhcevpname" Type="Edm.String" MaxLength="60" sap:unicode="false" sap:label="Logical System" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zhcevpaction" Type="Edm.String" MaxLength="60" sap:unicode="false" sap:label="Logical System" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zhcevpactiondate" Type="Edm.DateTime" Precision="7" sap:unicode="false" sap:label="Date" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zhcevpremark" Type="Edm.String" MaxLength="255" sap:unicode="false" sap:label="Logical System" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zlegalmembername" Type="Edm.String" MaxLength="60" sap:unicode="false" sap:label="Logical System" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zlegalmemberaction" Type="Edm.String" MaxLength="60" sap:unicode="false" sap:label="Logical System" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zlegalmemberactiondate" Type="Edm.DateTime" Precision="7" sap:unicode="false" sap:label="Date" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zlegalremark" Type="Edm.String" MaxLength="255" sap:unicode="false" sap:label="Logical System" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zceoname" Type="Edm.String" MaxLength="60" sap:unicode="false" sap:label="Logical System" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zceoaction" Type="Edm.String" MaxLength="60" sap:unicode="false" sap:label="Logical System" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zceoactiondate" Type="Edm.DateTime" Precision="7" sap:unicode="false" sap:label="Date" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zceoactionremark" Type="Edm.String" MaxLength="255" sap:unicode="false" sap:label="Logical System" sap:creatable="false" sap:updatable="false"/>
             </EntityType>
             <EntityType Name="EMP_SEARCHHELP" sap:content-version="1">
                 <Key>
@@ -355,32 +355,32 @@
                 <Key>
                     <PropertyRef Name="ZempId"/>
                 </Key>
-                <Property Name="ZempId" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Employee ID" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZschDateIn" Type="Edm.DateTime" Nullable="false" Precision="7" sap:unicode="false" sap:label="Start Date" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZschDateOut" Type="Edm.DateTime" Nullable="false" Precision="7" sap:unicode="false" sap:label="End Date" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZschTimeIn" Type="Edm.Time" Nullable="false" Precision="0" sap:unicode="false" sap:label="Start Time" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZschTimeOut" Type="Edm.Time" Nullable="false" Precision="0" sap:unicode="false" sap:label="End Time" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZotDateIn" Type="Edm.DateTime" Nullable="false" Precision="7" sap:unicode="false" sap:label="OT Date In" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZschOtIn" Type="Edm.Time" Nullable="false" Precision="0" sap:unicode="false" sap:label="Overtime In" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZotDateOut" Type="Edm.DateTime" Nullable="false" Precision="7" sap:unicode="false" sap:label="OT Date Out" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZschOtOut" Type="Edm.Time" Nullable="false" Precision="0" sap:unicode="false" sap:label="Overtime Out" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zpunchindate" Type="Edm.DateTime" Nullable="false" Precision="7" sap:unicode="false" sap:label="Punch Date" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zpunchintime" Type="Edm.Time" Nullable="false" Precision="0" sap:unicode="false" sap:label="Punch In Time" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZpunchInSent" Type="Edm.String" Nullable="false" MaxLength="1" sap:unicode="false" sap:label="Punch In Sent" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zpunchoutdate" Type="Edm.DateTime" Nullable="false" Precision="7" sap:unicode="false" sap:label="Punch Date" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zpunchouttime" Type="Edm.Time" Nullable="false" Precision="0" sap:unicode="false" sap:label="Punch Out Time" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZpunchOutSent" Type="Edm.String" Nullable="false" MaxLength="1" sap:unicode="false" sap:label="Punch out Sent" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Znextday" Type="Edm.String" Nullable="false" MaxLength="1" sap:unicode="false" sap:label="ZNEXTDAY" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZrefNuIn" Type="Edm.String" Nullable="false" MaxLength="32" sap:unicode="false" sap:label="Reference ID" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZrefNuOut" Type="Edm.String" Nullable="false" MaxLength="32" sap:unicode="false" sap:label="Reference ID" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zregion" Type="Edm.String" Nullable="false" MaxLength="255" sap:unicode="false" sap:label="Region" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Ztimestamp" Type="Edm.DateTime" Nullable="false" Precision="0" sap:unicode="false" sap:label="Time Stamp" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zuser" Type="Edm.String" Nullable="false" MaxLength="50" sap:unicode="false" sap:label="User" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZmanagerName" Type="Edm.String" Nullable="false" MaxLength="30" sap:unicode="false" sap:label="Manager Name" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZmanagerId" Type="Edm.String" Nullable="false" MaxLength="20" sap:unicode="false" sap:label="Manager ID" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZempName" Type="Edm.String" Nullable="false" MaxLength="50" sap:unicode="false" sap:label="Employee Name" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="ZmanagerEmail" Type="Edm.String" Nullable="false" MaxLength="241" sap:unicode="false" sap:label="E-Mail Address" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Bukrs" Type="Edm.String" Nullable="false" MaxLength="4" sap:unicode="false" sap:label="Company Code" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="ZempId" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Employee ID" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZschDateIn" Type="Edm.DateTime" Nullable="false" Precision="7" sap:unicode="false" sap:label="Start Date" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZschDateOut" Type="Edm.DateTime" Nullable="false" Precision="7" sap:unicode="false" sap:label="End Date" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZschTimeIn" Type="Edm.Time" Nullable="false" Precision="0" sap:unicode="false" sap:label="Start Time" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZschTimeOut" Type="Edm.Time" Nullable="false" Precision="0" sap:unicode="false" sap:label="End Time" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZotDateIn" Type="Edm.DateTime" Nullable="false" Precision="7" sap:unicode="false" sap:label="OT Date In" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZschOtIn" Type="Edm.Time" Nullable="false" Precision="0" sap:unicode="false" sap:label="Overtime In" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZotDateOut" Type="Edm.DateTime" Nullable="false" Precision="7" sap:unicode="false" sap:label="OT Date Out" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZschOtOut" Type="Edm.Time" Nullable="false" Precision="0" sap:unicode="false" sap:label="Overtime Out" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zpunchindate" Type="Edm.DateTime" Nullable="false" Precision="7" sap:unicode="false" sap:label="Punch Date" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zpunchintime" Type="Edm.Time" Nullable="false" Precision="0" sap:unicode="false" sap:label="Punch In Time" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZpunchInSent" Type="Edm.String" Nullable="false" MaxLength="1" sap:unicode="false" sap:label="Punch In Sent" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zpunchoutdate" Type="Edm.DateTime" Nullable="false" Precision="7" sap:unicode="false" sap:label="Punch Date" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zpunchouttime" Type="Edm.Time" Nullable="false" Precision="0" sap:unicode="false" sap:label="Punch Out Time" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZpunchOutSent" Type="Edm.String" Nullable="false" MaxLength="1" sap:unicode="false" sap:label="Punch out Sent" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Znextday" Type="Edm.String" Nullable="false" MaxLength="1" sap:unicode="false" sap:label="ZNEXTDAY" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZrefNuIn" Type="Edm.String" Nullable="false" MaxLength="32" sap:unicode="false" sap:label="Reference ID" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZrefNuOut" Type="Edm.String" Nullable="false" MaxLength="32" sap:unicode="false" sap:label="Reference ID" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zregion" Type="Edm.String" Nullable="false" MaxLength="255" sap:unicode="false" sap:label="Region" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Ztimestamp" Type="Edm.DateTime" Nullable="false" Precision="0" sap:unicode="false" sap:label="Time Stamp" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zuser" Type="Edm.String" Nullable="false" MaxLength="50" sap:unicode="false" sap:label="User" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZmanagerName" Type="Edm.String" Nullable="false" MaxLength="30" sap:unicode="false" sap:label="Manager Name" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZmanagerId" Type="Edm.String" Nullable="false" MaxLength="20" sap:unicode="false" sap:label="Manager ID" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZempName" Type="Edm.String" Nullable="false" MaxLength="50" sap:unicode="false" sap:label="Employee Name" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZmanagerEmail" Type="Edm.String" Nullable="false" MaxLength="241" sap:unicode="false" sap:label="E-Mail Address" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Bukrs" Type="Edm.String" Nullable="false" MaxLength="4" sap:unicode="false" sap:label="Company Code" sap:creatable="false" sap:updatable="false"/>
             </EntityType>
             <EntityType Name="UPDATE_MISS_PUNCH" sap:content-version="1">
                 <Key>
@@ -391,14 +391,14 @@
                 <Property Name="ZempNumber" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Employee ID" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="ZschDateIn" Type="Edm.DateTime" Nullable="false" Precision="7" sap:unicode="false" sap:label="Start Date" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="ZschDateOut" Type="Edm.DateTime" Nullable="false" Precision="7" sap:unicode="false" sap:label="End Date" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zpunchindate" Type="Edm.DateTime" Nullable="false" Precision="7" sap:unicode="false" sap:label="Punch Date" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zpunchintime" Type="Edm.Time" Nullable="false" Precision="0" sap:unicode="false" sap:label="Punch In Time" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zpunchoutdate" Type="Edm.DateTime" Nullable="false" Precision="7" sap:unicode="false" sap:label="Punch Date" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Zpunchouttime" Type="Edm.Time" Nullable="false" Precision="0" sap:unicode="false" sap:label="Punch Out Time" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Zpunchindate" Type="Edm.DateTime" Precision="7" sap:unicode="false" sap:label="Punch Date" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Zpunchintime" Type="Edm.Time" Precision="0" sap:unicode="false" sap:label="Punch In Time" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Zpunchoutdate" Type="Edm.DateTime" Precision="7" sap:unicode="false" sap:label="Punch Date" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Zpunchouttime" Type="Edm.Time" Precision="0" sap:unicode="false" sap:label="Punch Out Time" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
             </EntityType>
             <EntityContainer Name="ZHR_SACTIONS_APPLICATION_SRV_Entities" m:IsDefaultEntityContainer="true" sap:supported-formats="atom json xlsx">
-                <EntitySet Name="HDR_STRSet" EntityType="ZHR_SACTIONS_APPLICATION_SRV.HDR_STR" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:content-version="1"/>
-                <EntitySet Name="ITM_STRSet" EntityType="ZHR_SACTIONS_APPLICATION_SRV.ITM_STR" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:content-version="1"/>
+                <EntitySet Name="HDR_STRSet" EntityType="ZHR_SACTIONS_APPLICATION_SRV.HDR_STR" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1"/>
+                <EntitySet Name="ITM_STRSet" EntityType="ZHR_SACTIONS_APPLICATION_SRV.ITM_STR" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1"/>
                 <EntitySet Name="EMP_SEARCHHELPSet" EntityType="ZHR_SACTIONS_APPLICATION_SRV.EMP_SEARCHHELP" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:content-version="1"/>
                 <EntitySet Name="VIOALATION_SEARCHHELPSet" EntityType="ZHR_SACTIONS_APPLICATION_SRV.VIOALATION_SEARCHHELP" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:content-version="1"/>
                 <EntitySet Name="FIST_INC_DATESet" EntityType="ZHR_SACTIONS_APPLICATION_SRV.FIST_INC_DATE" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:content-version="1"/>
