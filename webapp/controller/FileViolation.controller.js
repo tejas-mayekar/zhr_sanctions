@@ -125,7 +125,7 @@ sap.ui.define([
                 Zworkschedule: emp.Zworkschedule || this.byId("inputZworkschedule").getValue(),
                 ZlatestNode: emp.ZlatestNode || this.byId("inputZlatestNode").getValue(),
                 Zlmemail: emp.ZlmEmail,
-
+                ZunautDays: emp.ZunautDays || this.byId("inputZunautDays").getValue(),
                 ZempEmail: emp.ZempMail,
                 ZstdWeekHrs: emp.ZstdWeekHrs || this.byId("inputZstdWeekHrs").getValue(),
                 ZwrkDyWeek: emp.ZwrkDyWeek || this.byId("inputZwrkDyWeek").getValue(),
@@ -183,10 +183,11 @@ sap.ui.define([
                 Zceoactionremark: this.byId("inputZceoactionremark").getValue()
             };
 
-            if (!payload.ZempId || !payload.ZincDate) {
-                MessageBox.error("Please fill in all mandatory key fields:\n- Employee ID\n- Incident Date");
+            if (!payload.ZempId || !payload.ZincDate || !payload.Zlinemanagerremarks || this._pendingFiles.length === 0) {
+                MessageBox.error("Please fill in all mandatory key fields:\n- Employee ID\n- Incident Date\n- Remarks\n- Supporting Documents");
                 return;
             }
+            
 
             const today = new Date();
             today.setHours(23, 59, 59, 999);

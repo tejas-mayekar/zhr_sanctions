@@ -332,6 +332,7 @@ sap.ui.define([
                 ZinitatedBy: ODataUtils.getCurrentUserId(),
                 Zlinemanageractiondate: new Date(),
                 ZinitDate: new Date(),
+                Zstatus: "1",
                 Zlinemanagerremarks: reason
             });
             const zactionRefNo = record.ZACTION_REF_NO || record.ZactionRefNo;
