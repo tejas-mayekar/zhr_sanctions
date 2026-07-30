@@ -94,17 +94,11 @@ sap.ui.define([
             const selectedEmployee = this._getSelectedEmployeeData();
             const emp = selectedEmployee || {};
             const dateInput = this.byId("dpZincDate").getDateValue();
-            const localincDate = new Date(
-                dateInput.getFullYear(),
-                dateInput.getMonth(),
-                dateInput.getDate()
-            );
+            const localincDate = new Date(dateInput.toLocaleDateString('en-CA'));
+
             const datediscInput = this.byId("dpZincDisDate").getDateValue();
-            const localincdiscDate = new Date(
-                datediscInput.getFullYear(),
-                datediscInput.getMonth(),
-                datediscInput.getDate()
-            );
+            const localincdiscDate = new Date(datediscInput.toLocaleDateString('en-CA'));
+
 
             const payload = {
                 ZempId: emp.ZempId || this.byId("inputZempId").getValue(),
@@ -187,7 +181,7 @@ sap.ui.define([
                 MessageBox.error("Please fill in all mandatory key fields:\n- Employee ID\n- Incident Date\n- Remarks\n- Supporting Documents");
                 return;
             }
-            
+
 
             const today = new Date();
             today.setHours(23, 59, 59, 999);
