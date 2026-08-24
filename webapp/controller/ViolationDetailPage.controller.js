@@ -261,7 +261,7 @@ sap.ui.define([
 
             const itmPayload = ODataUtils.buildITMPayload(record, {
                 Zaction: "A",
-                Zlinemanagerremarks: reason,
+                Zregularizereason: reason,
                 Zlinemanagername: ODataUtils.getCurrentUserName(),
                 ZinitatedBy: ODataUtils.getCurrentUserId(),
                 ZinitDate: new Date(),

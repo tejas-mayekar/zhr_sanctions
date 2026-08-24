@@ -264,7 +264,7 @@ sap.ui.define([
             })
                 .then(() => ODataUtils.submitHCAction(oDataModel, record, {
                     Zaction: "A",
-                    Zhcopsremark: reason,
+                    Zregularizereason: reason,
                     Zstatus: "4",
                     Zhcopsname: ODataUtils.getCurrentUserName(),
                 }))
@@ -337,7 +337,7 @@ sap.ui.define([
             }
             this._submitHCAction(violationRec, {
                 ZactionRefNo: violationRec.ZactionRefNo,
-                Zhcopsremark: actionData.reason,
+                Zregularizereason: actionData.reason,
                 Zrepeatcount: parseByteField(actionData.Zrepeatcount),
                 Zhcevpactiondate: new Date(),
                 Zstatus: "4",
