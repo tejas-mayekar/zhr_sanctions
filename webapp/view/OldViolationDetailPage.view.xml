@@ -446,6 +446,20 @@
                                 id="_IDGenText60"
                                 text="{path: 'detailData>/record/Zlinemanageractiondate', formatter: '.displaydateFormatter' }"
                             />
+                            <Label id="_IDGenLabel142"
+                                text="Manager Action Taken"
+                            />
+                            <Text id="_IDGenText126"
+
+                                text="{path: 'detailData>/record/Zaction', formatter: '.formatZaction' }"
+                            />
+                            <Label id="_IDGenLabel143" 
+                                text="Manager Remark"
+                            />
+                            <Text id="_IDGenText127" 
+
+                                text="{detailData>/record/Zlinemanagerremarks}"
+                            />
                         </form:content>
                     </form:SimpleForm>
                 </Panel>

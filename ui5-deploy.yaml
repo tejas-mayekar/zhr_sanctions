@@ -15,12 +15,12 @@ builder:
       configuration:
         ignoreCertErrors: true
         target:
-          url: https://sapdev-app01.matarat.local:44300
+          url: https://10.123.1.11:44300
           client: '100'
         app:
           name: ZHR_SANCTIONS
           description: Sanctions and Violations
           package: ZDAC_HR
-          transport: MD4K914310
+          transport: MD4K915729
         exclude:
           - /test/
