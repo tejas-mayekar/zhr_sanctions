@@ -53,6 +53,7 @@ sap.ui.define([
         { label: "Line Manager ID", binding: "ZlmIdName", width: "14rem", sortProperty: "ZlmIdName", filterProperty: "ZlmIdName", visible: true },
         { label: "Line Manager Name", binding: "Zlinemanagername", width: "14rem", sortProperty: "Zlinemanagername", filterProperty: "Zlinemanagername", visible: true },
         { label: "LM Action Date", binding: "Zlinemanageractiondate", width: "12rem", sortProperty: "Zlinemanageractiondate", filterProperty: "Zlinemanageractiondate", visible: true, isDate: true },
+        { label: "Regularize Reason", binding: "Zregularizereason", width: "14rem", sortProperty: "Zregularizereason", filterProperty: "Zregularizereason", visible: true },
     ];
     const MISS_PUNCH_COLUMNS = [
         { label: "Employee ID", binding: "ZempId", width: "6rem", sortProperty: "ZempId", filterProperty: "ZempId", visible: true },

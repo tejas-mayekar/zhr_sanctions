@@ -307,7 +307,7 @@
                     required="true"
                     class="sapUiSmallMarginTop"
                 />
-                <TextArea
+                <!-- <TextArea
                     id="regularizeReason"
                     value="{regularize>/reason}"
                     rows="3"
@@ -315,7 +315,42 @@
                     growing="false"
                     width="100%"
                     placeholder="Enter reason for regularization..."
-                />
+                /> -->
+                <Select
+                    id="regularizeReason"
+                    selectedKey="{regularize>/reason}"
+                >
+                <core:Item
+                        id="_IDGenReasonItem0"
+                        key=""
+                        text=""
+                    />
+                    <core:Item
+                        id="_IDGenReasonItem1"
+                        key="Official Duty"
+                        text="Official Duty"
+                    />
+                    <core:Item
+                        id="_IDGenReasonItem3"
+                        key="Permission"
+                        text="Permission"
+                    />
+                    <core:Item
+                        id="_IDGenReasonItem2"
+                        key="Family Emergency"
+                        text="Family Emergency"
+                    />
+                    <core:Item
+                        id="_IDGenReasonItem4"
+                        key="Transportation Breakdown"
+                        text="Transportation Breakdown"
+                    />
+                    <core:Item
+                        id="_IDGenReasonItem5"
+                        key="Other"
+                        text="Other"
+                    />
+                </Select>
             </VBox>
         </content>
 

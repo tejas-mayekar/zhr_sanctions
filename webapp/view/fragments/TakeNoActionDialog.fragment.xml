@@ -20,14 +20,50 @@
                     text="Reason / Remarks"
                     required="true"
                 />
-                <TextArea
+                <!-- <TextArea
                     id="dTaNaReason"
                     value="{regularize>/reason}"
                     width="100%"
                     rows="4"
                     placeholder="Enter reason or remarks"
                     required="true"
-                />
+                /> -->
+                <Select
+                    id="regularizeReason2"
+                    
+                    selectedKey="{regularize>/reason}"
+                >
+                <core:Item
+                        id="_IDGenReasonItem10"
+                        key=""
+                        text=""
+                    />
+                    <core:Item
+                        id="_IDGenReasonItem12"
+                        key="Official Duty"
+                        text="Official Duty"
+                    />
+                    <core:Item
+                        id="_IDGenReasonItem32"
+                        key="Permission"
+                        text="Permission"
+                    />
+                    <core:Item
+                        id="_IDGenReasonItem22"
+                        key="Family Emergency"
+                        text="Family Emergency"
+                    />
+                    <core:Item
+                        id="_IDGenReasonItem42"
+                        key="Transportation Breakdown"
+                        text="Transportation Breakdown"
+                    />
+                    <core:Item
+                        id="_IDGenReasonItem52"
+                        key="Other"
+                        text="Other"
+                    />
+                </Select>
             </VBox>
         </content>
 
