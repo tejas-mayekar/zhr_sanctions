@@ -17,8 +17,8 @@ server:
           url: https://ui5.sap.com
         backend:
           - path: /sap
-            url: https://sapdev-app01.matarat.local:44300
-            client: '100'
+            url: https://10.123.1.11:44300
+            client: '150'
     - name: fiori-tools-appreload
       afterMiddleware: compression
       configuration:

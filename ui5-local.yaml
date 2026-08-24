@@ -31,8 +31,8 @@ server:
         ignoreCertErrors: true # If set to true, certificate errors will be ignored. E.g. self-signed certificates will be accepted
         backend:
           - path: /sap
-            url: https://sapdev-app01.matarat.local:44300
-            client: '100'
+            url: https://10.123.1.11:44300
+            client: '150'
     - name: sap-fe-mockserver
       beforeMiddleware: csp
       configuration:
