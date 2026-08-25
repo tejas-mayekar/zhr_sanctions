@@ -182,7 +182,7 @@
                             />
                             <Text
                                 id="_IDGenText5"
-                                text="{detailData>/record/ZempClass}"
+                                text="{detailData>/record/ZempClassDesc}"
                             />
 
                             <Label
