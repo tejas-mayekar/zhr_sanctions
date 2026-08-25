@@ -374,6 +374,13 @@
                                         press=".onRefreshMissPunch"
                                     />
                                     <Button
+                                        id="btnAutofillMissPunch"
+                                        text="Autofill Sch. Times"
+                                        type="Ghost"
+                                        tooltip="Fill Punch In/Out with Scheduled In/Out"
+                                        press=".onAutofillMissPunch"
+                                    />
+                                    <Button
                                         id="_IDGenButtonExportMissPunch"
                                         icon="sap-icon://excel-attachment"
                                         tooltip="Export to Excel"
