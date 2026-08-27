@@ -251,13 +251,42 @@ sap.ui.define([
                 ZschTimeOut: state.showUnauth ? state.unauthPunchOut : state.shortTo,
                 DelayFlag: delayFlag
             })
-                .then(() => ODataUtils.submitHCAction(oDataModel, record, {
-                    Zaction: "A",
-                    Zregularizereason: reason,
-                    Zhcopsremark: lmreason,
-                    Zstatus: "4",
-                    Zhcopsname: ODataUtils.getCurrentUserName(),
-                }))
+                .then(() => {
+
+                    let correctedPunchIn = this.toTimeString(record.Zpunchintime);
+                    let correctedPunchOut = this.toTimeString(record.Zpunchouttime);
+                    const itmPayload = ODataUtils.buildITMPayload(record, {
+                        Zaction: "A",
+                        Zregularizereason: reason,
+                        Zlinemanagerremarks: lmreason,
+                        Zlinemanagername: ODataUtils.getCurrentUserName(),
+                        ZinitatedBy: ODataUtils.getCurrentUserId(),
+                        ZinitDate: new Date(),
+                        Zlinemanageractiondate: new Date(),
+                        Zpunchintime: ODataUtils.formatTimeForPayload(correctedPunchIn),
+                        Zpunchouttime: ODataUtils.formatTimeForPayload(correctedPunchOut),
+                        Zstatus: "4"
+                    });
+                    oDataModel.create("/ITM_STRSet", itmPayload, {
+                        success: () => {
+                            sap.ui.core.BusyIndicator.hide();
+                            MessageToast.show("Regularization submitted successfully.");
+                            this._closeDialog("regularize");
+                            this.onNavBack();
+                        },
+                        error: (error) => {
+                            sap.ui.core.BusyIndicator.hide();
+                            ODataUtils.handleODataError(error, "Error submitting Regularization");
+                        }
+                    });
+                })
+                // .then(() => ODataUtils.submitHCAction(oDataModel, record, {
+                //     Zaction: "A",
+                //     Zregularizereason: reason,
+                //     Zhcopsremark: lmreason,
+                //     Zstatus: "4",
+                //     Zhcopsname: ODataUtils.getCurrentUserName(),
+                // }))
                 .then(() => {
                     sap.ui.core.BusyIndicator.hide();
                     MessageToast.show("Regularization submitted successfully.");
@@ -347,30 +376,70 @@ sap.ui.define([
         onValueHelpLiveSearch(oEvent) {
             SearchHelpHandler.onLiveSearch(oEvent);
         },
-        onPayrollDeductionPress() {
-            const violationRec = this.getView().getModel("detailData").getData().record;
-            if (!violationRec?.ZactionRefNo) {
-                MessageBox.error("No violation record loaded. Cannot submit Payroll Deduction.");
+        _submitToITMSet(payload, successMsg, onSuccess, errorTitle) {
+            const oDataModel = this.getOwnerComponent().getModel()
+                || this.getView().getModel("mainService");
+
+            if (!oDataModel) {
+                MessageBox.warning(
+                    "No active OData service connected. Payload logged to console:\n"
+                    + JSON.stringify(payload, null, 2)
+                );
                 return;
             }
 
-            const oDataModel = this.getOwnerComponent().getModel();
-            oDataModel.setUseBatch(false);
-
             sap.ui.core.BusyIndicator.show(0);
-            ODataUtils.submitHCAction(oDataModel, violationRec, {
+            oDataModel.create("/ITM_STRSet", payload, {
+                success: () => {
+                    sap.ui.core.BusyIndicator.hide();
+                    MessageToast.show(successMsg);
+                    onSuccess();
+                },
+                error: (error) => {
+                    sap.ui.core.BusyIndicator.hide();
+                    ODataUtils.handleODataError(error, errorTitle);
+                }
+            });
+        },
+        onPayrollDeductionPress() {
+            var violationRec = this.getView().getModel("detailData").getData().record;
+            if (!violationRec?.ZACTION_REF_NO) {
+                MessageBox.error("No violation record loaded. Cannot submit Payroll Deduction.");
+                return;
+            }
+            debugger;
+            const payload = ODataUtils.buildITMPayload(violationRec, {
                 Zaction: "B",
+                Zlinemanagername: ODataUtils.getCurrentUserName(),
+                ZinitatedBy: ODataUtils.getCurrentUserId(),
+                Zlinemanageractiondate: new Date(),
+                ZinitDate: new Date(),
                 Zstatus: "4"
-            })
-                .then(() => {
-                    sap.ui.core.BusyIndicator.hide();
-                    MessageToast.show("Payroll Deduction submitted successfully.");
-                    this.onNavBack();
-                })
-                .catch((error) => {
-                    sap.ui.core.BusyIndicator.hide();
-                    console.error("HCViolationDetailPage: payroll deduction update failed:", error);
-                });
+            });
+            this._submitToITMSet(
+                payload,
+                "Payroll Deduction submitted successfully.",
+                () => this.onNavBack(),
+                "Error submitting Payroll Deduction"
+            );
+            // const oDataModel = this.getOwnerComponent().getModel();
+            // oDataModel.setUseBatch(false);
+
+            // sap.ui.core.BusyIndicator.show(0);
+            // violationRec.ZactionRefNo = violationRec.ZACTION_REF_NO; // Ensure the correct property is set for the OData call
+            // ODataUtils.submitHCAction(oDataModel, violationRec, {
+            //     Zaction: "B",
+            //     Zstatus: "4"
+            // })
+            //     .then(() => {
+            //         sap.ui.core.BusyIndicator.hide();
+            //         MessageToast.show("Payroll Deduction submitted successfully.");
+            //         this.onNavBack();
+            //     })
+            //     .catch((error) => {
+            //         sap.ui.core.BusyIndicator.hide();
+            //         console.error("HCViolationDetailPage: payroll deduction update failed:", error);
+            //     });
         },
         onValueHelpClose() {
         },
