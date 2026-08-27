@@ -138,7 +138,9 @@ sap.ui.define([
                 this.byId("HcTable"),
                 HC_TABLE_COLUMNS,
                 "HC_Violations",
-                this.formatEdmTime.bind(this)
+                this.formatEdmTime.bind(this),
+                this.formatZstatus.bind(this),
+                this.formatZaction.bind(this)
             );
         },
 
@@ -261,7 +263,9 @@ sap.ui.define([
                 this.byId("HcNewTable"),
                 HC_TABLE_COLUMNS,
                 "HC_New_Violations",
-                this.formatEdmTime.bind(this)
+                this.formatEdmTime.bind(this),
+                this.formatZstatus.bind(this),
+                this.formatZaction.bind(this)
             );
         },
 
@@ -297,7 +301,9 @@ sap.ui.define([
                 this.byId("HcCompletedTable"),
                 HC_TABLE_COLUMNS,
                 "HC_Completed_Violations",
-                this.formatEdmTime.bind(this)
+                this.formatEdmTime.bind(this),
+                this.formatZstatus.bind(this),
+                this.formatZaction.bind(this)
             );
         },
         _loadHCReport() {
@@ -331,7 +337,9 @@ sap.ui.define([
                 this.byId("HcReportTable"),
                 HC_REPORT_COLUMNS,
                 "HC_Report",
-                this.formatEdmTime.bind(this)
+                this.formatEdmTime.bind(this),
+                this.formatZstatus.bind(this),
+                this.formatZaction.bind(this)
             );
         },
 

@@ -280,7 +280,9 @@ sap.ui.define([
                 this.byId("currentTable"),
                 CURRENT_VIOLATIONS_COLUMNS,
                 "Current_Violations",
-                this.formatEdmTime.bind(this)
+                this.formatEdmTime.bind(this),
+                this.formatZstatus.bind(this),
+                this.formatZaction.bind(this)
             );
         },
 
@@ -289,7 +291,9 @@ sap.ui.define([
                 this.byId("historyTable"),
                 HISTORY_VIOLATIONS_COLUMNS,
                 "Violation_History",
-                this.formatEdmTime.bind(this)
+                this.formatEdmTime.bind(this),
+                this.formatZstatus.bind(this),
+                this.formatZaction.bind(this)
             );
         },
 
@@ -368,7 +372,9 @@ sap.ui.define([
                 this.byId("missPunchTable"),
                 MISS_PUNCH_COLUMNS,
                 "Miss_Punch",
-                this.formatEdmTime.bind(this)
+                this.formatEdmTime.bind(this),
+                this.formatZstatus.bind(this),
+                this.formatZaction.bind(this)
             );
         },
 
