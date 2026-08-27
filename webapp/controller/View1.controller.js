@@ -58,8 +58,8 @@ sap.ui.define([
     const MISS_PUNCH_COLUMNS = [
         { label: "Employee ID", binding: "ZempId", width: "6rem", sortProperty: "ZempId", filterProperty: "ZempId", visible: true },
         { label: "Employee Name", binding: "ZempName", width: "14rem", sortProperty: "ZempName", filterProperty: "ZempName", visible: true },
-        { label: "Scheduled In Date", binding: "ZschDateIn", width: "14rem", sortProperty: "ZschDateIn", filterProperty: "ZschDateIn", visible: true, isDate:true },
-        { label: "Sheduled Out Date", binding: "ZschDateOut", width: "14rem", sortProperty: "ZschDateOut", filterProperty: "ZschDateOut", visible: true , isDate:true},
+        { label: "Scheduled In Date", binding: "ZschDateIn", width: "14rem", sortProperty: "ZschDateIn", filterProperty: "ZschDateIn", visible: true, isDate: true },
+        { label: "Sheduled Out Date", binding: "ZschDateOut", width: "14rem", sortProperty: "ZschDateOut", filterProperty: "ZschDateOut", visible: true, isDate: true },
         { label: "Scheduled In", binding: "ZschTimeIn", width: "12rem", sortProperty: "ZschTimeIn", filterProperty: "ZschTimeIn", visible: true, isTime: true },
         { label: "Scheduled Out", binding: "ZschTimeOut", width: "12rem", sortProperty: "ZschTimeOut", filterProperty: "ZschTimeOut", visible: true, isTime: true },
         {
@@ -279,7 +279,9 @@ sap.ui.define([
                 this.byId("currentTable"),
                 CURRENT_VIOLATIONS_COLUMNS,
                 "Current_Violations",
-                this.formatEdmTime.bind(this)
+                this.formatEdmTime.bind(this),
+                this.formatZstatus.bind(this),
+                this.formatZaction.bind(this)
             );
         },
 
@@ -288,7 +290,9 @@ sap.ui.define([
                 this.byId("historyTable"),
                 HISTORY_VIOLATIONS_COLUMNS,
                 "Violation_History",
-                this.formatEdmTime.bind(this)
+                this.formatEdmTime.bind(this),
+                this.formatZstatus.bind(this),
+                this.formatZaction.bind(this)
             );
         },
 
@@ -367,7 +371,9 @@ sap.ui.define([
                 this.byId("missPunchTable"),
                 MISS_PUNCH_COLUMNS,
                 "Miss_Punch",
-                this.formatEdmTime.bind(this)
+                this.formatEdmTime.bind(this),
+                this.formatZstatus.bind(this),
+                this.formatZaction.bind(this)
             );
         },
 
