@@ -14,7 +14,7 @@ sap.ui.define([
      */
     function resolveEdmType(columnConfig) {
         if (columnConfig.isTime || columnConfig.isDate) { return EdmType.String; }
-        if (columnConfig.isNumber)                      { return EdmType.Number; }
+        if (columnConfig.isNumber) { return EdmType.Number; }
         return EdmType.String;
     }
 
@@ -24,7 +24,7 @@ sap.ui.define([
      */
     function defaultFormatEdmTime(edmTime) {
         if (edmTime === null || edmTime === undefined) { return ""; }
-        if (typeof edmTime === "string")               { return edmTime; }
+        if (typeof edmTime === "string") { return edmTime; }
 
         let ms;
         if (typeof edmTime === "object" && edmTime.ms !== undefined) {
@@ -62,8 +62,8 @@ sap.ui.define([
         if (isNaN(date.getTime())) { return ""; }
 
         const yyyy = date.getFullYear();
-        const mm   = String(date.getMonth() + 1).padStart(2, "0");
-        const dd   = String(date.getDate()).padStart(2, "0");
+        const mm = String(date.getMonth() + 1).padStart(2, "0");
+        const dd = String(date.getDate()).padStart(2, "0");
         return `${yyyy}-${mm}-${dd}`;
     }
 
@@ -72,14 +72,16 @@ sap.ui.define([
     const ExportUtils = {
 
         /**
-         * Export currently bound (and filtered) table rows to an .xlsx file.
-         *
-         * @param {sap.ui.table.Table} table         - source table
-         * @param {Array}              columnConfigs  - same config used to build the table
-         * @param {string}             [fileName]     - base file name without extension
-         * @param {Function}           [timeFormatter]- formatter(rawValue) → string for isTime cols
-         */
-        exportTableToExcel(table, columnConfigs, fileName, timeFormatter) {
+  * Export currently bound (and filtered) table rows to an .xlsx file.
+  *
+  * @param {sap.ui.table.Table} table         - source table
+  * @param {Array}              columnConfigs  - same config used to build the table
+  * @param {string}             [fileName]     - base file name without extension
+  * @param {Function}           [timeFormatter]- formatter(rawValue) → string for isTime cols
+  * @param {Function}           [statusFormatter] - formatter(rawValue) → string for isStatus cols
+  * @param {Function}           [actionFormatter] - formatter(rawValue) → string for isAction cols
+  */
+        exportTableToExcel(table, columnConfigs, fileName, timeFormatter, statusFormatter, actionFormatter) {
             if (!table) {
                 MessageToast.show("Nothing to export: table not found.");
                 return;
@@ -104,10 +106,10 @@ sap.ui.define([
 
             // sap.ui.export column definitions
             const exportColumns = visibleColumns.map(col => ({
-                label:    col.label,
+                label: col.label,
                 property: col.binding,
-                type:     resolveEdmType(col),
-                width:    col.exportWidth || undefined
+                type: resolveEdmType(col),
+                width: col.exportWidth || undefined
             }));
 
             // Pre-format time/date fields so Excel gets readable strings
@@ -121,14 +123,18 @@ sap.ui.define([
                             : defaultFormatEdmTime(row[col.binding]);
                     } else if (col.isDate) {
                         formattedRow[col.binding] = defaultFormatEdmDate(row[col.binding]);
+                    } else if (col.isStatus && statusFormatter) {
+                        formattedRow[col.binding] = statusFormatter(row[col.binding]);
+                    } else if (col.isAction && actionFormatter) {
+                        formattedRow[col.binding] = actionFormatter(row[col.binding]);
                     }
                 });
 
                 return formattedRow;
             });
 
-            const baseName    = fileName || "export";
-            const sheetName   = baseName.substring(0, 31); // Excel sheet name limit
+            const baseName = fileName || "export";
+            const sheetName = baseName.substring(0, 31); // Excel sheet name limit
 
             const spreadsheet = new Spreadsheet({
                 workbook: {
@@ -136,7 +142,7 @@ sap.ui.define([
                     context: { sheetName }
                 },
                 dataSource: formattedRows,
-                fileName:   `${baseName}.xlsx`
+                fileName: `${baseName}.xlsx`
             });
 
             spreadsheet.build()
