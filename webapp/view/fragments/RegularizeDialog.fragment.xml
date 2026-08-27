@@ -351,6 +351,15 @@
                         text="Other"
                     />
                 </Select>
+                                <TextArea
+                    id="regularizeLMReason"
+                    value="{regularize>/lmreason}"
+                    rows="3"
+                    maxLength="255"
+                    growing="false"
+                    width="100%"
+                    placeholder="Enter reason for regularization..."
+                />
             </VBox>
         </content>
 

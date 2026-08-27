@@ -458,7 +458,7 @@
                             />
                             <Text id="_IDGenText127" 
 
-                                text="{detailData>/record/Zlinemanagerremarks}"
+                                text="{detailData>/record/Zregularizereason}"
                             />
                         </form:content>
                     </form:SimpleForm>
