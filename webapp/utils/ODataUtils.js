@@ -282,6 +282,8 @@ sap.ui.define([], () => {
                 Zhiredate: r.Zhiredate || r.ZhireDate || null,
                 Zpaygrade: s(r.Zpaygrade || r.ZpayGrade),
                 ZunautDays: s(r.ZunautDays),
+                ZempEmail:s(r.ZempEmail),
+                Zlmemail:s(r.ZlmEmail),
                 // ── Position / Location ───────────────────────────────────
                 Zposition: s(r.Zposition),
                 Zjobtitle: s(r.Zjobtitle || r.ZjobTitle),
