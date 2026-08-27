@@ -8,8 +8,9 @@
                     <PropertyRef Name="ZempId"/>
                     <PropertyRef Name="ZACTION_REF_NO"/>
                 </Key>
-                <Property Name="Zishc" Type="Edm.Boolean" Nullable="false" sap:unicode="false" sap:label="Is Hc" sap:creatable="false" sap:updatable="false"/>
                 <Property Name="ZempEmail" Type="Edm.String" Nullable="false" MaxLength="241" sap:unicode="false" sap:label="Emp Email" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Zishc" Type="Edm.Boolean" Nullable="false" sap:unicode="false" sap:label="Is Hc" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="ZlmEmail" Type="Edm.String" MaxLength="241" sap:unicode="false" sap:label="E-Mail Address" sap:creatable="false" sap:updatable="false"/>
                 <Property Name="Zstatus" Type="Edm.String" Nullable="false" MaxLength="1" sap:unicode="false" sap:label="Status for Sanctions" sap:creatable="false" sap:updatable="false"/>
                 <Property Name="ZempId" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Employee ID" sap:creatable="false" sap:updatable="false"/>
                 <Property Name="ZACTION_REF_NO" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Action Reference ID" sap:creatable="false" sap:updatable="false"/>
