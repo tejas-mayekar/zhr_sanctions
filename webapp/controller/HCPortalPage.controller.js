@@ -200,7 +200,8 @@ sap.ui.define([
                 path: "mainService>/HDR_STRSet",
                 filters: [
                     new Filter("ZlmIdName", FilterOperator.EQ, ODataUtils.getCurrentUserId()),
-                    new Filter("Zishc", FilterOperator.EQ, true)
+                    new Filter("Zishc", FilterOperator.EQ, true),
+                    new Filter("ZunautDays", FilterOperator.EQ, 'Unatt')
                 ],
                 events: {
                     dataReceived: () => {
