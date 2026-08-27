@@ -21,6 +21,7 @@ sap.ui.define([
         ZincDate: "",
         isVisible: false,
         reason: "",
+        lmreason: "",
         insdescription: "",
         actionOptions: []
     };
@@ -214,7 +215,8 @@ sap.ui.define([
                 delayTo: this.secondsToTimeString(this.timeStringToSeconds(pIn) - 1),
                 shortFrom: this.secondsToTimeString(this.timeStringToSeconds(pOut) + 1),
                 shortTo: schOut,
-                reason: ""
+                reason: "",
+                lmreason: "",
             };
 
             this.getView().getModel("regularize").setData(state);
@@ -224,6 +226,11 @@ sap.ui.define([
             const reason = (state.reason || "").trim();
             if (!reason) {
                 MessageBox.warning("Please enter a reason before submitting.");
+                return;
+            }
+            const lmreason = (state.lmreason || "").trim();
+            if (state.reason === "Other" && !lmreason) {
+                MessageBox.warning("Please specify a reason when 'Other' is selected.");
                 return;
             }
 
@@ -246,7 +253,8 @@ sap.ui.define([
             })
                 .then(() => ODataUtils.submitHCAction(oDataModel, record, {
                     Zaction: "A",
-                    Zhcopsremark: reason,
+                    Zregularizereason: reason,
+                    Zhcopsremark: lmreason,
                     Zstatus: "4",
                     Zhcopsname: ODataUtils.getCurrentUserName(),
                 }))

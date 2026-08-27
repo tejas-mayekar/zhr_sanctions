@@ -153,7 +153,8 @@ sap.ui.define([
                 shortFrom: this.secondsToTimeString(this.timeStringToSeconds(punchOut) + 1),
                 shortTo: scheduledOut,
 
-                reason: ""
+                reason: "",
+                lmreason: ""
             };
 
             Object.assign(state, hasUnauth
@@ -184,7 +185,7 @@ sap.ui.define([
             const regularizeModel = this.getView().getModel("regularize");
             const state = regularizeModel.getData();
             const reason = (state.reason || "").trim();
-
+            const lmreason = (state.lmreason || "").trim();
             if (!reason) {
                 MessageBox.warning("Please enter a reason before submitting.");
                 return;
@@ -216,6 +217,10 @@ sap.ui.define([
                     MessageBox.warning("Please fill in both Punch In and Punch Out times.");
                     return;
                 }
+            }
+            if (state.reason === "Other" && !(lmreason || "").trim()) {
+                MessageBox.warning("Please specify a reason when 'Other' is selected.");
+                return;
             }
             const record = this.getView().getModel("detailData").getProperty("/record");
             if (!record?.ZACTION_REF_NO) {
@@ -262,6 +267,7 @@ sap.ui.define([
             const itmPayload = ODataUtils.buildITMPayload(record, {
                 Zaction: "A",
                 Zregularizereason: reason,
+                Zlinemanagerremarks: lmreason,
                 Zlinemanagername: ODataUtils.getCurrentUserName(),
                 ZinitatedBy: ODataUtils.getCurrentUserId(),
                 ZinitDate: new Date(),
@@ -541,7 +547,8 @@ sap.ui.define([
                 delayTo: "",
                 shortFrom: "",
                 shortTo: "",
-                reason: ""
+                reason: "",
+                lmreason: ""
             };
         }
     });
