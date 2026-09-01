@@ -189,8 +189,15 @@ sap.ui.define([
             const pOut = this.toTimeString(record.Zpunchouttime);
             const unautDays = parseInt(record.ZunautDays, 10) || 0;
             const hasUnauth = unautDays > 0;
-            const hasDelay = schIn && pIn && this.timeStringToSeconds(pIn) > this.timeStringToSeconds(schIn);
-            const hasShort = schOut && pOut && this.timeStringToSeconds(pOut) < this.timeStringToSeconds(schOut);
+            const schInSec = this.timeStringToSeconds(schIn);
+            let schOutSec = this.timeStringToSeconds(schOut);
+            const isOvernight = schIn && schOut && schOutSec < schInSec;
+            if (isOvernight) { schOutSec += 86400; }
+            const pInSec = isOvernight ? this.normalizeOvernightSeconds(schInSec, this.timeStringToSeconds(pIn)) : this.timeStringToSeconds(pIn);
+            const pOutSec = isOvernight ? this.normalizeOvernightSeconds(schInSec, this.timeStringToSeconds(pOut)) : this.timeStringToSeconds(pOut);
+
+            const hasDelay = schIn && pIn && pInSec > schInSec;
+            const hasShort = schOut && pOut && pOutSec < schOutSec;
             const hasBoth = hasDelay && hasShort;
             const mode = hasBoth ? "both" : hasDelay ? "delay" : "short";
 

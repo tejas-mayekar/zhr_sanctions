@@ -216,6 +216,7 @@
                     <PropertyRef Name="DelayFlag"/>
                 </Key>
                 <Property Name="ZempId" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Employee ID" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="ZscheduleOutDate" Type="Edm.DateTime" Nullable="false" Precision="7" sap:unicode="false" sap:label="End Date" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="ZincDate" Type="Edm.DateTime" Nullable="false" Precision="7" sap:unicode="false" sap:label="Incident date" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="ZschTimeIn" Type="Edm.Time" Precision="0" sap:unicode="false" sap:label="Start Time" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="ZschTimeOut" Type="Edm.Time" Precision="0" sap:unicode="false" sap:label="End Time" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
