@@ -114,29 +114,29 @@ sap.ui.define([], () => {
             });
         },
         fetchODataAll(oDataModel, entitySetPath, filters, pageSize = 20) {
-    if (!oDataModel) {
-        return Promise.reject(new Error("ODataUtils.fetchODataAll: oDataModel is null."));
-    }
-    const readPage = (skip, acc) => {
-        return new Promise((resolve, reject) => {
-            oDataModel.read(entitySetPath, {
-                filters: filters || [],
-                urlParameters: { "$skip": skip, "$top": pageSize },
-                success: (data) => {
-                    const results = data?.results || [];
-                    const merged = acc.concat(results);
-                    if (results.length < pageSize) {
-                        resolve(merged);
-                    } else {
-                        readPage(skip + pageSize, merged).then(resolve).catch(reject);
-                    }
-                },
-                error: (err) => reject(err)
-            });
-        });
-    };
-    return readPage(0, []);
-},
+            if (!oDataModel) {
+                return Promise.reject(new Error("ODataUtils.fetchODataAll: oDataModel is null."));
+            }
+            const readPage = (skip, acc) => {
+                return new Promise((resolve, reject) => {
+                    oDataModel.read(entitySetPath, {
+                        filters: filters || [],
+                        urlParameters: { "$skip": skip, "$top": pageSize },
+                        success: (data) => {
+                            const results = data?.results || [];
+                            const merged = acc.concat(results);
+                            if (results.length < pageSize) {
+                                resolve(merged);
+                            } else {
+                                readPage(skip + pageSize, merged).then(resolve).catch(reject);
+                            }
+                        },
+                        error: (err) => reject(err)
+                    });
+                });
+            };
+            return readPage(0, []);
+        },
         formatEdmTime(edmTime) {
             if (edmTime === null || edmTime === undefined) { return ""; }
             if (typeof edmTime === "string") { return edmTime; }
@@ -282,8 +282,8 @@ sap.ui.define([], () => {
                 Zhiredate: r.Zhiredate || r.ZhireDate || null,
                 Zpaygrade: s(r.Zpaygrade || r.ZpayGrade),
                 ZunautDays: s(r.ZunautDays),
-                ZempEmail:s(r.ZempEmail),
-                Zlmemail:s(r.ZlmEmail),
+                ZempEmail: s(r.ZempEmail),
+                Zlmemail: s(r.ZlmEmail),
                 // ── Position / Location ───────────────────────────────────
                 Zposition: s(r.Zposition),
                 Zjobtitle: s(r.Zjobtitle || r.ZjobTitle),
@@ -384,7 +384,8 @@ sap.ui.define([], () => {
                 Zpunchouttime: this.formatTimeDurationForPayload(o.Zpunchouttime || r.Zpunchouttime),
                 ZschTimeOut: this.formatTimeDurationForPayload(o.ZschTimeOut || r.ZschTimeOut),
                 DelayFlag: (o.DelayFlag !== undefined && o.DelayFlag !== null)
-                    ? String(o.DelayFlag) : "0"
+                    ? String(o.DelayFlag) : "0",
+                ZscheduleOutDate: this.formatDateTimeForPayload(o.ZscheduleOutDate)
             };
         },
 

@@ -246,6 +246,28 @@ sap.ui.define([
 
             this.getView().getModel("regularize").setData(state);
         },
+        _getScheduleOutDate(incDate, isNightShift) {
+            if (!isNightShift) { return incDate; }
+
+            let date;
+            if (incDate instanceof Date) {
+                date = new Date(incDate.getTime());
+            } else if (typeof incDate === "string" && incDate.startsWith("/Date(")) {
+                date = new Date(parseInt(incDate.replace(/[^0-9]/g, ""), 10));
+            } else if (typeof incDate === "string") {
+                date = new Date(incDate);
+            } else {
+                return incDate; // unknown shape — leave as-is
+            }
+
+            if (isNaN(date.getTime())) { return incDate; }
+
+            date.setDate(date.getDate() + 1);
+            // Preserve the same shape it came in as
+            return (typeof incDate === "string" && incDate.startsWith("/Date("))
+                ? `/Date(${date.getTime()})/`
+                : date;
+        },
         onRegularizeSubmit() {
             const state = this.getView().getModel("regularize").getData();
             const reason = (state.reason || "").trim();
@@ -258,8 +280,20 @@ sap.ui.define([
                 MessageBox.warning("Please specify a reason when 'Other' is selected.");
                 return;
             }
-
             const record = this.getView().getModel("detailData").getData().record;
+            const schInRaw = this.toTimeString(record.ZschTimeIn);
+            const schOutRaw = this.toTimeString(record.ZschTimeOut);
+            const isNightShift = !!schInRaw && !!schOutRaw
+                && this.timeStringToSeconds(schInRaw) > this.timeStringToSeconds(schOutRaw);
+
+            const toSecondsWithWrap = (fromStr, toStr) => {
+                let toSec = this.timeStringToSeconds(toStr);
+                const fromSec = this.timeStringToSeconds(fromStr);
+                if (isNightShift && toSec <= fromSec) {
+                    toSec += 86400;
+                }
+                return toSec;
+            };
             const delayFlag = state.showUnauth ? "4"
                 : state.showDelay && state.showShort ? "3"
                     : state.showDelay ? "1" : "2";
@@ -274,7 +308,8 @@ sap.ui.define([
                 Zpunchintime: state.showUnauth ? state.unauthPunchIn : state.delayTo,
                 Zpunchouttime: state.showUnauth ? state.unauthPunchOut : state.shortFrom,
                 ZschTimeOut: state.showUnauth ? state.unauthPunchOut : state.shortTo,
-                DelayFlag: delayFlag
+                DelayFlag: delayFlag,
+                ZscheduleOutDate: this._getScheduleOutDate(record.ZincDate, isNightShift)
             })
                 .then(() => ODataUtils.submitHCAction(oDataModel, record, {
                     Zaction: "A",
