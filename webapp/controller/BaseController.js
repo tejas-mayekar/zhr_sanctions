@@ -49,15 +49,26 @@ sap.ui.define([
             const ss = String(totalSeconds % 60).padStart(2, "0");
             return `${hh}:${mm}:${ss}`;
         },
-
+        normalizeOvernightSeconds(schInSeconds, valueSeconds) {
+            return (valueSeconds < schInSeconds) ? valueSeconds + 86400 : valueSeconds;
+        },
         hasAttendanceTimeDifference(record) {
             if (!record) { return false; }
             const schIn = this.toTimeString(record.ZschTimeIn);
             const schOut = this.toTimeString(record.ZschTimeOut);
             const pIn = this.toTimeString(record.Zpunchintime);
             const pOut = this.toTimeString(record.Zpunchouttime);
-            const delay = schIn && pIn && this.timeStringToSeconds(pIn) > this.timeStringToSeconds(schIn);
-            const short = schOut && pOut && this.timeStringToSeconds(pOut) < this.timeStringToSeconds(schOut);
+
+            const schInSec = this.timeStringToSeconds(schIn);
+            let schOutSec = this.timeStringToSeconds(schOut);
+            const isOvernight = schIn && schOut && schOutSec < schInSec;
+            if (isOvernight) { schOutSec += 86400; }
+
+            const pInSec = isOvernight ? this.normalizeOvernightSeconds(schInSec, this.timeStringToSeconds(pIn)) : this.timeStringToSeconds(pIn);
+            const pOutSec = isOvernight ? this.normalizeOvernightSeconds(schInSec, this.timeStringToSeconds(pOut)) : this.timeStringToSeconds(pOut);
+
+            const delay = schIn && pIn && pInSec > schInSec;
+            const short = schOut && pOut && pOutSec < schOutSec;
             return delay || short;
         },
 

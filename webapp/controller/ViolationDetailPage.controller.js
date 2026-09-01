@@ -115,14 +115,19 @@ sap.ui.define([
             const punchOut = this.toTimeString(record.Zpunchouttime);
             const unautDays = parseInt(record.ZunautDays, 10) || 0;
             const hasUnauth = unautDays > 0;
+            const scheduledInSec = this.timeStringToSeconds(scheduledIn);
+            let scheduledOutSec = this.timeStringToSeconds(scheduledOut);
+            const isOvernight = scheduledIn && scheduledOut && scheduledOutSec < scheduledInSec;
+            if (isOvernight) { scheduledOutSec += 86400; }
+            const punchInSec = isOvernight ? this.normalizeOvernightSeconds(scheduledInSec, this.timeStringToSeconds(punchIn)) : this.timeStringToSeconds(punchIn);
+            const punchOutSec = isOvernight ? this.normalizeOvernightSeconds(scheduledInSec, this.timeStringToSeconds(punchOut)) : this.timeStringToSeconds(punchOut);
+
             const hasDelay = isNonZeroTime(record.ZdelayHrs) && (
-                !punchIn || !scheduledIn ||
-                this.timeStringToSeconds(punchIn) > this.timeStringToSeconds(scheduledIn)
+                !punchIn || !scheduledIn || punchInSec > scheduledInSec
             );
 
             const hasShort = isNonZeroTime(record.ZshortHrs) && (
-                !punchOut || !scheduledOut ||
-                this.timeStringToSeconds(punchOut) < this.timeStringToSeconds(scheduledOut)
+                !punchOut || !scheduledOut || punchOutSec < scheduledOutSec
             );
 
             const hasBoth = hasDelay && hasShort;
@@ -180,7 +185,28 @@ sap.ui.define([
             regularizeModel.setProperty("/showDelay", visibility.showDelay);
             regularizeModel.setProperty("/showShort", visibility.showShort);
         },
+        _getScheduleOutDate(incDate, isNightShift) {
+            if (!isNightShift) { return incDate; }
 
+            let date;
+            if (incDate instanceof Date) {
+                date = new Date(incDate.getTime());
+            } else if (typeof incDate === "string" && incDate.startsWith("/Date(")) {
+                date = new Date(parseInt(incDate.replace(/[^0-9]/g, ""), 10));
+            } else if (typeof incDate === "string") {
+                date = new Date(incDate);
+            } else {
+                return incDate; // unknown shape — leave as-is
+            }
+
+            if (isNaN(date.getTime())) { return incDate; }
+
+            date.setDate(date.getDate() + 1);
+            // Preserve the same shape it came in as
+            return (typeof incDate === "string" && incDate.startsWith("/Date("))
+                ? `/Date(${date.getTime()})/`
+                : date;
+        },
         onRegularizeSubmit() {
             const regularizeModel = this.getView().getModel("regularize");
             const state = regularizeModel.getData();
@@ -191,12 +217,32 @@ sap.ui.define([
                 return;
             }
 
+            const record = this.getView().getModel("detailData").getProperty("/record");
+            if (!record?.ZACTION_REF_NO) {
+                MessageBox.error("No violation record loaded. Cannot submit Regularization.");
+                return;
+            }
+
+            const schInRaw = this.toTimeString(record.ZschTimeIn);
+            const schOutRaw = this.toTimeString(record.ZschTimeOut);
+            const isNightShift = !!schInRaw && !!schOutRaw
+                && this.timeStringToSeconds(schInRaw) > this.timeStringToSeconds(schOutRaw);
+
+            const toSecondsWithWrap = (fromStr, toStr) => {
+                let toSec = this.timeStringToSeconds(toStr);
+                const fromSec = this.timeStringToSeconds(fromStr);
+                if (isNightShift && toSec <= fromSec) {
+                    toSec += 86400;
+                }
+                return toSec;
+            };
+
             if (state.showDelay) {
                 if (!state.delayFrom || !state.delayTo) {
                     MessageBox.warning("Please fill in both Delay From and To times.");
                     return;
                 }
-                if (this.timeStringToSeconds(state.delayTo) <= this.timeStringToSeconds(state.delayFrom)) {
+                if (toSecondsWithWrap(state.delayFrom, state.delayTo) <= this.timeStringToSeconds(state.delayFrom)) {
                     MessageBox.warning("Delay 'To Time' must be later than 'From Time'.");
                     return;
                 }
@@ -207,7 +253,7 @@ sap.ui.define([
                     MessageBox.warning("Please fill in both Short Hours From and To times.");
                     return;
                 }
-                if (this.timeStringToSeconds(state.shortTo) <= this.timeStringToSeconds(state.shortFrom)) {
+                if (toSecondsWithWrap(state.shortFrom, state.shortTo) <= this.timeStringToSeconds(state.shortFrom)) {
                     MessageBox.warning("Short Hours 'To Time' must be later than 'From Time'.");
                     return;
                 }
@@ -222,16 +268,11 @@ sap.ui.define([
                 MessageBox.warning("Please specify a reason when 'Other' is selected.");
                 return;
             }
-            const record = this.getView().getModel("detailData").getProperty("/record");
-            if (!record?.ZACTION_REF_NO) {
-                MessageBox.error("No violation record loaded. Cannot submit Regularization.");
-                return;
-            }
 
-            let correctedSchIn = this.toTimeString(record.ZschTimeIn);
+            let correctedSchIn = schInRaw;
             let correctedPunchIn = this.toTimeString(record.Zpunchintime);
             let correctedPunchOut = this.toTimeString(record.Zpunchouttime);
-            let correctedSchOut = this.toTimeString(record.ZschTimeOut);
+            let correctedSchOut = schOutRaw;
             if (state.showUnauth) {
                 correctedSchIn = state.unauthPunchIn;
                 correctedPunchIn = state.unauthPunchIn;
@@ -250,6 +291,17 @@ sap.ui.define([
                 correctedPunchIn = state.delayTo;
                 correctedPunchOut = state.shortFrom;
                 correctedSchOut = state.shortTo;
+            }
+
+            if (this.timeStringToSeconds(correctedSchIn) > this.timeStringToSeconds(correctedSchOut)) {
+                correctedSchOut = this.secondsToTimeString(
+                    this.timeStringToSeconds(correctedSchOut) + 86400
+                );
+            }
+            if (this.timeStringToSeconds(correctedPunchIn) > this.timeStringToSeconds(correctedPunchOut)) {
+                correctedPunchOut = this.secondsToTimeString(
+                    this.timeStringToSeconds(correctedPunchOut) + 86400
+                );
             }
 
             const delayFlag = state.showUnauth ? "4"
@@ -284,7 +336,8 @@ sap.ui.define([
                 Zpunchintime: correctedPunchIn,
                 Zpunchouttime: correctedPunchOut,
                 ZschTimeOut: correctedSchOut,
-                DelayFlag: delayFlag
+                DelayFlag: delayFlag,
+                ZscheduleOutDate: this._getScheduleOutDate(record.ZincDate, isNightShift)
             })
                 .then(() => {
                     oDataModel.create("/ITM_STRSet", itmPayload, {
