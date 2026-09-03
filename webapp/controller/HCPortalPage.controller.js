@@ -344,6 +344,7 @@ sap.ui.define([
             );
         },
 
+        // NEW
         onViewReportDetails(oEvent) {
             const context = oEvent.getSource().getBindingContext("mainService");
             if (!context) { return; }
@@ -353,10 +354,10 @@ sap.ui.define([
                 return;
             }
             this.getOwnerComponent().setModel(
-                new JSONModel({ record: context.getObject(), source: "hcdetail" }),
+                new JSONModel({ record: context.getObject(), source: "hcreportdetail" }),
                 "detailData"
             );
-            this.getOwnerComponent().getRouter().navTo("RouteHCViolationDetailpage", {
+            this.getOwnerComponent().getRouter().navTo("RouteHCReportDetailpage", {
                 actionRefNo: encodeURIComponent(actionRefNo)
             });
         },
