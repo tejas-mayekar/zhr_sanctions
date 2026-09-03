@@ -30,8 +30,8 @@ sap.ui.define([
 
         onInit() {
             this.getView().setModel(new JSONModel({ isEditOn: false }));
-
             this.getView().setModel(new JSONModel({ ...EMPTY_ACTION_STATE }), "regularize");
+            this._pendingFiles = [];   // ← add this
 
             this.getOwnerComponent()
                 .getRouter()
@@ -51,6 +51,7 @@ sap.ui.define([
             this.getView().getModel().setProperty("/isEditOn", isOpen);
 
             this.getView().getModel("regularize").setData({ ...EMPTY_ACTION_STATE });
+            this._pendingFiles = [];
         },
         onMediaFilePress(oEvent) {
             const ctx = oEvent.getSource().getBindingContext("media");
@@ -70,99 +71,96 @@ sap.ui.define([
             this.getView().getModel("regularize").setProperty("/ZincCategory", selectedKey);
             return selectedKey || null;
         },
+        onFileChange(oEvent) {
+            const files = oEvent.getParameter("files");
+            this._pendingFiles = files ? Array.from(files) : [];
+        },
 
-        onTakeActionPress() {
-            if (!this._takeActionDialog) {
-                this._takeActionDialog = sap.ui.xmlfragment(
+        onReportToHCPress() {
+            this.clearFileUploadState("reportToHCFileUploader");
+            this.getView().getModel("regularize").setData({ ...EMPTY_ACTION_STATE, reason: "" });
+
+            if (!this._reportToHCDialog) {
+                this._reportToHCDialog = sap.ui.xmlfragment(
                     this.getView().getId(),
-                    "zhrsanctions.view.fragments.TakeActionDialog",
+                    "zhrsanctions.view.fragments.ReportToHCDialog",
                     this
                 );
-                this.getView().addDependent(this._takeActionDialog);
+                this.getView().addDependent(this._reportToHCDialog);
             }
-            const regularizeModel = this.getView().getModel("regularize");
-            regularizeModel.setProperty("/Zrepeatcount", 0);
-            regularizeModel.setProperty("/ZfirstIncDate", 0);
-            regularizeModel.setProperty("/isVisible", false);
-            regularizeModel.setProperty("/ZincTypeDesc", "");
-            regularizeModel.setProperty("/ZincType", "");
-            this._takeActionDialog.open();
+            this._reportToHCDialog.open();
         },
 
-        onCloseTakeActionDialog() {
-            this._takeActionDialog.close();
-        },
-        onRepeatCountChange(oEvent) {
-            const actionData = this.getView().getModel("regularize").getData();
-
-            const oInput = oEvent.getSource();
-            const newValue = parseInt(oInput.getValue(), 10);
-
-            if (actionData.Zrepeatcount < newValue) {
-                oInput.setValueState("Error");
-                oInput.setValueStateText("Repeat count cannot be greater than system repeat count");
+        onReportToHCSubmit() {
+            const reason = (this.getView().getModel("regularize").getProperty("/reason") || "").trim();
+            if (!reason) {
+                MessageBox.warning("Please enter a reason before submitting.");
                 return;
-            } else {
-                oInput.setValueState("None");
             }
 
-            try {
-                const insdescription = JSON.parse(actionData.insdescriptionstring);
-                console.log("Full data:", insdescription);
-
-                const selectedValue = insdescription.ins1[newValue];
-                console.log(`Value at index ${newValue}:`, selectedValue);
-
-                if (selectedValue !== undefined) {
-                    actionData.insdescription = selectedValue;
-                    this.getView().getModel("regularize").refresh();
-                    console.log("Updated insdescription:", actionData.insdescription);
-                } else {
-                    console.warn(`Index ${newValue} is out of bounds. Array length: ${insdescription.ins1.length}`);
-                }
-            } catch (error) {
-                console.error("Invalid JSON:", error.message);
-                oInput.setValueState("Error");
-                oInput.setValueStateText("Invalid data format");
-            }
-        },
-        onSubmitTakeAction() {
-            const actionData = this.getView().getModel("regularize").getData();
             const violationRec = this.getView().getModel("detailData").getData().record;
+            if (!violationRec?.ZACTION_REF_NO) {
+                MessageBox.error("No violation record loaded. Cannot raise to HC.");
+                return;
+            }
 
-            if (!actionData.ZincCategory || !actionData.ZincType) {
-                MessageBox.error("Please fill all required fields");
-                return;
-            }
-            if (!actionData.Zsysrepeatcount || actionData.Zsysrepeatcount === "0") {
-                MessageBox.error("System repeat count is required");
-                return;
-            }
-            if (actionData.Zrepeatcount < actionData.Zsysrepeatcount) {
-                MessageBox.error("Repeat count cannot be greater than system repeat count");
-                return;
-            }
-            if (actionData.Zsysrepeatcount > 4) {
-                MessageBox.error("Repeat count cannot be more than 4");
-                return;
-            }
-            if (actionData.reason.trim() === "") {
-                MessageBox.error("Please provide a reason for taking action");
-                return;
-            }
-            this._submitHCAction(violationRec, {
-                ZactionRefNo: violationRec.ZactionRefNo,
-                ZincCategory: actionData.ZincCategory,
-                ZincType: actionData.ZincType,
-                Zhcopsremark: actionData.reason,
-                Zhcevpactiondate: new Date(),
-                Zstatus: "5",
-                Zsysyrepeatcount: parseInt(actionData.Zsysrepeatcount),
-                ZlmIdName: ODataUtils.getCurrentUserId(),
-                Zhcopsname: ODataUtils.getCurrentUserName(),
-            }, () => this._takeActionDialog.close());
+            const payload = ODataUtils.buildITMPayload(violationRec, {
+                Zaction: "C",
+                Zstatus: "1",
+                Zlinemanagername: ODataUtils.getCurrentUserName(),
+                ZinitatedBy: ODataUtils.getCurrentUserId(),
+                ZinitDate: new Date(),
+                Zlinemanageractiondate: new Date(),
+                Zlinemanagerremarks: reason
+            });
+            const zactionRefNo = violationRec.ZACTION_REF_NO || violationRec.ZactionRefNo;
+
+            this._submitToITMSet(payload, "Raised to HC successfully.", () => {
+                if (this._pendingFiles.length > 0) {
+                    sap.ui.core.BusyIndicator.show();
+                    this.UploadFiles(this._pendingFiles, zactionRefNo);
+                }
+                this.clearFileUploadState("reportToHCFileUploader");
+                this._reportToHCDialog.close();
+                this.onNavBack();
+            }, "Error raising to HC");
         },
 
+        onReportToHCCancel() {
+            this.clearFileUploadState("reportToHCFileUploader");
+            this._reportToHCDialog.close();
+        },
+
+        UploadFiles(files, zactionRefNo) {
+            const oDataModel = this.getOwnerComponent().getModel() || this.getView().getModel("mainService");
+            const sServiceUrl = oDataModel.sServiceUrl;
+            const sCsrfToken = oDataModel.getSecurityToken ? oDataModel.getSecurityToken() : oDataModel.oHeaders["x-csrf-token"];
+
+            files.forEach((file, index) => {
+                const sUrl = `${sServiceUrl}/ZHR_SANC_MEDIAUPLOADSet`;
+                const oReq = new XMLHttpRequest();
+                oReq.open("POST", sUrl, true);
+                oReq.setRequestHeader("Content-Type", file.type || "application/octet-stream");
+                oReq.setRequestHeader("x-csrf-token", sCsrfToken);
+                oReq.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+                oReq.setRequestHeader("slug", encodeURIComponent(file.name) + ";" + encodeURIComponent(zactionRefNo) + ";" + encodeURIComponent(index));
+                oReq.onload = () => {
+                    sap.ui.core.BusyIndicator.hide();
+                    if (oReq.status >= 200 && oReq.status < 300) {
+                        MessageToast.show("File " + file.name + " uploaded successfully.");
+                    } else {
+                        MessageToast.show("Upload failed: " + file.name);
+                        console.error(oReq.responseText);
+                    }
+                };
+                oReq.onerror = () => {
+                    sap.ui.core.BusyIndicator.hide();
+                    MessageToast.show("Upload error: " + file.name);
+                };
+                oReq.send(file);
+            });
+            this._pendingFiles = [];
+        },
         onTakeNoActionPress() {
             const violationRec = this.getView().getModel("detailData").getData().record;
 
