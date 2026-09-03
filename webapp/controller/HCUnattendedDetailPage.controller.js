@@ -228,6 +228,28 @@ sap.ui.define([
 
             this.getView().getModel("regularize").setData(state);
         },
+        _getScheduleOutDate(incDate, isNightShift) {
+            if (!isNightShift) { return incDate; }
+
+            let date;
+            if (incDate instanceof Date) {
+                date = new Date(incDate.getTime());
+            } else if (typeof incDate === "string" && incDate.startsWith("/Date(")) {
+                date = new Date(parseInt(incDate.replace(/[^0-9]/g, ""), 10));
+            } else if (typeof incDate === "string") {
+                date = new Date(incDate);
+            } else {
+                return incDate; // unknown shape — leave as-is
+            }
+
+            if (isNaN(date.getTime())) { return incDate; }
+
+            date.setDate(date.getDate() + 1);
+            // Preserve the same shape it came in as
+            return (typeof incDate === "string" && incDate.startsWith("/Date("))
+                ? `/Date(${date.getTime()})/`
+                : date;
+        },
         onRegularizeSubmit() {
             const state = this.getView().getModel("regularize").getData();
             const reason = (state.reason || "").trim();
@@ -256,7 +278,8 @@ sap.ui.define([
                 Zpunchintime: state.showUnauth ? state.unauthPunchIn : state.delayTo,
                 Zpunchouttime: state.showUnauth ? state.unauthPunchOut : state.shortFrom,
                 ZschTimeOut: state.showUnauth ? state.unauthPunchOut : state.shortTo,
-                DelayFlag: delayFlag
+                DelayFlag: delayFlag,
+                ZscheduleOutDate: this._getScheduleOutDate(record.ZincDate, isNightShift)
             })
                 .then(() => {
 
