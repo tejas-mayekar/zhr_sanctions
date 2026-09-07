@@ -31,10 +31,11 @@ sap.ui.define([
     function formatDateForODataKey(dateValue) {
         const date = typeof dateValue === "string" ? new Date(dateValue) : dateValue;
         const year = date.getFullYear();
-        const month = date.getMonth() + 1;
-        const day = date.getDate();
-        return `${year}-${month}-${day}T00:00:00`;
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}T00:00:00`;  // ✅ Zero-padded
     }
+
     function dialogCacheKey(inputId) {
         return `_valueHelpDialog_${inputId}`;
     }
@@ -245,7 +246,7 @@ sap.ui.define([
                     new Filter("ZlmIdName", FilterOperator.EQ, selectedKey),
                     new Filter("ZincDate", FilterOperator.EQ, dialog._extraParam)
                 ];
-                
+
                 // filters.push(new Filter("ZincDate", FilterOperator.EQ, extraParam));
                 this.fetchEntitySet(controller, fieldConfig.modelName, fieldConfig.detailEntitySetPath, detailFilters)
                     .then(results => {
@@ -272,13 +273,14 @@ sap.ui.define([
             }
             const isHCController = controller.getMetadata().getName() ===
                 "zhrsanctions.controller.HCViolationDetailPage";
-
-            if (inputId === "dIpZincType" && isHCController) {
+            const isHCUnattendedController = controller.getMetadata().getName() ===
+                "zhrsanctions.controller.HCUnattendedDetailPage";
+            if (inputId === "dIpZincType" && (isHCController || isHCUnattendedController)) {
                 const category = dialog._extraParam; // Zviolationcategory passed as extraParam
                 const detailModel = controller.getView().getModel("detailData");
                 const employeeId = detailModel?.getProperty("/record/ZempId");
                 const incidentDate = detailModel?.getProperty("/record/ZincDate");
-                const actionRefNo = detailModel?.getProperty("/record/ZactionRefNo");
+                const actionRefNo = detailModel?.getProperty("/record/ZactionRefNo") || detailModel?.getProperty("/record/ZACTION_REF_NO");
 
                 this.loadRepeatInfo(controller, employeeId, category, selectedKey, incidentDate, actionRefNo);
             }

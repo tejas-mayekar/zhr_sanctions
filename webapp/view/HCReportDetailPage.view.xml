@@ -1,0 +1,301 @@
+<mvc:View
+    controllerName="zhrsanctions.controller.HCReportDetailPage"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:f="sap.f"
+    xmlns:core="sap.ui.core"
+    xmlns:form="sap.ui.layout.form"
+    xmlns="sap.m"
+>
+    <f:DynamicPage
+        id="hcReportDetailPage"
+        fitContent="true"
+    >
+        <!-- ─── Header ─── -->
+        <f:title>
+            <f:DynamicPageTitle id="hcReportDetailPageTitle">
+                <f:navigationActions>
+                    <Button
+                        id="hcReportBtnBack"
+                        icon="sap-icon://nav-back"
+                        tooltip="Back to HC Portal"
+                        press=".onNavBack"
+                    />
+                </f:navigationActions>
+                <f:heading>
+                    <Title
+                        id="hcReportDetailTitle"
+                        text="HC Report Details – {detailData>/record/ZactionRefNo}"
+                    />
+                </f:heading>
+                <f:snappedHeading>
+                    <Title
+                        id="hcReportDetailTitleSnapped"
+                        text="{detailData>/record/ZactionRefNo}"
+                    />
+                </f:snappedHeading>
+            </f:DynamicPageTitle>
+        </f:title>
+
+        <f:header>
+            <f:DynamicPageHeader
+                id="hcReportDetailHeader"
+                pinnable="true"
+            >
+                <HBox
+                    id="hcReportHeaderHBox"
+                    wrap="Wrap"
+                    class="sapUiSmallMargin"
+                    width="100%"
+                    justifyContent="SpaceBetween"
+                >
+                    <VBox
+                        id="hcReportEmpSnapshotBox"
+                        class="sapUiSmallMarginEnd"
+                        width="50rem"
+                    >
+                        <ObjectHeader
+                            id="hcReportObjectHeader"
+                            title="{detailData>/record/ZempName}"
+                            number="{detailData>/record/ZempId}"
+                            numberUnit="Employee ID"
+                            icon="sap-icon://employee"
+                            backgroundDesign="Transparent"
+                        >
+                            <attributes>
+                                <ObjectAttribute
+                                    id="hcReportAttrCompany"
+                                    title="Company"
+                                    text="{detailData>/record/Zn0}"
+                                />
+                                <ObjectAttribute
+                                    id="hcReportAttrDept"
+                                    title="Department"
+                                    text="{detailData>/record/Zn3}"
+                                />
+                                <ObjectAttribute
+                                    id="hcReportAttrIncDate"
+                                    title="Incident Date"
+                                    text="{
+                                        path: 'detailData>/record/ZincDate',
+                                        formatter: '.displaydateFormatter'
+                                    }"
+                                />
+                            </attributes>
+                        </ObjectHeader>
+                    </VBox>
+                </HBox>
+            </f:DynamicPageHeader>
+        </f:header>
+
+        <!-- ─── Content ─── -->
+        <f:content>
+            <VBox
+                id="hcReportContentBox"
+                class="sapUiMediumMargin"
+            >
+                <Panel
+                    id="hcReportPanelEmployee"
+                    headerText="Employee Information"
+                    expandable="true"
+                    expanded="true"
+                    class="sapUiSmallMarginBottom"
+                >
+                    <headerToolbar>
+                        <OverflowToolbar id="hcReportEmpToolbar">
+                            <Title id="hcReportEmpToolbarTitle" text="Employee Information" />
+                            <ToolbarSpacer id="hcReportEmpToolbarSpacer" />
+                            <Button
+                                id="hcReportBtnViewRemark"
+                                icon="sap-icon://comment"
+                                text="View Remarks"
+                                press=".onViewRemarkPress"
+                            />
+                        </OverflowToolbar>
+                    </headerToolbar>
+                    <form:SimpleForm
+                        id="hcReportFormEmployee"
+                        editable="false"
+                        layout="ResponsiveGridLayout"
+                        labelSpanL="4"
+                        labelSpanM="4"
+                        labelSpanS="12"
+                        emptySpanL="0"
+                        emptySpanM="0"
+                        columnsL="2"
+                        columnsM="2"
+                    >
+                        <form:content>
+                            <Label id="hcReportLblEmpId" text="Employee ID" />
+                            <Text id="hcReportTxtEmpId" text="{detailData>/record/ZempId}" />
+
+                            <Label id="hcReportLblEmpName" text="Employee Name" />
+                            <Text id="hcReportTxtEmpName" text="{detailData>/record/ZempName}" />
+
+                            <Label id="hcReportLblEmpType" text="Employee Type" />
+                            <Text id="hcReportTxtEmpType" text="{detailData>/record/ZempTypeDesc}" />
+
+                            <Label id="hcReportLblEmpClass" text="Employment Class" />
+                            <Text id="hcReportTxtEmpClass" text="{detailData>/record/ZempClassDesc}" />
+
+                            <Label id="hcReportLblCompany" text="Company" />
+                            <Text id="hcReportTxtCompany" text="{detailData>/record/Zn0}" />
+
+                            <Label id="hcReportLblDept" text="Department" />
+                            <Text id="hcReportTxtDept" text="{detailData>/record/Zn3}" />
+
+                            <Label id="hcReportLblPosition" text="Position" />
+                            <Text id="hcReportTxtPosition" text="{detailData>/record/Zposition}" />
+
+                            <Label id="hcReportLblJobTitle" text="Job Title" />
+                            <Text id="hcReportTxtJobTitle" text="{detailData>/record/Zjobtitle}" />
+
+                            <Label id="hcReportLblLocation" text="Location" />
+                            <Text id="hcReportTxtLocation" text="{detailData>/record/Zlocation}" />
+                        </form:content>
+                    </form:SimpleForm>
+                </Panel>
+
+                <Panel
+                    id="hcReportPanelViolation"
+                    headerText="Violation Details"
+                    expandable="true"
+                    expanded="true"
+                    class="sapUiSmallMarginBottom"
+                >
+                    <form:SimpleForm
+                        id="hcReportFormViolation"
+                        editable="false"
+                        layout="ResponsiveGridLayout"
+                        labelSpanL="4"
+                        labelSpanM="4"
+                        labelSpanS="12"
+                        emptySpanL="0"
+                        emptySpanM="0"
+                        columnsL="2"
+                        columnsM="2"
+                    >
+                        <form:content>
+                            <Label id="hcReportLblActionRef" text="Action Ref No" />
+                            <Text id="hcReportTxtActionRef" text="{detailData>/record/ZactionRefNo}" />
+
+                            <Label id="hcReportLblAction" text="Action" />
+                            <Text
+                                id="hcReportTxtAction"
+                                text="{
+                                    path: 'detailData>/record/Zaction',
+                                    formatter: '.formatZaction'
+                                }"
+                            />
+
+                            <Label id="hcReportLblStatus" text="Status" />
+                            <Text
+                                id="hcReportTxtStatus"
+                                text="{
+                                    path: 'detailData>/record/Zstatus',
+                                    formatter: '.formatZstatus'
+                                }"
+                            />
+
+                            <Label id="hcReportLblSanction" text="Sanction" />
+                            <Text id="hcReportTxtSanction" text="{detailData>/record/Zsanction}" />
+
+                            <Label id="hcReportLblIncDate" text="Incident Date" />
+                            <Text
+                                id="hcReportTxtIncDate"
+                                text="{
+                                    path: 'detailData>/record/ZincDate',
+                                    formatter: '.displaydateFormatter'
+                                }"
+                            />
+
+                            <Label id="hcReportLblIncDisDate" text="Incident Discovery Date" />
+                            <Text
+                                id="hcReportTxtIncDisDate"
+                                text="{
+                                    path: 'detailData>/record/ZincDisDate',
+                                    formatter: '.displaydateFormatter'
+                                }"
+                            />
+
+                            <Label id="hcReportLblInitBy" text="Initiated By" />
+                            <Text id="hcReportTxtInitBy" text="{detailData>/record/ZinitatedBy}" />
+
+                            <Label id="hcReportLblInitDate" text="Initiated Date" />
+                            <Text
+                                id="hcReportTxtInitDate"
+                                text="{
+                                    path: 'detailData>/record/ZinitDate',
+                                    formatter: '.displaydateFormatter'
+                                }"
+                            />
+                        </form:content>
+                    </form:SimpleForm>
+                </Panel>
+
+                <Panel
+                    id="hcReportPanelManager"
+                    headerText="Manager Details"
+                    expandable="true"
+                    expanded="true"
+                    class="sapUiSmallMarginBottom"
+                >
+                    <form:SimpleForm
+                        id="hcReportFormManager"
+                        editable="false"
+                        layout="ResponsiveGridLayout"
+                        labelSpanL="4"
+                        labelSpanM="4"
+                        labelSpanS="12"
+                        emptySpanL="0"
+                        emptySpanM="0"
+                        columnsL="2"
+                        columnsM="2"
+                    >
+                        <form:content>
+                            <Label id="hcReportLblLmId" text="Manager ID" />
+                            <Text id="hcReportTxtLmId" text="{detailData>/record/ZlmIdName}" />
+
+                            <Label id="hcReportLblLmName" text="Line Manager Name" />
+                            <Text id="hcReportTxtLmName" text="{detailData>/record/Zlinemanagername}" />
+
+                            <Label id="hcReportLblLmActionDate" text="Manager Action Date" />
+                            <Text
+                                id="hcReportTxtLmActionDate"
+                                text="{
+                                    path: 'detailData>/record/Zlinemanageractiondate',
+                                    formatter: '.displaydateFormatter'
+                                }"
+                            />
+
+                            <Label id="hcReportLblLmRemark" text="Manager Remark" />
+                            <Text id="hcReportTxtLmRemark" text="{detailData>/record/Zlinemanagerremarks}" />
+                        </form:content>
+                    </form:SimpleForm>
+                </Panel>
+
+                <!-- ── Attached Media ── -->
+                <Panel
+                    id="hcReportPanelMedia"
+                    headerText="Attached Files"
+                    expandable="true"
+                    expanded="true"
+                    class="sapUiSmallMarginTop"
+                >
+                    <List
+                        id="hcReportMediaList"
+                        items="{media>/results}"
+                        noDataText="No files found"
+                    >
+                        <StandardListItem
+                            id="hcReportMediaItem"
+                            title="{media>Filename}"
+                            icon="sap-icon://attachment"
+                            type="Active"
+                            press=".onMediaFilePress"
+                        />
+                    </List>
+                </Panel>
+            </VBox>
+        </f:content>
+    </f:DynamicPage>
+</mvc:View>
