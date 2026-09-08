@@ -106,23 +106,7 @@
                                     id="_IDGenOverflowToolbar4"
                                     style="Standard"
                                 >
-                                    <HBox
-                                        id="_IDGenHBox2"
-                                        alignItems="Center"
-                                        columnGap="0.5rem"
-                                    >
-                                        <core:Icon
-                                            id="_IDGenIcon5"
-                                            src="sap-icon://search"
-                                        />
-                                        <Input
-                                            id="_IDGenInput"
-                                            showClearIcon="true"
-                                            width="25rem"
-                                            placeholder="Search..."
-                                            liveChange=".onSearchHistory"
-                                        />
-                                    </HBox>
+
                                     <ToolbarSpacer id="_IDGenToolbarSpacer2" />
                                     <Button
                                         id="_IDGenButton10"
@@ -220,23 +204,7 @@
                                     id="_IDGenOverflowToolbar8"
                                     style="Standard"
                                 >
-                                    <HBox
-                                        id="_IDGenHBox13"
-                                        alignItems="Center"
-                                        columnGap="0.5rem"
-                                    >
-                                        <core:Icon
-                                            id="_IDGenIcon9"
-                                            src="sap-icon://search"
-                                        />
-                                        <Input
-                                            id="_IDGenInputCompleted"
-                                            showClearIcon="true"
-                                            width="25rem"
-                                            placeholder="Search..."
-                                            liveChange=".onSearchCompleted"
-                                        />
-                                    </HBox>
+
                                     <ToolbarSpacer id="_IDGenToolbarSpacer4" />
                                     <Button
                                         id="_IDGenButton24"
@@ -334,23 +302,7 @@
                                     id="_IDGenOverflowToolbar10"
                                     style="Standard"
                                 >
-                                    <HBox
-                                        id="_IDGenHBox12"
-                                        alignItems="Center"
-                                        columnGap="0.5rem"
-                                    >
-                                        <core:Icon
-                                            id="_IDGenIcon7"
-                                            src="sap-icon://search"
-                                        />
-                                        <Input
-                                            id="_IDGenInputNew"
-                                            showClearIcon="true"
-                                            width="25rem"
-                                            placeholder="Search..."
-                                            liveChange=".onSearchNew"
-                                        />
-                                    </HBox>
+
                                     <ToolbarSpacer id="_IDGenToolbarSpacer5" />
                                     <Button
                                         id="_IDGenButton22"
@@ -447,23 +399,7 @@
                                     id="_IDGenOverflowToolbar12"
                                     style="Standard"
                                 >
-                                    <HBox
-                                        id="_IDGenHBox18"
-                                        alignItems="Center"
-                                        columnGap="0.5rem"
-                                    >
-                                        <core:Icon
-                                            id="_IDGenIcon11"
-                                            src="sap-icon://search"
-                                        />
-                                        <Input
-                                            id="_IDGenInput6"
-                                            showClearIcon="true"
-                                            width="25rem"
-                                            placeholder="Search..."
-                                            liveChange=".onSearchReport"
-                                        />
-                                    </HBox>
+
                                     <ToolbarSpacer id="_IDGenToolbarSpacer7" />
                                     <Button
                                         id="_IDGenButton31"
