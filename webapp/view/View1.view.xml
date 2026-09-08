@@ -262,6 +262,18 @@
                             rowMode="Auto"
                             rowSelectionChange=".onMissPunchSelectionChange"
                         >
+                         <!-- ADD THIS -->
+    <t:rowSettingsTemplate>
+        <t:RowSettings id="_IDGenRowSettings"
+            highlight="{
+                parts: [
+                    { path: 'mainService>Zpunchintime' },
+                    { path: 'mainService>Zpunchouttime' }
+                ],
+                formatter: '.formatMissPunchHighlight'
+            }"
+        />
+    </t:rowSettingsTemplate>
                             <t:noData>
                                 <VBox
                                     id="_IDGenVBoxMP"

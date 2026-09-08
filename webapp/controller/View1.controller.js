@@ -151,7 +151,19 @@ sap.ui.define([
                 table.getSelectedIndices().length > 0
             );
         },
+        // Add near isPunchInEditable / isPunchOutEditable
+        formatMissPunchHighlight(punchIn, punchOut) {
+            const inStr = ODataUtils.formatEdmTime(punchIn);
+            const outStr = ODataUtils.formatEdmTime(punchOut);
 
+            const missingIn = !inStr || inStr === "00:00:00";
+            const missingOut = !outStr || outStr === "00:00:00";
+
+            if (missingIn && missingOut) { return "Error"; }      // both missing → red
+            if (missingIn) { return "Warning"; }                  // punch-in missing → orange
+            if (missingOut) { return "Information"; }             // punch-out missing → blue
+            return "None";                                        // nothing missing → no highlight
+        },
         isPunchOutEditable(punchIn, punchOut) {
             const inStr = ODataUtils.formatEdmTime(punchIn);
             const outStr = ODataUtils.formatEdmTime(punchOut);
@@ -383,15 +395,18 @@ sap.ui.define([
             if (!context) { return; }
             this._navigateToDetailPage(context.getObject(), "current");
         },
+        // NEW
         onAutofillMissPunch() {
             const table = this.byId("missPunchTable");
             const binding = table.getBinding("rows");
             if (!binding) { return; }
 
-            const selectedIndices = table.getSelectedIndices();
-            const indices = selectedIndices.length > 0
-                ? selectedIndices
-                : Array.from({ length: binding.getLength() }, (_, i) => i);
+            const indices = table.getSelectedIndices();
+
+            if (indices.length === 0) {
+                sap.m.MessageToast.show("Please select at least one record to autofill.");
+                return;
+            }
 
             let updatedCount = 0;
 
@@ -414,8 +429,8 @@ sap.ui.define([
             });
 
             sap.m.MessageToast.show(updatedCount > 0
-                ? "Autofilled Punch In/Out from Scheduled times."
-                : "No editable punch fields to autofill.");
+                ? "Autofilled Punch In/Out for selected record(s)."
+                : "No editable punch fields to autofill for the selected record(s).");
         },
     });
 });
