@@ -179,9 +179,9 @@
                             />
                             <Button
                                 id="_IDGenButton34"
-                                text="HC Dialog"
+                                text="Employee HC Conversation"
                                 type="Ghost"
-                                width="10rem"
+                                width="14rem"
                                 visible="{= ${/isEditOn} }"
                                 enabled="{= ${/isEditOn} }"
                                 press=".onViewHCDialog"
