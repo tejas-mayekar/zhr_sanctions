@@ -58,16 +58,16 @@ sap.ui.define([
     const MISS_PUNCH_COLUMNS = [
         { label: "Employee ID", binding: "ZempId", width: "6rem", sortProperty: "ZempId", filterProperty: "ZempId", visible: true },
         { label: "Employee Name", binding: "ZempName", width: "14rem", sortProperty: "ZempName", filterProperty: "ZempName", visible: true },
-        { label: "Scheduled In Date", binding: "ZschDateIn", width: "14rem", sortProperty: "ZschDateIn", filterProperty: "ZschDateIn", visible: true, isDate: true },
-        { label: "Sheduled Out Date", binding: "ZschDateOut", width: "14rem", sortProperty: "ZschDateOut", filterProperty: "ZschDateOut", visible: true, isDate: true },
-        { label: "Scheduled In", binding: "ZschTimeIn", width: "12rem", sortProperty: "ZschTimeIn", filterProperty: "ZschTimeIn", visible: true, isTime: true },
-        { label: "Scheduled Out", binding: "ZschTimeOut", width: "12rem", sortProperty: "ZschTimeOut", filterProperty: "ZschTimeOut", visible: true, isTime: true },
+        { label: "Scheduled In Date", binding: "ZschDateIn", width: "8rem", sortProperty: "ZschDateIn", filterProperty: "ZschDateIn", visible: true, isDate: true },
+        { label: "Scheduled  Out Date", binding: "ZschDateOut", width: "8rem", sortProperty: "ZschDateOut", filterProperty: "ZschDateOut", visible: true, isDate: true },
+        { label: "Scheduled In", binding: "ZschTimeIn", width: "8rem", sortProperty: "ZschTimeIn", filterProperty: "ZschTimeIn", visible: true, isTime: true },
+        { label: "Scheduled Out", binding: "ZschTimeOut", width: "8rem", sortProperty: "ZschTimeOut", filterProperty: "ZschTimeOut", visible: true, isTime: true },
         {
-            label: "Punch In Time", binding: "Zpunchintime", width: "12rem", sortProperty: "Zpunchintime", filterProperty: "Zpunchintime", visible: true, isTime: true,
+            label: "Punch In Time", binding: "Zpunchintime", width: "8rem", sortProperty: "Zpunchintime", filterProperty: "Zpunchintime", visible: true, isTime: true,
             editableConfig: { dependsOn: "Zpunchouttime", formatter: null, onChange: null }
         },
         {
-            label: "Punch Out Time", binding: "Zpunchouttime", width: "12rem", sortProperty: "Zpunchouttime", filterProperty: "Zpunchouttime", visible: true, isTime: true,
+            label: "Punch Out Time", binding: "Zpunchouttime", width: "8rem", sortProperty: "Zpunchouttime", filterProperty: "Zpunchouttime", visible: true, isTime: true,
             editableConfig: { dependsOn: "Zpunchintime", formatter: null, onChange: null }
         },
         { label: "Manager ID", binding: "ZmanagerId", width: "10rem", sortProperty: "ZmanagerId", filterProperty: "ZmanagerId", visible: true },
