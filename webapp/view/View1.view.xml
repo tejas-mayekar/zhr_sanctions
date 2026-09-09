@@ -358,6 +358,7 @@
                                         text="Autofill Sch. Times"
                                         type="Ghost"
                                         tooltip="Fill Punch In/Out with Scheduled In/Out"
+                                        enabled="{= ${/hasMissPunchSelection} }"
                                         press=".onAutofillMissPunch"
                                     />
                                     <Button
