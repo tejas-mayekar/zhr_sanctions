@@ -99,8 +99,17 @@
                         <HBox
                             id="_IDGenHBox7"
                             justifyContent="SpaceBetween"
-                            width="41rem"
+                            width="51rem"
                         >
+                            <Button
+                                id="_IDGenButton34"
+                                text="HC Dialog"
+                                type="Ghost"
+                                width="10rem"
+                                visible="{= ${/isEditOn} }"
+                                enabled="{= ${/isEditOn} }"
+                                press=".onViewHCDialog"
+                            />
                             <Button
                                 id="_IDGenButton15"
                                 text="Take Actions"
@@ -129,14 +138,14 @@
                                 press=".onPayrollDeductionPress"
                             />
                             <Button
-    id="_IDGenButton33"
-    text="Send Back to LM"
-    type="Ghost"
-    width="10rem"
-    visible="{= ${/isEditOn} }"
-    enabled="{= ${/isEditOn} }"
-    press=".onSendBackToLMPress"
-/>
+                                id="_IDGenButton33"
+                                text="Send Back to LM"
+                                type="Ghost"
+                                width="10rem"
+                                visible="{= ${/isEditOn} }"
+                                enabled="{= ${/isEditOn} }"
+                                press=".onSendBackToLMPress"
+                            />
                         </HBox>
                         <Button
                             id="btnAppeal"

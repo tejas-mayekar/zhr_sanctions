@@ -34,13 +34,79 @@ sap.ui.define([
             this.getView().setModel(new JSONModel({ ...EMPTY_ACTION_STATE }), "regularize");
             this.getView().setModel(new JSONModel({ questions: [{ value: "" }] }), "questions");
 
+            this.getView().setModel(new JSONModel({ pairs: [] }), "qa");
+
             this.getOwnerComponent()
                 .getRouter()
                 .getRoute("RouteHCViolationDetailpage")
                 .attachPatternMatched(this._onRouteMatched, this);
             this._pendingFiles = [];
         },
+        onViewHCDialog() {
+            if (!this._hcChatDialog) {
+                this._hcChatDialog = sap.ui.xmlfragment(
+                    this.getView().getId(),
+                    "zhrsanctions.view.fragments.HCDialog",
+                    this
+                );
+                this.getView().addDependent(this._hcChatDialog);
+            }
+            this._hcChatDialog.open();
+        },
 
+        onCloseHCDialog() {
+            this._hcChatDialog.close();
+        },
+
+        /**
+         * Append a new empty Question/Answer row.
+         */
+        onAddQAPair() {
+            const qaModel = this.getView().getModel("qa");
+            const pairs = qaModel.getProperty("/pairs") || [];
+            pairs.push({ question: "", answer: "" });
+            qaModel.setProperty("/pairs", pairs);
+        },
+
+        /**
+         * Remove the Question/Answer row the delete button was pressed on.
+         */
+        onRemoveQAPair(oEvent) {
+            const ctx = oEvent.getSource().getBindingContext("qa");
+            if (!ctx) { return; }
+
+            const path = ctx.getPath();               // e.g. "/pairs/2"
+            const index = parseInt(path.split("/").pop(), 10);
+
+            const qaModel = this.getView().getModel("qa");
+            const pairs = qaModel.getProperty("/pairs") || [];
+            pairs.splice(index, 1);
+            qaModel.setProperty("/pairs", pairs);
+        },
+
+        /**
+         * Collect all non-empty Q&A pairs as JSON.
+         * Wire this into an OData create/update call if persistence is needed.
+         */
+        onSaveQAPairs() {
+            const qaModel = this.getView().getModel("qa");
+            const pairs = qaModel.getProperty("/pairs") || [];
+
+            const validPairs = pairs.filter(p => (p.question || "").trim() && (p.answer || "").trim());
+
+            if (!validPairs.length) {
+                sap.m.MessageBox.warning("Please add at least one complete question and answer.");
+                return;
+            }
+
+            const jsonPayload = JSON.stringify(validPairs, null, 2);
+            console.log("QA JSON payload:", jsonPayload);
+
+            // TODO: persist jsonPayload via ODataUtils / a dedicated entity set if required
+
+            sap.m.MessageToast.show("Questions & answers saved.");
+            this._hcChatDialog.close();
+        },
         _onRouteMatched() {
             const detailModel = this.getOwnerComponent().getModel("detailData");
             if (detailModel) {

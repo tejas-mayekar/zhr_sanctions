@@ -58,16 +58,16 @@ sap.ui.define([
     const MISS_PUNCH_COLUMNS = [
         { label: "Employee ID", binding: "ZempId", width: "6rem", sortProperty: "ZempId", filterProperty: "ZempId", visible: true },
         { label: "Employee Name", binding: "ZempName", width: "14rem", sortProperty: "ZempName", filterProperty: "ZempName", visible: true },
-        { label: "Scheduled In Date", binding: "ZschDateIn", width: "14rem", sortProperty: "ZschDateIn", filterProperty: "ZschDateIn", visible: true, isDate: true },
-        { label: "Sheduled Out Date", binding: "ZschDateOut", width: "14rem", sortProperty: "ZschDateOut", filterProperty: "ZschDateOut", visible: true, isDate: true },
-        { label: "Scheduled In", binding: "ZschTimeIn", width: "12rem", sortProperty: "ZschTimeIn", filterProperty: "ZschTimeIn", visible: true, isTime: true },
-        { label: "Scheduled Out", binding: "ZschTimeOut", width: "12rem", sortProperty: "ZschTimeOut", filterProperty: "ZschTimeOut", visible: true, isTime: true },
+        { label: "Scheduled In Date", binding: "ZschDateIn", width: "8rem", sortProperty: "ZschDateIn", filterProperty: "ZschDateIn", visible: true, isDate: true },
+        { label: "Scheduled  Out Date", binding: "ZschDateOut", width: "8rem", sortProperty: "ZschDateOut", filterProperty: "ZschDateOut", visible: true, isDate: true },
+        { label: "Scheduled In", binding: "ZschTimeIn", width: "8rem", sortProperty: "ZschTimeIn", filterProperty: "ZschTimeIn", visible: true, isTime: true },
+        { label: "Scheduled Out", binding: "ZschTimeOut", width: "8rem", sortProperty: "ZschTimeOut", filterProperty: "ZschTimeOut", visible: true, isTime: true },
         {
-            label: "Punch In Time", binding: "Zpunchintime", width: "12rem", sortProperty: "Zpunchintime", filterProperty: "Zpunchintime", visible: true, isTime: true,
+            label: "Punch In Time", binding: "Zpunchintime", width: "8rem", sortProperty: "Zpunchintime", filterProperty: "Zpunchintime", visible: true, isTime: true,
             editableConfig: { dependsOn: "Zpunchouttime", formatter: null, onChange: null }
         },
         {
-            label: "Punch Out Time", binding: "Zpunchouttime", width: "12rem", sortProperty: "Zpunchouttime", filterProperty: "Zpunchouttime", visible: true, isTime: true,
+            label: "Punch Out Time", binding: "Zpunchouttime", width: "8rem", sortProperty: "Zpunchouttime", filterProperty: "Zpunchouttime", visible: true, isTime: true,
             editableConfig: { dependsOn: "Zpunchintime", formatter: null, onChange: null }
         },
         { label: "Manager ID", binding: "ZmanagerId", width: "10rem", sortProperty: "ZmanagerId", filterProperty: "ZmanagerId", visible: true },
@@ -151,7 +151,19 @@ sap.ui.define([
                 table.getSelectedIndices().length > 0
             );
         },
+        // Add near isPunchInEditable / isPunchOutEditable
+        formatMissPunchHighlight(punchIn, punchOut) {
+            const inStr = ODataUtils.formatEdmTime(punchIn);
+            const outStr = ODataUtils.formatEdmTime(punchOut);
 
+            const missingIn = !inStr || inStr === "00:00:00";
+            const missingOut = !outStr || outStr === "00:00:00";
+
+            if (missingIn && missingOut) { return "Error"; }      // both missing → red
+            if (missingIn) { return "Warning"; }                  // punch-in missing → orange
+            if (missingOut) { return "Information"; }             // punch-out missing → blue
+            return "None";                                        // nothing missing → no highlight
+        },
         isPunchOutEditable(punchIn, punchOut) {
             const inStr = ODataUtils.formatEdmTime(punchIn);
             const outStr = ODataUtils.formatEdmTime(punchOut);
@@ -383,15 +395,18 @@ sap.ui.define([
             if (!context) { return; }
             this._navigateToDetailPage(context.getObject(), "current");
         },
+        // NEW
         onAutofillMissPunch() {
             const table = this.byId("missPunchTable");
             const binding = table.getBinding("rows");
             if (!binding) { return; }
 
-            const selectedIndices = table.getSelectedIndices();
-            const indices = selectedIndices.length > 0
-                ? selectedIndices
-                : Array.from({ length: binding.getLength() }, (_, i) => i);
+            const indices = table.getSelectedIndices();
+
+            if (indices.length === 0) {
+                sap.m.MessageToast.show("Please select at least one record to autofill.");
+                return;
+            }
 
             let updatedCount = 0;
 
@@ -414,8 +429,8 @@ sap.ui.define([
             });
 
             sap.m.MessageToast.show(updatedCount > 0
-                ? "Autofilled Punch In/Out from Scheduled times."
-                : "No editable punch fields to autofill.");
+                ? "Autofilled Punch In/Out for selected record(s)."
+                : "No editable punch fields to autofill for the selected record(s).");
         },
     });
 });

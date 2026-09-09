@@ -109,7 +109,23 @@
                                     id="_IDGenOverflowToolbar"
                                     style="Standard"
                                 >
-                                    
+                                    <HBox
+                                        id="_IDGenHBox"
+                                        alignItems="Center"
+                                        columnGap="0.5rem"
+                                    >
+                                        <core:Icon
+                                            id="_IDGenIcon1"
+                                            src="sap-icon://search"
+                                        />
+                                        <Input
+                                            id="currentSearch"
+                                            showClearIcon="true"
+                                            width="25rem"
+                                            placeholder="Search..."
+                                            liveChange=".onSearchCurrent"
+                                        />
+                                    </HBox>
                                     <ToolbarSpacer id="_IDGenToolbarSpacer" />
                                     <Button
                                         id="_IDGenButton"
@@ -212,23 +228,7 @@
                                     id="_IDGenOverflowToolbar2"
                                     style="Standard"
                                 >
-                                    <HBox
-                                        id="_IDGenHBox1"
-                                        alignItems="Center"
-                                        columnGap="0.5rem"
-                                    >
-                                        <core:Icon
-                                            id="_IDGenIcon3"
-                                            src="sap-icon://search"
-                                        />
-                                        <Input
-                                            id="historySearch"
-                                            showClearIcon="true"
-                                            width="25rem"
-                                            placeholder="Search..."
-                                            liveChange=".onSearchHistory"
-                                        />
-                                    </HBox>
+
                                     <ToolbarSpacer id="_IDGenToolbarSpacer1" />
                                     <Button
                                         id="_IDGenButton1"
@@ -278,6 +278,18 @@
                             rowMode="Auto"
                             rowSelectionChange=".onMissPunchSelectionChange"
                         >
+                         <!-- ADD THIS -->
+    <t:rowSettingsTemplate>
+        <t:RowSettings id="_IDGenRowSettings"
+            highlight="{
+                parts: [
+                    { path: 'mainService>Zpunchintime' },
+                    { path: 'mainService>Zpunchouttime' }
+                ],
+                formatter: '.formatMissPunchHighlight'
+            }"
+        />
+    </t:rowSettingsTemplate>
                             <t:noData>
                                 <VBox
                                     id="_IDGenVBoxMP"
@@ -325,23 +337,7 @@
                                     id="_IDGenOverflowToolbarMP"
                                     style="Standard"
                                 >
-                                    <HBox
-                                        id="_IDGenHBoxMP"
-                                        alignItems="Center"
-                                        columnGap="0.5rem"
-                                    >
-                                        <core:Icon
-                                            id="_IDGenIconMP2"
-                                            src="sap-icon://search"
-                                        />
-                                        <Input
-                                            id="missPunchSearch"
-                                            showClearIcon="true"
-                                            width="25rem"
-                                            placeholder="Search..."
-                                            liveChange=".onSearchMissPunch"
-                                        />
-                                    </HBox>
+
                                     <ToolbarSpacer id="_IDGenToolbarSpacerMP" />
 
                                     <Button
