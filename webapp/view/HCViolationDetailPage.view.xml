@@ -102,15 +102,6 @@
                             width="51rem"
                         >
                             <Button
-                                id="_IDGenButton34"
-                                text="HC Dialog"
-                                type="Ghost"
-                                width="10rem"
-                                visible="{= ${/isEditOn} }"
-                                enabled="{= ${/isEditOn} }"
-                                press=".onViewHCDialog"
-                            />
-                            <Button
                                 id="_IDGenButton15"
                                 text="Take Actions"
                                 type="Reject"
@@ -185,6 +176,15 @@
                                 icon="sap-icon://comment"
                                 text="View Remarks"
                                 press=".onViewRemarkPress"
+                            />
+                            <Button
+                                id="_IDGenButton34"
+                                text="HC Dialog"
+                                type="Ghost"
+                                width="10rem"
+                                visible="{= ${/isEditOn} }"
+                                enabled="{= ${/isEditOn} }"
+                                press=".onViewHCDialog"
                             />
                         </OverflowToolbar>
                     </headerToolbar>
