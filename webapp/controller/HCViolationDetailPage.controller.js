@@ -99,6 +99,16 @@ sap.ui.define([
                 return;
             }
 
+            // Mark all pairs that have both question and answer as confirmed —
+            // this disables their delete button once saved.
+            const updatedPairs = pairs.map(p => {
+                if ((p.question || "").trim() && (p.answer || "").trim()) {
+                    return { ...p, confirmed: true };
+                }
+                return p;
+            });
+            qaModel.setProperty("/pairs", updatedPairs);
+
             const jsonPayload = JSON.stringify(validPairs, null, 2);
             console.log("QA JSON payload:", jsonPayload);
 

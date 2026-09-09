@@ -99,7 +99,7 @@
                         <HBox
                             id="_IDGenHBox7"
                             justifyContent="SpaceBetween"
-                            width="51rem"
+                            width="41rem"
                         >
                             <Button
                                 id="_IDGenButton15"
