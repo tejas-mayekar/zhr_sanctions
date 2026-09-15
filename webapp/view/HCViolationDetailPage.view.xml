@@ -99,7 +99,7 @@
                         <HBox
                             id="_IDGenHBox7"
                             justifyContent="SpaceBetween"
-                            width="51rem"
+                            width="41rem"
                         >
                             <Button
                                 id="_IDGenButton15"
@@ -151,7 +151,6 @@
             </f:DynamicPageHeader>
         </f:header>
 
-        <!-- ─── Content ─── -->
         <f:content>
             <VBox
                 id="_IDGenVBox11"
@@ -179,9 +178,9 @@
                             />
                             <Button
                                 id="_IDGenButton34"
-                                text="HC Dialog"
+                                text="Employee HC Conversation"
                                 type="Ghost"
-                                width="10rem"
+                                width="14rem"
                                 visible="{= ${/isEditOn} }"
                                 enabled="{= ${/isEditOn} }"
                                 press=".onViewHCDialog"

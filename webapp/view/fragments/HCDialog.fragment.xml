@@ -46,6 +46,7 @@
                                 alignItems="Center"
                                 width="100%"
                             >
+                            <Label text="Question" width="5rem"/>
                                 <Input
                                     id="qaQuestionInput"
                                     value="{qa>question}"
@@ -58,18 +59,22 @@
                                     icon="sap-icon://delete"
                                     type="Transparent"
                                     tooltip="Remove"
+                                    enabled="{= !${qa>confirmed} }"
                                     press=".onRemoveQAPair"
                                 />
                             </HBox>
+                            <HBox width="100%">
+                            <Label text="Answer" width="5rem"/>
                             <TextArea
                                 id="qaAnswerText"
                                 value="{qa>answer}"
                                 placeholder="Enter answer"
-                                rows="2"
-                                width="100%"
+                                rows="4"
+                                width="35rem"
                                 growing="true"
                                 class="sapUiTinyMarginTop"
                             />
+                            </HBox>
                         </VBox>
                     </CustomListItem>
                 </List>

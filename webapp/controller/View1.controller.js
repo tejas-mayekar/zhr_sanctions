@@ -113,6 +113,8 @@ sap.ui.define([
             this.byId("currentTable").attachFilter(this._onColumnFilter.bind(this, "current"));
             this.byId("historyTable").attachFilter(this._onColumnFilter.bind(this, "history"));
             this.byId("missPunchTable").attachFilter(this._onColumnFilter.bind(this, "missPunch"));
+
+            this.getView().getModel().setProperty("/hasMissPunchSelection", false);
             setTimeout(() => this._loadCurrentViolations(), 0);
         },
         _onColumnFilter(context, oEvent) {
