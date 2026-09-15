@@ -126,9 +126,8 @@ sap.ui.define([
                 !punchIn || !scheduledIn || punchInSec > scheduledInSec
             );
 
-            const hasShort = isNonZeroTime(record.ZshortHrs) && (
-                !punchOut || !scheduledOut || punchOutSec < scheduledOutSec
-            );
+            const shortHrsSec = this.shortHrsToSeconds(record.ZshortHrs);
+            const hasShort = shortHrsSec > 0;
 
             const hasBoth = hasDelay && hasShort;
             const mode = hasBoth ? "both" : hasDelay ? "delay" : "short";
@@ -155,7 +154,7 @@ sap.ui.define([
 
                 delayFrom: scheduledIn,
                 delayTo: this.secondsToTimeString(this.timeStringToSeconds(punchIn) - 1),
-                shortFrom: this.secondsToTimeString(this.timeStringToSeconds(punchOut) + 1),
+                shortFrom: this.secondsToTimeString(this.timeStringToSeconds(scheduledOut) - shortHrsSec),
                 shortTo: scheduledOut,
 
                 reason: "",

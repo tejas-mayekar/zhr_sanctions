@@ -194,8 +194,9 @@ sap.ui.define([
             const pInSec = isOvernight ? this.normalizeOvernightSeconds(schInSec, this.timeStringToSeconds(pIn)) : this.timeStringToSeconds(pIn);
             const pOutSec = isOvernight ? this.normalizeOvernightSeconds(schInSec, this.timeStringToSeconds(pOut)) : this.timeStringToSeconds(pOut);
 
+            const shortHrsSec = this.shortHrsToSeconds(record.ZshortHrs);
             const hasDelay = schIn && pIn && pInSec > schInSec;
-            const hasShort = schOut && pOut && pOutSec < schOutSec;
+            const hasShort = shortHrsSec > 0;
             const hasBoth = hasDelay && hasShort;
             const mode = hasBoth ? "both" : hasDelay ? "delay" : "short";
 
@@ -218,7 +219,7 @@ sap.ui.define([
                 mode: hasUnauth ? "unauth" : mode,
                 delayFrom: schIn,
                 delayTo: this.secondsToTimeString(this.timeStringToSeconds(pIn) - 1),
-                shortFrom: this.secondsToTimeString(this.timeStringToSeconds(pOut) + 1),
+                shortFrom: this.secondsToTimeString(this.timeStringToSeconds(schOut) - shortHrsSec),
                 shortTo: schOut,
                 reason: "",
                 lmreason: "",
