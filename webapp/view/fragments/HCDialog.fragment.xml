@@ -41,40 +41,84 @@
                             class="sapUiSmallMarginBottom sapUiSmallMarginTop"
                             width="100%"
                         >
-                            <HBox
-                                id="qaQuestionRow"
-                                alignItems="Center"
+                            <!-- ══ READ-ONLY view (loaded from QNA_SETSet) ══ -->
+                            <VBox
+                                id="qaDisplayBox"
+                                visible="{= !!${qa>confirmed} }"
+                                class="sapUiTinyMarginBottom"
                                 width="100%"
                             >
-                            <Label text="Question" width="5rem"/>
-                                <Input
-                                    id="qaQuestionInput"
-                                    value="{qa>question}"
-                                    placeholder="Enter question"
-                                    width="35rem"
-                                    class="sapUiTinyMarginEnd"
-                                />
-                                <Button
-                                    id="btnRemoveQAPair"
-                                    icon="sap-icon://delete"
-                                    type="Transparent"
-                                    tooltip="Remove"
-                                    enabled="{= !${qa>confirmed} }"
-                                    press=".onRemoveQAPair"
-                                />
-                            </HBox>
-                            <HBox width="100%">
-                            <Label text="Answer" width="5rem"/>
-                            <TextArea
-                                id="qaAnswerText"
-                                value="{qa>answer}"
-                                placeholder="Enter answer"
-                                rows="4"
-                                width="35rem"
-                                growing="true"
-                                class="sapUiTinyMarginTop"
-                            />
-                            </HBox>
+                                <HBox id="qaQuestionDisplayRow" alignItems="Start" width="100%">
+                                    <Label
+                                        id="qaQuestionLabel"
+                                        text="Q:"
+                                        width="2rem"
+                                        design="Bold"
+                                        class="sapUiTinyMarginEnd"
+                                    />
+                                    <Text
+                                        id="qaQuestionText"
+                                        text="{qa>question}"
+                                        wrapping="true"
+                                        width="38rem"
+                                    />
+                                </HBox>
+                                <HBox id="qaAnswerDisplayRow" alignItems="Start" width="100%" class="sapUiTinyMarginTop">
+                                    <Label
+                                        id="qaAnswerLabel"
+                                        text="A:"
+                                        width="2rem"
+                                        design="Bold"
+                                        class="sapUiTinyMarginEnd"
+                                    />
+                                    <Text
+                                        id="qaAnswerText"
+                                        text="{qa>answer}"
+                                        wrapping="true"
+                                        width="38rem"
+                                    />
+                                </HBox>
+                            </VBox>
+
+                            <!-- ══ EDITABLE view (new pairs added by user) ══ -->
+                            <VBox
+                                id="qaEditBox"
+                                visible="{= !${qa>confirmed} }"
+                                width="100%"
+                            >
+                                <HBox
+                                    id="qaQuestionRow"
+                                    alignItems="Center"
+                                    width="100%"
+                                >
+                                    <Label text="Question" width="5rem"/>
+                                    <Input
+                                        id="qaQuestionInput"
+                                        value="{qa>question}"
+                                        placeholder="Enter question"
+                                        width="33rem"
+                                        class="sapUiTinyMarginEnd"
+                                    />
+                                    <Button
+                                        id="btnRemoveQAPair"
+                                        icon="sap-icon://delete"
+                                        type="Transparent"
+                                        tooltip="Remove"
+                                        press=".onRemoveQAPair"
+                                    />
+                                </HBox>
+                                <HBox width="100%" class="sapUiTinyMarginTop">
+                                    <Label text="Answer" width="5rem"/>
+                                    <TextArea
+                                        id="qaAnswerInput"
+                                        value="{qa>answer}"
+                                        placeholder="Enter answer"
+                                        rows="4"
+                                        width="33rem"
+                                        growing="true"
+                                    />
+                                </HBox>
+                            </VBox>
                         </VBox>
                     </CustomListItem>
                 </List>
