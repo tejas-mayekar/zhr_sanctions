@@ -263,8 +263,8 @@
                 <Key>
                     <PropertyRef Name="ZactionRefNo"/>
                 </Key>
-                <Property Name="ZactionRefNo" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Action reference Num" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="ZitemNo" Type="Edm.String" Nullable="false" MaxLength="3" sap:unicode="false" sap:label="Dummy" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="ZactionRefNo" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Action reference Num" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="Filename" Type="Edm.String" Nullable="false" MaxLength="30" sap:unicode="false" sap:label="30 Characters" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
             </EntityType>
             <EntityType Name="CASE_REOPEN" sap:content-version="1">
@@ -402,6 +402,13 @@
                 <Property Name="Zpunchoutdate" Type="Edm.DateTime" Precision="7" sap:unicode="false" sap:label="Punch Date" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="Zpunchouttime" Type="Edm.Time" Precision="0" sap:unicode="false" sap:label="Punch Out Time" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
             </EntityType>
+            <EntityType Name="QNA_SET" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="ZactionRefNo"/>
+                </Key>
+                <Property Name="ZactionRefNo" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Action reference Num" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Tdline" Type="Edm.String" Nullable="false" MaxLength="132" sap:unicode="false" sap:label="Text Line" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+            </EntityType>
             <EntityContainer Name="ZHR_SACTIONS_APPLICATION_SRV_Entities" m:IsDefaultEntityContainer="true" sap:supported-formats="atom json xlsx">
                 <EntitySet Name="HDR_STRSet" EntityType="ZHR_SACTIONS_APPLICATION_SRV.HDR_STR" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1"/>
                 <EntitySet Name="ITM_STRSet" EntityType="ZHR_SACTIONS_APPLICATION_SRV.ITM_STR" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1"/>
@@ -418,6 +425,7 @@
                 <EntitySet Name="HC_REPORTSet" EntityType="ZHR_SACTIONS_APPLICATION_SRV.HC_REPORT" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:content-version="1"/>
                 <EntitySet Name="MissPunchSet" EntityType="ZHR_SACTIONS_APPLICATION_SRV.MissPunch" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:content-version="1"/>
                 <EntitySet Name="UPDATE_MISS_PUNCHSet" EntityType="ZHR_SACTIONS_APPLICATION_SRV.UPDATE_MISS_PUNCH" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:content-version="1"/>
+                <EntitySet Name="QNA_SETSet" EntityType="ZHR_SACTIONS_APPLICATION_SRV.QNA_SET" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:content-version="1"/>
             </EntityContainer>
             <atom:link rel="self" href="/sap/opu/odata/sap/ZHR_SACTIONS_APPLICATION_SRV/$metadata" xmlns:atom="http://www.w3.org/2005/Atom"/>
             <atom:link rel="latest-version" href="/sap/opu/odata/sap/ZHR_SACTIONS_APPLICATION_SRV/$metadata" xmlns:atom="http://www.w3.org/2005/Atom"/>

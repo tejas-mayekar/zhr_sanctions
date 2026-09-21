@@ -52,6 +52,77 @@ sap.ui.define([
                 this.getView().addDependent(this._hcChatDialog);
             }
             this._hcChatDialog.open();
+
+            // Load Q&A data from backend whenever the dialog is opened
+            const violationRec = this.getView().getModel("detailData")?.getData()?.record;
+            this.loadQnA(violationRec);
+        },
+
+        /**
+         * Fetch QNA_SETSet for the given violation record and populate the "qa" model.
+         *
+         * The entity set stores long text as consecutive Tdline rows (max 132 chars each).
+         * Lines prefixed with "Q:" start a new question block.
+         * Lines prefixed with "A:" start an answer block.
+         * All other lines continue the current block (long-text wrap).
+         */
+        loadQnA(violationRec) {
+            if (!violationRec) { return; }
+            const actionRefNo = violationRec.ZactionRefNo || violationRec.ZACTION_REF_NO;
+            if (!actionRefNo) { return; }
+
+            const oDataModel = this.getOwnerComponent().getModel();
+            oDataModel.setUseBatch(false);
+
+            const Filter = sap.ui.model.Filter;
+            const FilterOperator = sap.ui.model.FilterOperator;
+
+            oDataModel.read("/QNA_SETSet", {
+                filters: [new Filter("ZactionRefNo", FilterOperator.EQ, actionRefNo)],
+                success: (data) => {
+                    const rows = (data.results || []).map(r => r.Tdline || "");
+                    const pairs = [];
+                    let current = null; // { question: string, answer: string }
+                    let mode = null;   // "Q" | "A"
+
+                    // Matches Q1:, Q2:, A1:, A2: etc. (case-insensitive)
+                    const Q_RE = /^[Qq]\d+:/;
+                    const A_RE = /^[Aa]\d+:/;
+
+                    rows.forEach((line) => {
+                        const qMatch = Q_RE.exec(line);
+                        const aMatch = A_RE.exec(line);
+
+                        if (qMatch) {
+                            // Save previous pair before starting a new question
+                            if (current) { pairs.push(current); }
+                            current = { question: line.slice(qMatch[0].length).trimStart(), answer: "", confirmed: true };
+                            mode = "Q";
+                        } else if (aMatch) {
+                            if (!current) {
+                                current = { question: "", answer: "", confirmed: true };
+                            }
+                            current.answer = line.slice(aMatch[0].length).trimStart();
+                            mode = "A";
+                        } else {
+                            // Continuation line — append to active block
+                            if (current && mode === "Q") {
+                                current.question += line;
+                            } else if (current && mode === "A") {
+                                current.answer += line;
+                            }
+                        }
+                    });
+
+                    // Push the last pair
+                    if (current) { pairs.push(current); }
+
+                    this.getView().getModel("qa").setProperty("/pairs", pairs);
+                },
+                error: (err) => {
+                    console.error("QNA_SETSet fetch failed:", err);
+                }
+            });
         },
 
         onCloseHCDialog() {
@@ -290,8 +361,9 @@ sap.ui.define([
             const pInSec = isOvernight ? this.normalizeOvernightSeconds(schInSec, this.timeStringToSeconds(pIn)) : this.timeStringToSeconds(pIn);
             const pOutSec = isOvernight ? this.normalizeOvernightSeconds(schInSec, this.timeStringToSeconds(pOut)) : this.timeStringToSeconds(pOut);
 
+            const shortHrsSec = this.shortHrsToSeconds(record.ZshortHrs);
             const hasDelay = schIn && pIn && pInSec > schInSec;
-            const hasShort = schOut && pOut && pOutSec < schOutSec;
+            const hasShort = shortHrsSec > 0;
             const hasBoth = hasDelay && hasShort;
             const mode = hasBoth ? "both" : hasDelay ? "delay" : "short";
 
@@ -314,7 +386,7 @@ sap.ui.define([
                 mode: hasUnauth ? "unauth" : mode,
                 delayFrom: schIn,
                 delayTo: this.secondsToTimeString(this.timeStringToSeconds(pIn) - 1),
-                shortFrom: this.secondsToTimeString(this.timeStringToSeconds(pOut) + 1),
+                shortFrom: this.secondsToTimeString(this.timeStringToSeconds(schOut) - shortHrsSec),
                 shortTo: schOut,
                 reason: "",
                 lmreason: "",

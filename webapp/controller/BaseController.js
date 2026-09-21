@@ -68,7 +68,7 @@ sap.ui.define([
             const pOutSec = isOvernight ? this.normalizeOvernightSeconds(schInSec, this.timeStringToSeconds(pOut)) : this.timeStringToSeconds(pOut);
 
             const delay = schIn && pIn && pInSec > schInSec;
-            const short = schOut && pOut && pOutSec < schOutSec;
+            const short = this.shortHrsToSeconds(record.ZshortHrs) > 0;
             return delay || short;
         },
 
@@ -109,7 +109,14 @@ sap.ui.define([
             }
             return `<span style="background-color:${bg}; padding:2px 6px; color:${bg === "transparent" ? "#000" : "#fff"}; border-radius:3px;">${text}</span>`;
         },
-
+        shortHrsToSeconds(shortHrs) {
+            if (shortHrs === null || shortHrs === undefined || shortHrs === "") { return 0; }
+            if (typeof shortHrs === "string" && shortHrs.includes(":")) {
+                return this.timeStringToSeconds(shortHrs);
+            }
+            const num = parseFloat(shortHrs);
+            return isNaN(num) ? 0 : Math.round(num * 60); // treat plain numbers as minutes
+        },
         /**
          * Load media items for the active violation and bind them to the view model.
          */
